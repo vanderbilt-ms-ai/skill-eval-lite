@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 305" width="300" height="305" role="img" aria-labelledby="help-step-3-t help-step-3-d"><title id="help-step-3-t">Step 3: where the runs come from</title><desc id="help-step-3-d">In the terminal, run and then judge write skill-eval-lite/runs/&lt;name&gt;/bundle.json. Choose it under Your runs in step 3.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t3{fill:#5F6A73}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .s-term{stroke:#1C7C6E}
+.dg .h-term{fill:#1C7C6E}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+.dg .tw{fill:#1E2A33;stroke:#13202A}
+.dg .twbar{fill:#2B3945}
+.dg .twdot{fill:#5B6B78}
+.dg .tw-t{fill:#E6EDF3}
+.dg .tw-p{fill:#62D2C0}
+.dg .tw-o{fill:#A9B8C4}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t3{fill:#8593A0}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .s-term{stroke:#4CC0AE}
+.dg .h-term{fill:#4CC0AE}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+.dg .tw{fill:#0A0F13;stroke:#2A3640}
+.dg .twbar{fill:#18222A}
+.dg .twdot{fill:#5B6B78}
+.dg .tw-t{fill:#E6EDF3}
+.dg .tw-p{fill:#62D2C0}
+.dg .tw-o{fill:#A9B8C4}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="304" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Where the runs come from</text><g transform="translate(0 34)"><rect x="8" y="8" width="284" height="105" rx="10" class="tw"/><path d="M8 18 Q8 8 18 8 H282 Q292 8 292 18 V32 H8 Z" class="twbar"/><circle cx="22" cy="20" r="3.6" class="twdot"/><circle cx="35" cy="20" r="3.6" class="twdot"/><circle cx="48" cy="20" r="3.6" class="twdot"/><text x="150" y="24.5" font-size="11" class="tw-o" text-anchor="middle">Terminal</text><text x="22" y="60" font-size="12.5" class="m"><tspan class="tw-p">$ </tspan><tspan class="tw-t">python3 run_ab.py run …</tspan></text><text x="22" y="79" font-size="12.5" class="m"><tspan class="tw-p">$ </tspan><tspan class="tw-t">python3 run_ab.py judge</tspan></text><text x="37.5" y="98" font-size="12.5" class="m"><tspan class="tw-t">runs/&lt;name&gt;</tspan></text></g><path d="M30 159 L30 174" class="ln s-term"/><path d="M30 181 L25.2 172 L34.8 172 Z" class="h-term"/><text x="42" y="174" font-size="10.5" class="t3 it">they write</text><path transform="translate(12 184) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="32" y="195.5" font-size="11.5" class="m">skill-eval-lite/runs/&lt;name&gt;/</text><path d="M18 204 V217 H25" class="ln thin s-rule"/><g transform="translate(28 205) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="48" y="217.5" font-size="11.5" class="m b t-web">bundle.json</text><text x="288" y="217.5" font-size="10.5" class="t3 it" text-anchor="end">every answer</text><path d="M30 225 L30 240" class="ln s-web"/><path d="M30 247 L25.2 238 L34.8 238 Z" class="h-web"/><text x="42" y="240" font-size="10.5" class="t3 it">choose it</text><rect x="12" y="253" width="276" height="40" rx="8" class="f-web dash"/><rect x="22" y="265" width="17" height="14" rx="3" class="f-web"/><path d="M22 269.5 L39 269.5" class="ln s-web thin"/><circle cx="25" cy="267.3" r="0.9" class="h-web"/><circle cx="27.6" cy="267.3" r="0.9" class="h-web"/><text x="46" y="277.5" font-size="12" class="b t-web">Step 3: under “Your runs”</text></svg>

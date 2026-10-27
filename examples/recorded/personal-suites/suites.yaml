@@ -1,0 +1,96 @@
+# Two suites of tests for Personal I, on the class assistant (Wren, for Morgan
+# Reyes: fictional). A worked example for Skill Eval Lite's checks-only mode:
+#
+#     python3 run_ab.py suite examples/personal-suites/suites.yaml --out runs/personal-suites
+#
+# Each suite's items are folders under product/, stage/ or process/; its
+# control cases are folders under controls/<suite>/, each with expect.json;
+# its tests' files are under tests/<test>/. Paths are relative to this file.
+schema: skill-eval-lite/suites@1
+title: Board drafts and how Wren prepares a brief
+
+suites:
+  - id: board-drafts
+    object: product
+    what: >
+      Drafts that Wren writes for the Riverside board or its finance committee,
+      which Morgan sends under their own name. Six real drafts, made by the
+      class assistant's demonstration runs on 2026-10-26.
+    file: output.md
+    items: [summary-1, summary-2, summary-3, summary-4, note-1, note-2]
+    tests:
+      - id: no-shorthand
+        kind: mechanical
+        question: Does the committee's shorthand (Q1, cttee, mtg) reach a board document?
+        criterion: Passes when none of Q1, cttee or mtg appears in the draft.
+        why: A program can settle whether a string appears; a person would miss one.
+        check: {kind: not-contains, text: ["Q1", "cttee", "mtg"]}
+      - id: facts-match-the-source
+        kind: llm
+        question: Does every date, amount, name and decision in the draft match its source?
+        criterion: >
+          Passes when every date, amount, name and decision in the draft can be
+          found in the source (the notes or the email) or the request, unchanged.
+          A fact that is added, changed or contradicted fails. Unknown when the
+          source can't settle it.
+        why: Matching facts across two documents needs reading, not a pattern.
+        prompt: tests/facts-match-the-source/prompt.md
+        model: claude-sonnet-5-5
+        decision: The last line of the response is PASS, FAIL or UNKNOWN.
+      - id: sendable
+        kind: human
+        form: rating
+        question: Would Morgan send this draft as it is?
+        criterion: A rating from 1 to 4 on the scale below; 3 or 4 counts as a pass.
+        why: Whether a draft is sendable depends on taste and on knowing the audience.
+        pass_at: 3
+        scale:
+          1: "Morgan would rewrite it: wrong, missing what was asked, or not in Morgan's voice."
+          2: "It needs substantial edits: a wrong fact, a missing section, or the wrong register."
+          3: "Small edits only: a phrase or a line Morgan would change."
+          4: "Morgan would send it as it is."
+        instructions: tests/sendable/instructions.md
+
+  - id: graph-briefs
+    object: process
+    what: >
+      How Wren prepares a brief about a person or a funder: whether it looks
+      things up in the knowledge graph before it writes, and writes only what
+      it found. Four real runs from the class assistant's demonstrations, two
+      of them made with the knowledge graph removed.
+    items: [dana-brief-1, dana-brief-2, priya-brief-1, priya-brief-2]
+    tests:
+      - id: search-before-write
+        kind: mechanical
+        question: Did the run look something up in the knowledge graph before it wrote the brief?
+        criterion: >
+          Passes when a step that searched or read the graph (kb/kb search, node
+          or query, or the knowledge-graph skill), in a step that didn't fail,
+          comes before the first step that wrote a file.
+        why: The order of steps in a record is something a program can check exactly.
+        program: tests/search-before-write/check.py
+      - id: steps-follow
+        kind: llm
+        question: Does each step follow from what the step before it found, and does the brief use only what the steps found?
+        criterion: >
+          Passes when the lookups come before the writing, each step makes sense
+          given what the previous ones returned, and every fact in the brief was
+          returned by a step or given in the request. Fails when the brief states
+          something no step found, or was written before the lookups.
+        why: Whether a step follows from a result needs reading the results.
+        prompt: tests/steps-follow/prompt.md
+        model: claude-sonnet-5-5
+        decision: The last line of the response is PASS, FAIL or UNKNOWN.
+      - id: sound-process
+        kind: human
+        form: rating
+        question: Would you trust a brief made this way?
+        criterion: A rating from 1 to 4 on the scale below; 3 or 4 counts as a pass.
+        why: Trust in a process is a judgment about what was checked and what was assumed.
+        pass_at: 3
+        scale:
+          1: "No: it wrote without looking, or claims what its steps didn't find."
+          2: "Barely: it looked, but the brief goes beyond what it found."
+          3: "Mostly: it looked first, with a step or two that wasted time or failed."
+          4: "Yes: it looked up what it needed first, and wrote only that."
+        instructions: tests/sound-process/instructions.md

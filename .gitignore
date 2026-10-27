@@ -1,0 +1,7 @@
+# Made by run_ab.py: run folders, and intakes written by the experiment-intake skill.
+# examples/recorded/ holds the reviewed demonstration runs.
+runs/
+experiments/
+__pycache__/
+*.pyc
+.DS_Store

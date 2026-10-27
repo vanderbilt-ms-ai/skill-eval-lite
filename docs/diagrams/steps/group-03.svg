@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 194" width="400" height="194" role="img" aria-labelledby="steps-group-03-t steps-group-03-d"><title id="steps-group-03-t">Claude Code: Start the intake</title><desc id="steps-group-03-d">Type: /experiment-intake ../your-assistant.  You should see: A list of the assistant’s parts, then a first question.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .tw{fill:#1E2A33;stroke:#13202A}
+.dg .twbar{fill:#2B3945}
+.dg .twdot{fill:#5B6B78}
+.dg .tw-t{fill:#E6EDF3}
+.dg .tw-o{fill:#A9B8C4}
+.dg .tw-ag{fill:#CDB4F2}
+.dg .tw-box{fill:none;stroke:#6C7C89}
+.dg .tw-cur{fill:#E6EDF3}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .tw{fill:#0A0F13;stroke:#2A3640}
+.dg .twbar{fill:#18222A}
+.dg .twdot{fill:#5B6B78}
+.dg .tw-t{fill:#E6EDF3}
+.dg .tw-o{fill:#A9B8C4}
+.dg .tw-ag{fill:#CDB4F2}
+.dg .tw-box{fill:none;stroke:#6C7C89}
+.dg .tw-cur{fill:#E6EDF3}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="399" height="193" rx="12"/><rect x="8" y="8" width="384" height="178" rx="10" class="tw"/><path d="M8 18 Q8 8 18 8 H382 Q392 8 392 18 V32 H8 Z" class="twbar"/><circle cx="22" cy="20" r="3.6" class="twdot"/><circle cx="35" cy="20" r="3.6" class="twdot"/><circle cx="48" cy="20" r="3.6" class="twdot"/><text x="200" y="24.5" font-size="11" class="tw-o" text-anchor="middle">Claude Code</text><text x="22" y="60" font-size="12.5" class="m"><tspan class="tw-ag b">Claude Code</tspan><tspan class="tw-o">  in skill-eval-lite</tspan></text><rect x="16" y="71" width="368" height="27" rx="6" class="tw-box"/><text x="26.7" y="91" font-size="12.5" class="m"><tspan class="tw-ag">&gt; </tspan><tspan class="tw-t">/experiment-intake ../your-assistant</tspan></text><text x="22" y="118" font-size="12"><tspan class="tw-o it">(Claude reads the assistant, then asks your group</tspan></text><text x="22" y="137" font-size="12"><tspan class="tw-o it">its first question)</tspan></text><rect x="16" y="144" width="368" height="26" rx="6" class="tw-box"/><text x="24" y="161.5" font-size="12.5" class="m tw-ag">&gt;</text><rect x="36.4" y="151" width="7.4" height="14" rx="1" class="tw-cur"/></svg>

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 300" width="300" height="300" role="img" aria-labelledby="help-step-2-t help-step-2-d"><title id="help-step-2-t">Step 2: freeze, then put the frozen file back</title><desc id="help-step-2-d">Press Freeze, then Export the frozen experiment. Your browser saves experiment.toml in Downloads. Move it back over skill-eval-lite/experiments/&lt;name&gt;/experiment.toml. The run uses this file.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t3{fill:#5F6A73}
+.dg .inv{fill:#FFFFFF}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .btn{fill:#16212B;stroke:#16212B}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-term{fill:rgba(28,124,110,.14);stroke:#1C7C6E}
+.dg .t-term{fill:#187062}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+.dg .f-n{fill:rgba(122,135,145,.16);stroke:#7A8791}
+.dg .tw{fill:#1E2A33;stroke:#13202A}
+.dg .tw-arrow{stroke:#62D2C0}
+.dg .tw-cur{fill:#E6EDF3}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t3{fill:#8593A0}
+.dg .inv{fill:#141C23}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .btn{fill:#E2E8EE;stroke:#E2E8EE}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-term{fill:rgba(76,192,174,.16);stroke:#4CC0AE}
+.dg .t-term{fill:#4CC0AE}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+.dg .f-n{fill:rgba(142,155,165,.18);stroke:#8E9BA5}
+.dg .tw{fill:#0A0F13;stroke:#2A3640}
+.dg .tw-arrow{stroke:#62D2C0}
+.dg .tw-cur{fill:#E6EDF3}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="299" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Freeze, then put the frozen file back</text><rect x="12" y="42" width="62" height="26" rx="6" class="btn"/><text x="43" y="59.1" font-size="11.5" class="inv" text-anchor="middle">Freeze</text><path d="M30 72 L30 87" class="ln s-web"/><path d="M30 94 L25.2 85 L34.8 85 Z" class="h-web"/><text x="42" y="87" font-size="10.5" class="t3 it">then</text><rect x="12" y="100" width="208.8" height="26" rx="6" class="btn"/><text x="116.4" y="117.1" font-size="11.5" class="inv" text-anchor="middle">Export the frozen experiment</text><path d="M30 130 L30 145" class="ln s-web"/><path d="M30 152 L25.2 143 L34.8 143 Z" class="h-web"/><text x="42" y="145" font-size="10.5" class="t3 it">your browser saves it</text><path transform="translate(12 162) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-n"/><text x="32" y="174" font-size="11.5" class="m b">Downloads/</text><rect x="116" y="158" width="141" height="24" rx="6" class="f-web"/><g transform="translate(122 162) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="142" y="174" font-size="11.5" class="m">experiment.toml</text><path d="M30 188 L30 203" class="ln s-web"/><path d="M30 210 L25.2 201 L34.8 201 Z" class="h-web"/><text x="42" y="203" font-size="10.5" class="t3 it">move it back, over the old one</text><path transform="translate(12 213) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="32" y="224.5" font-size="11.5" class="m">skill-eval-lite/experiments/&lt;name&gt;/</text><path d="M18 233 V246 H25" class="ln thin s-rule"/><g transform="translate(28 234) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="48" y="246.5" font-size="11.5" class="m b t-web">experiment.toml</text><text x="288" y="246.5" font-size="10.5" class="t3 it" text-anchor="end">the frozen one</text><rect x="12" y="266" width="184.7" height="24" rx="12" class="f-term"/><rect x="19" y="271" width="17" height="14" rx="3" class="tw"/><path d="M22.5 275 L26 278 L22.5 281" class="ln thin tw-arrow"/><rect x="27.5" y="280.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="42" y="282.1" font-size="11.5" class="t-term">the run uses this file</text></svg>

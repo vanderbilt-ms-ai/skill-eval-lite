@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 190" width="300" height="190" role="img" aria-labelledby="help-suite-2-t help-suite-2-d"><title id="help-suite-2-t">Checks-only step 2: you first, then the AI test</title><desc id="help-suite-2-d">For each case, choose Pass, Unknown or Fail, with a reason. The AI test’s answers appear after you have judged every case.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t3{fill:#5F6A73}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .wh{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .btn2{fill:#FFFFFF;stroke:#5F6A73}
+.dg .bar{fill:#E9EAE3;stroke:none}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thick{stroke-width:2.2}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .s-n{stroke:#7A8791}
+.dg .h-n{fill:#7A8791}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t3{fill:#8593A0}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .wh{fill:#141C23;stroke:#2A3640}
+.dg .btn2{fill:#141C23;stroke:#8593A0}
+.dg .bar{fill:#1F2A33;stroke:none}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thick{stroke-width:2.2}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .s-n{stroke:#8E9BA5}
+.dg .h-n{fill:#8E9BA5}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="189" rx="12"/><text x="12" y="22" font-size="12.5" class="b">You first, then the AI test</text><rect x="12" y="42" width="276" height="46" rx="8" class="wh"/><text x="22" y="59" font-size="11" class="b">a case</text><rect x="22" y="68" width="180" height="5" rx="2.5" class="bar"/><rect x="22" y="78" width="130" height="5" rx="2.5" class="bar"/><rect x="12" y="96" width="89.3" height="24" rx="6" class="btn2"/><text x="56.7" y="112" font-size="11" text-anchor="middle">Pass</text><rect x="105.3" y="96" width="89.3" height="24" rx="6" class="btn2"/><text x="150" y="112" font-size="11" text-anchor="middle">Unknown</text><rect x="198.7" y="96" width="89.3" height="24" rx="6" class="btn2"/><text x="243.3" y="112" font-size="11" text-anchor="middle">Fail</text><rect x="8" y="92" width="97.3" height="32" rx="9" class="ln s-web thick"/><path d="M30 126 L30 141" class="ln s-n"/><path d="M30 148 L25.2 139 L34.8 139 Z" class="h-n"/><text x="42" y="141" font-size="10.5" class="t3 it">after you have judged every case</text><rect x="12" y="154" width="276" height="26" rx="6" class="f-web"/><text x="22" y="171" font-size="11" class="t-web">You: pass. The AI test: fail.</text></svg>

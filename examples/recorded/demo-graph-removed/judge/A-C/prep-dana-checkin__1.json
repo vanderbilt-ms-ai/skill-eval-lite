@@ -1,0 +1,62 @@
+{
+ "comparison": "A|C",
+ "prompt": "prep-dana-checkin",
+ "repeat": 1,
+ "shown_left": "A",
+ "decision": "LEFT",
+ "winner": "A",
+ "note": "",
+ "response": "Left gives Morgan a usable brief: the Hale renewal and the two quiet partners as open items, concrete asks for Dana, and flags where the source data is shaky. Right produces no content, only a list of what it couldn't find and blank sections, so Morgan would have to redo the work. Left's caveats are a bit long, but it is something Morgan could read before the meeting and send largely as is.\n\nLEFT",
+ "model": "claude-sonnet-5-5",
+ "when": "2026-10-26T21:32:50Z",
+ "seconds": 3.6,
+ "cost_usd": 0.0137349,
+ "status": "ok",
+ "requested_model": "claude-sonnet-5-5",
+ "input": "You are judging two drafts that an assistant wrote for Morgan Reyes. Morgan\nsends drafts under their own name. Read the request, the starting file if\nthere is one, and the two drafts.\n\nQuestion: Which draft would Morgan be more willing to send under their own\nname without changes?\n\nJudge what is on the page: whether it answers what was asked, whether its\nfacts match the request, and whether it reads as Morgan writes (plain, short,\nno stock openers or sign-offs). Do not prefer a draft because it is longer.\n\nGive two or three sentences of reasons. Then, on the last line, write only\nLEFT, RIGHT or TIE, or UNKNOWN if you can't tell.\n\n## The request\n\nMy check-in with Dana is Wednesday at 11. Give me a short brief to read\nbeforehand: what's open between us, and what I need from her. Save it in\nnotes/.\n\n## Left\n\n# Check-in with Dana Whitfield - Wednesday 2026-10-28, 11:00\n\nSource note: everything below comes from the knowledge graph (kb/wiki). I could not open\nGrants/current/ from this machine, so the dates and the 120,000 figure are not re-checked\nagainst pipeline.xlsx or calendar.md. Check them there before you quote any of it.\n\n## Open between you\n\n1. Hale renewal narrative needs Dana's review before it goes.\n   - Request: 120,000 over two years (Funder pipeline, Hale row). Above 50,000, so Dana reviews.\n   - Proposal due to Hale 2026-12-01 (Grant calendar). The interim report on the current\n     grant is due 2026-11-30, the day before.\n   - The narrative is not drafted yet (Hale Foundation renewal page).\n2. Two quiet corporate partners: mark them inactive in the pipeline, or keep chasing?\n   - No reply from either since September (Funder pipeline, last-contact column).\n   - You held this for this check-in. Nothing has been decided.\n\n## What you need from Dana\n\n1. A review window for the Hale narrative. Ask how many days she needs to turn a draft,\n   and when she can take it. The interim report (11/30) and the proposal (12/01) land back\n   to back, so an earlier draft gives her more room.\n2. A decision on the two quiet partners. My recommendation: mark them inactive now so the\n   pipeline stays honest, and reopen if either replies. Ask Dana whether there is any\n   reason to keep them active.\n\n## If time allows\n\n- Does Dana want to see the interim report too, or only the renewal?\n\n## Flags\n\n- The graph records the Hale status and the quiet-partner hold \"as of 2026-10-28\", which\n  is the day of this meeting and two days after today. The date looks wrong. Treat \"not yet\n  drafted\" and \"nothing decided\" as unconfirmed until you check.\n- The graph has no other open items with Dana (no budget, staffing, or agreement threads).\n  If there are some, they are not in this brief. I have no access to your email or calendar\n  from here, so I did not check for recent threads.\n\n## Right\n\n# Dana check-in brief - Wed 2026-10-28, 11:00 (America/Denver)\n\nStatus: NOT READY. I could not reach any source that says what is open between you and Dana. Nothing below is invented; the open sections are blank on purpose.\n\n## What I checked\n\n| Source | Result |\n|---|---|\n| Knowledge graph (`kb/`) | Not present in this directory. No pages on Dana. |\n| `Grants/current/` (pipeline, calendar) | Not present in this directory. |\n| `notes/` (prior briefs, kb updates) | Did not exist before this file. |\n| Google Workspace mail and calendar | No mail or calendar tool available in this session, so no threads or meeting details checked. |\n\n## Known standing facts (from user.md)\n\n- Dana Whitfield is Executive Director and your manager.\n- She reviews anything going to a funder above 50,000 dollars. Any draft in that range needs her eyes before it goes out.\n\n## Open between you and Dana\n\n[NOT FOUND - needs mail/calendar or your list]\n\n## What you need from her\n\n[NOT FOUND - needs mail/calendar or your list]\n\n## To finish this brief\n\nAny one of these is enough:\n\n1. Connect or point me at the Cedar Commons mail and calendar, and I will pull threads with Dana and the invite for Wednesday.\n2. Give me `Grants/current/` (pipeline.xlsx, calendar.md), and I will list funder items over 50,000 that need her review.\n3. Tell me the two or three items on your mind, and I will draft the asks.\n",
+ "command": [
+  "claude",
+  "-p",
+  "--output-format",
+  "stream-json",
+  "--verbose",
+  "--model",
+  "claude-sonnet-5-5",
+  "--setting-sources",
+  "project",
+  "--strict-mcp-config",
+  "--settings",
+  "{\"autoMemoryEnabled\":false,\"disableClaudeAiConnectors\":true}",
+  "--tools",
+  "",
+  "--permission-mode",
+  "acceptEdits",
+  "--permission-prompts",
+  "none",
+  "--no-session-persistence",
+  "--max-budget-usd",
+  "0.5"
+ ],
+ "isolation": {
+  "claude_code_version": "2.1.310",
+  "model": "claude-sonnet-5-5",
+  "permission_mode": "acceptEdits",
+  "mcp_servers": 0,
+  "connector_tools": 0,
+  "tools": [],
+  "skills": [
+   "design",
+   "doctor",
+   "plugin-authoring"
+  ],
+  "plugins": [
+   "cc-plugin-agents-md",
+   "cc-plugin-telemetry",
+   "cc-plugin-plugin-authoring"
+  ],
+  "auto_memory": "off",
+  "verified": true
+ },
+ "claude_code_version": "2.1.310",
+ "tool": "skill-eval-lite 0.1.0"
+}

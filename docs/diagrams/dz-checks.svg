@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 206" width="300" height="206" role="img" aria-labelledby="dz-checks-t dz-checks-d"><title id="dz-checks-t">What can check an output?</title><desc id="dz-checks-d">Checks on the product (the output: contains, word count) and on the process (the trace of steps: ran a command). The AI judge reads two outputs, Left and Right, and answers the judging question.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .wh{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .bar{fill:#E9EAE3;stroke:none}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .h-ok{fill:#1F7D55}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .wh{fill:#141C23;stroke:#2A3640}
+.dg .bar{fill:#1F2A33;stroke:none}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .h-ok{fill:#4CC08B}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="205" rx="12"/><text x="12" y="22" font-size="12.5" class="b">What can check an output?</text><rect x="12" y="34" width="133" height="92" rx="8" class="wh"/><text x="20" y="50" font-size="11" class="b">the output</text><rect x="20" y="58" width="113" height="5" rx="2.5" class="bar"/><rect x="20" y="68" width="93" height="5" rx="2.5" class="bar"/><circle cx="28" cy="88" r="8" class="h-ok"/><path d="M24.3 88.3 L27 91 L31.8 85.6" class="ln" style="stroke:#fff;stroke-width:2"/><text x="40" y="92" font-size="10.5">contains</text><circle cx="28" cy="108" r="8" class="h-ok"/><path d="M24.3 108.3 L27 111 L31.8 105.6" class="ln" style="stroke:#fff;stroke-width:2"/><text x="40" y="112" font-size="10.5">word count</text><rect x="155" y="34" width="133" height="92" rx="8" class="wh"/><text x="163" y="50" font-size="11" class="b">the trace (steps)</text><text x="163" y="66" font-size="10" class="m t2">1 Read</text><text x="163" y="79" font-size="10" class="m t2">2 Bash kb/kb search</text><text x="163" y="92" font-size="10" class="m t2">3 Write</text><circle cx="171" cy="112" r="8" class="h-ok"/><path d="M167.3 112.3 L170 115 L174.8 109.6" class="ln" style="stroke:#fff;stroke-width:2"/><text x="183" y="116" font-size="10.5">ran a command</text><text x="12" y="142" font-size="10.5" class="t3 it">on the product</text><text x="155" y="142" font-size="10.5" class="t3 it">on the process</text><rect x="12" y="152" width="276" height="46" rx="8" class="f-web"/><rect x="20" y="159" width="17" height="14" rx="3" class="f-web"/><path d="M20 163.5 L37 163.5" class="ln s-web thin"/><circle cx="23" cy="161.3" r="0.9" class="h-web"/><circle cx="25.6" cy="161.3" r="0.9" class="h-web"/><text x="44" y="170" font-size="11" class="t-web">The AI judge reads two outputs,</text><text x="44" y="186" font-size="11" class="t-web">Left and Right, and answers your question.</text></svg>

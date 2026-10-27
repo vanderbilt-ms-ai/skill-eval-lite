@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 750" width="400" height="750" role="img" aria-labelledby="order-demo-t order-demo-d"><title id="order-demo-t">A demonstration, in order</title><desc id="order-demo-d">Terminal: setup, check, run, judge. Then the wizard: load the bundle in step 1, freeze in step 2, then steps 3 to 5. A demonstration is frozen after it is run; a recorded run can be loaded instead.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .b{font-weight:600}
+.dg .t2{fill:#45515B}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .pl{fill:#F8F8F4;stroke:#D9DAD2}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .f-term{fill:rgba(28,124,110,.14);stroke:#1C7C6E}
+.dg .s-term{stroke:#1C7C6E}
+.dg .h-term{fill:#1C7C6E}
+.dg .t-term{fill:#187062}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .s-n{stroke:#7A8791}
+.dg .h-n{fill:#7A8791}
+.dg .tw{fill:#1E2A33;stroke:#13202A}
+.dg .tw-arrow{stroke:#62D2C0}
+.dg .tw-cur{fill:#E6EDF3}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .b{font-weight:600}
+.dg .t2{fill:#A7B4BF}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .pl{fill:#18222A;stroke:#2A3640}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .f-term{fill:rgba(76,192,174,.16);stroke:#4CC0AE}
+.dg .s-term{stroke:#4CC0AE}
+.dg .h-term{fill:#4CC0AE}
+.dg .t-term{fill:#4CC0AE}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .s-n{stroke:#8E9BA5}
+.dg .h-n{fill:#8E9BA5}
+.dg .tw{fill:#0A0F13;stroke:#2A3640}
+.dg .tw-arrow{stroke:#62D2C0}
+.dg .tw-cur{fill:#E6EDF3}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="399" height="749" rx="12"/><text x="16" y="28" font-size="15" class="b">A demonstration, in order</text><rect x="12" y="43" width="17" height="14" rx="3" class="tw"/><path d="M15.5 47 L19 50 L15.5 53" class="ln thin tw-arrow"/><rect x="20.5" y="52.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="34" y="55" font-size="12" class="b t-term">Terminal</text><rect x="371" y="43" width="17" height="14" rx="3" class="f-web"/><path d="M371 47.5 L388 47.5" class="ln s-web thin"/><circle cx="374" cy="45.3" r="0.9" class="h-web"/><circle cx="376.6" cy="45.3" r="0.9" class="h-web"/><text x="364" y="55" font-size="12" class="b t-web" text-anchor="end">The wizard (browser)</text><path d="M22 66 V570" class="ln thin dash s-term"/><path d="M378 66 V570" class="ln thin dash s-web"/><rect x="44" y="78" width="280" height="54" rx="9" class="f-term"/><rect x="54" y="89" width="17" height="14" rx="3" class="tw"/><path d="M57.5 93 L61 96 L57.5 99" class="ln thin tw-arrow"/><rect x="62.5" y="98.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="80" y="100.5" font-size="13" class="b">Make the class assistant</text><text x="80" y="119" font-size="12" class="t2">setup (once per computer)</text><rect x="44" y="156" width="280" height="70" rx="9" class="f-term"/><rect x="54" y="167" width="17" height="14" rx="3" class="tw"/><path d="M57.5 171 L61 174 L57.5 177" class="ln thin tw-arrow"/><rect x="62.5" y="176.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="80" y="178.5" font-size="13" class="b">Look at the demonstration</text><text x="80" y="197" font-size="12" class="t2">check</text><text x="80" y="213" font-size="12" class="t2">examples/demo-graph-removed.toml</text><rect x="44" y="250" width="280" height="54" rx="9" class="f-term"/><rect x="54" y="261" width="17" height="14" rx="3" class="tw"/><path d="M57.5 265 L61 268 L57.5 271" class="ln thin tw-arrow"/><rect x="62.5" y="270.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="80" y="272.5" font-size="13" class="b">Run it</text><text x="80" y="291" font-size="12" class="t2">run: 4 runs, about 1 to 3 minutes</text><rect x="44" y="328" width="280" height="54" rx="9" class="f-term"/><rect x="54" y="339" width="17" height="14" rx="3" class="tw"/><path d="M57.5 343 L61 346 L57.5 349" class="ln thin tw-arrow"/><rect x="62.5" y="348.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="80" y="350.5" font-size="13" class="b">Ask the AI judge</text><text x="80" y="369" font-size="12" class="t2">judge runs/demo-graph-removed</text><rect x="76" y="406" width="280" height="86" rx="9" class="f-web"/><rect x="86" y="417" width="17" height="14" rx="3" class="f-web"/><path d="M86 421.5 L103 421.5" class="ln s-web thin"/><circle cx="89" cy="419.3" r="0.9" class="h-web"/><circle cx="91.6" cy="419.3" r="0.9" class="h-web"/><text x="112" y="428.5" font-size="13" class="b">Load the runs</text><text x="112" y="447" font-size="12" class="t2">Step 1:</text><text x="112" y="463" font-size="12" class="t2">runs/demo-graph-removed/</text><text x="112" y="479" font-size="12" class="t2">bundle.json</text><rect x="76" y="516" width="280" height="54" rx="9" class="f-web"/><rect x="86" y="527" width="17" height="14" rx="3" class="f-web"/><path d="M86 531.5 L103 531.5" class="ln s-web thin"/><circle cx="89" cy="529.3" r="0.9" class="h-web"/><circle cx="91.6" cy="529.3" r="0.9" class="h-web"/><text x="112" y="538.5" font-size="13" class="b">Freeze it, then read and judge</text><text x="112" y="557" font-size="12" class="t2">Steps 2 to 5</text><path d="M22 96 L44 96" class="ln s-term thin"/><circle cx="22" cy="96" r="4" class="h-term"/><path d="M22 174 L44 174" class="ln s-term thin"/><circle cx="22" cy="174" r="4" class="h-term"/><path d="M184 132 C184 142 184 139 184 149" class="ln s-n"/><path d="M184 156 L179.2 147 L188.8 147 Z" class="h-n"/><path d="M22 268 L44 268" class="ln s-term thin"/><circle cx="22" cy="268" r="4" class="h-term"/><path d="M184 226 C184 236 184 233 184 243" class="ln s-n"/><path d="M184 250 L179.2 241 L188.8 241 Z" class="h-n"/><path d="M22 346 L44 346" class="ln s-term thin"/><circle cx="22" cy="346" r="4" class="h-term"/><path d="M184 304 C184 314 184 311 184 321" class="ln s-n"/><path d="M184 328 L179.2 319 L188.8 319 Z" class="h-n"/><path d="M356 424 L378 424" class="ln s-web thin"/><circle cx="378" cy="424" r="4" class="h-web"/><path d="M184 382 C184 392 216 389 216 399" class="ln s-n"/><path d="M216 406 L211.2 397 L220.8 397 Z" class="h-n"/><path d="M356 534 L378 534" class="ln s-web thin"/><circle cx="378" cy="534" r="4" class="h-web"/><path d="M216 492 C216 502 216 499 216 509" class="ln s-n"/><path d="M216 516 L211.2 507 L220.8 507 Z" class="h-n"/><rect x="16" y="588" width="368" height="146" rx="8" class="pl"/><text x="26" y="606" font-size="12" class="t2">A demonstration is a small example, so it is run</text><text x="26" y="622" font-size="12" class="t2">first and frozen afterwards. Freezing writes your</text><text x="26" y="638" font-size="12" class="t2">experiment down, with the date and a fingerprint,</text><text x="26" y="654" font-size="12" class="t2">before you see any results, so that nobody can</text><text x="26" y="670" font-size="12" class="t2">change the test to fit the results later. The</text><text x="26" y="686" font-size="12" class="t2">runner uses the frozen file. No time to run? Skip</text><text x="26" y="702" font-size="12" class="t2">1 to 4: in step 1, load</text><text x="26" y="718" font-size="12" class="t2">examples/recorded/demo-graph-removed/bundle.json.</text></svg>

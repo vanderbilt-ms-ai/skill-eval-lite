@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 440 929" width="440" height="929" role="img" aria-labelledby="intake-decision-t intake-decision-d"><title id="intake-decision-t">Do I need to run the intake skill first?</title><desc id="intake-decision-d">If you already have an experiment file (the class one, a demonstration or your group’s), skip the intake and check it. If not: is your assistant’s folder a git project with a CLAUDE.md? If not, run setup for the class assistant, or let the intake make your own folder a git project, with your permission. Then, in skill-eval-lite, type claude and /experiment-intake ../your-assistant (with Codex, follow AGENTS.md). It writes experiments/&lt;name&gt;/experiment.toml.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#45515B}
+.dg .inv{fill:#FFFFFF}
+.dg .halo{paint-order:stroke;stroke:#FFFFFF;stroke-width:5px;stroke-linejoin:round}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .wh{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .h-ink{fill:#16212B}
+.dg .f-agent{fill:rgba(122,79,168,.12);stroke:#7A4FA8}
+.dg .s-agent{stroke:#7A4FA8}
+.dg .h-agent{fill:#7A4FA8}
+.dg .t-agent{fill:#7A4FA8}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+.dg .s-file{stroke:#9A6A0C}
+.dg .h-file{fill:#9A6A0C}
+.dg .t-file{fill:#85590A}
+.dg .f-ok{fill:rgba(31,125,85,.12);stroke:#1F7D55}
+.dg .s-ok{stroke:#1F7D55}
+.dg .h-ok{fill:#1F7D55}
+.dg .t-ok{fill:#1A6E4A}
+.dg .s-n{stroke:#7A8791}
+.dg .h-n{fill:#7A8791}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#A7B4BF}
+.dg .inv{fill:#141C23}
+.dg .halo{paint-order:stroke;stroke:#141C23;stroke-width:5px;stroke-linejoin:round}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .wh{fill:#141C23;stroke:#2A3640}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .h-ink{fill:#E2E8EE}
+.dg .f-agent{fill:rgba(180,148,222,.15);stroke:#B494DE}
+.dg .s-agent{stroke:#B494DE}
+.dg .h-agent{fill:#B494DE}
+.dg .t-agent{fill:#B494DE}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+.dg .s-file{stroke:#E2AE4A}
+.dg .h-file{fill:#E2AE4A}
+.dg .t-file{fill:#E2AE4A}
+.dg .f-ok{fill:rgba(76,192,139,.14);stroke:#4CC08B}
+.dg .s-ok{stroke:#4CC08B}
+.dg .h-ok{fill:#4CC08B}
+.dg .t-ok{fill:#4CC08B}
+.dg .s-n{stroke:#8E9BA5}
+.dg .h-n{fill:#8E9BA5}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="439" height="928" rx="12"/><text x="16" y="28" font-size="15" class="b">Do I need to run the intake skill first?</text><text x="16" y="50" font-size="12" class="t2">The intake skill is a set of instructions for Claude Code.</text><text x="16" y="66.3" font-size="12" class="t2">It writes your experiment file with your group, after</text><text x="16" y="82.6" font-size="12" class="t2">asking you a few questions.</text><rect x="16" y="100.6" width="408" height="64" rx="10" class="wh"/><circle cx="36" cy="119.6" r="10.5" class="h-ink"/><text x="36" y="124.1" font-size="13" class="b inv" text-anchor="middle">?</text><text x="54" y="124.1" font-size="13.5" class="b">Do you already have an experiment file?</text><text x="54" y="140.6" font-size="11.5" class="t2">An experiment file, experiment.toml, is the plan for</text><text x="54" y="155.6" font-size="11.5" class="t2">your test.</text><rect x="104" y="190.6" width="320" height="165.5" rx="10" class="f-ok"/><text x="116" y="211.6" font-size="13" class="b t-ok">Yes: you can skip the intake.</text><text x="116" y="230.6" font-size="12" class="t2">The class experiment:</text><text x="124" y="249.1" font-size="11.5" class="m">examples/class-assistant/experiment.toml</text><text x="116" y="267.6" font-size="12" class="t2">A demonstration:</text><text x="124" y="286.1" font-size="11.5" class="m">examples/demo-graph-removed.toml</text><text x="116" y="304.6" font-size="12" class="t2">Your group’s, written before:</text><text x="124" y="323.1" font-size="11.5" class="m">experiments/&lt;name&gt;/experiment.toml</text><text x="116" y="341.6" font-size="12" class="t2">Go on to check it.</text><path d="M354 164.6 C354 172.6 354 175.6 354 183.6" class="ln s-ok"/><path d="M354 190.6 L349.2 181.6 L358.8 181.6 Z" class="h-ok"/><text x="362" y="181.6" font-size="12" class="b halo">Yes</text><rect x="16" y="386.1" width="408" height="79" rx="10" class="wh"/><circle cx="36" cy="405.1" r="10.5" class="h-ink"/><text x="36" y="409.6" font-size="13" class="b inv" text-anchor="middle">?</text><text x="54" y="409.6" font-size="13.5" class="b">Is your assistant’s folder ready?</text><text x="54" y="426.1" font-size="11.5" class="t2">Ready means: it is a git project with a CLAUDE.md.</text><text x="54" y="441.1" font-size="11.5" class="t2">git keeps a record of each version of the folder.</text><text x="54" y="456.1" font-size="11.5" class="t2">CLAUDE.md holds the assistant’s main instructions.</text><path d="M44 164.6 L44 379.1" class="ln s-n"/><path d="M44 386.1 L39.2 377.1 L48.8 377.1 Z" class="h-n"/><text x="52" y="181.6" font-size="12" class="b halo">No</text><rect x="104" y="491.1" width="320" height="153.5" rx="10" class="f-file"/><text x="116" y="512.1" font-size="13" class="b t-file">Not yet: get it ready first.</text><text x="116" y="531.1" font-size="12" class="t2">The class assistant? Type:</text><text x="124" y="549.6" font-size="11.5" class="m">python3 run_ab.py setup</text><text x="124" y="565.1" font-size="11.5" class="m">../class-assistant</text><text x="116" y="583.6" font-size="12" class="t2">Your own folder? The intake offers to make</text><text x="116" y="599.1" font-size="12" class="t2">it a git project (git init and a first</text><text x="116" y="614.6" font-size="12" class="t2">commit). It asks you first. It never</text><text x="116" y="630.1" font-size="12" class="t2">writes CLAUDE.md for you.</text><path d="M354 465.1 C354 473.1 354 476.1 354 484.1" class="ln s-file"/><path d="M354 491.1 L349.2 482.1 L358.8 482.1 Z" class="h-file"/><text x="362" y="482.1" font-size="12" class="b halo">No</text><rect x="16" y="674.6" width="408" height="146" rx="10" class="f-agent"/><path d="M31 685.14 H42 Q45 685.14 45 688.14 V693.14 Q45 696.14 42 696.14 H36 L32.5 699.14 V696.14 H31 Q28 696.14 28 693.14 V688.14 Q28 685.14 31 685.14 Z" class="f-agent"/><circle cx="33.2" cy="690.6" r="1.1" class="h-agent"/><circle cx="36.5" cy="690.6" r="1.1" class="h-agent"/><circle cx="39.8" cy="690.6" r="1.1" class="h-agent"/><text x="54" y="697.6" font-size="13.5" class="b t-agent">Run the intake skill</text><text x="54" y="718.6" font-size="12" class="t2">In the skill-eval-lite folder, type</text><text x="62" y="737.1" font-size="12" class="m b">claude</text><text x="54" y="755.6" font-size="12" class="t2">then, in Claude Code, type</text><text x="62" y="774.1" font-size="12" class="m b">/experiment-intake ../your-assistant</text><text x="54" y="792.6" font-size="12" class="t2">With Codex: type codex, then ask it to follow</text><text x="54" y="808.1" font-size="12" class="t2">AGENTS.md.</text><path d="M44 465.1 L44 667.6" class="ln s-n"/><path d="M44 674.6 L39.2 665.6 L48.8 665.6 Z" class="h-n"/><text x="52" y="482.1" font-size="12" class="b halo">Yes</text><path d="M354 644.6 C354 652.6 354 659.6 354 667.6" class="ln s-file"/><path d="M354 674.6 L349.2 665.6 L358.8 665.6 Z" class="h-file"/><text x="362" y="660.6" font-size="12" class="b halo">then</text><path d="M44 820.6 L44 839.6" class="ln s-agent"/><path d="M44 846.6 L39.2 837.6 L48.8 837.6 Z" class="h-agent"/><rect x="16" y="846.6" width="408" height="66" rx="10" class="wh"/><text x="30" y="867.6" font-size="12" class="t2">It writes</text><rect x="94" y="852.6" width="276.4" height="24" rx="6" class="f-agent"/><g transform="translate(100 856.6) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-agent"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-agent"/></g><text x="120" y="868.6" font-size="11.5" class="m">experiments/&lt;name&gt;/experiment.toml</text><text x="30" y="898.6" font-size="12.5" class="b">Next: check it, then load it in the wizard.</text></svg>

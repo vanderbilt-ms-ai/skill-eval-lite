@@ -1,0 +1,62 @@
+{
+ "comparison": "A|D",
+ "prompt": "reply-to-priya",
+ "repeat": 1,
+ "shown_left": "A",
+ "decision": "RIGHT",
+ "winner": "D",
+ "note": "",
+ "response": "Right sticks to what Morgan asked for. It confirms Tuesday the 17th at 10 for Morgan and Dana, says the report can't come early because the finance close isn't done until the 25th, and says it will be in by the 30th. Left adds a question offering to send material from the report ahead of time, which Morgan didn't ask for and which commits them to something. Right's notes are extra, and one mentions a \"graph\" oddly, but the draft itself is plain, short and ready to send as is.\n\nRIGHT",
+ "model": "claude-sonnet-5-5",
+ "when": "2026-10-26T21:33:24Z",
+ "seconds": 7.7,
+ "cost_usd": 0.0129448,
+ "status": "ok",
+ "requested_model": "claude-sonnet-5-5",
+ "input": "You are judging two drafts that an assistant wrote for Morgan Reyes. Morgan\nsends drafts under their own name. Read the request, the starting file if\nthere is one, and the two drafts.\n\nQuestion: Which draft would Morgan be more willing to send under their own\nname without changes?\n\nJudge what is on the page: whether it answers what was asked, whether its\nfacts match the request, and whether it reads as Morgan writes (plain, short,\nno stock openers or sign-offs). Do not prefer a draft because it is longer.\n\nGive two or three sentences of reasons. Then, on the last line, write only\nLEFT, RIGHT or TIE, or UNKNOWN if you can't tell.\n\n## The request\n\nPriya wants to move Friday's site visit. Her email is in input/priya-email.md.\nTuesday the 17th at 10 works for me and Dana. We can't send the interim report\nearly, because our finance close isn't done until the 25th, but it will be in\nby the 30th. Draft a reply.\n\n## Starting file: input/priya-email.md\n\nFrom: Priya Raman <priya.raman@halefoundation.example>\nTo: Morgan Reyes <morgan.reyes@cedarcommons.example>\nDate: Monday 9 November 2026, 08:14\nSubject: Friday site visit\n\nHi Morgan,\n\nI'm sorry to do this on short notice, but our team retreat now overlaps with\nFriday's site visit. Could we move it to Tuesday the 17th or Wednesday the\n18th, at 10 either day? Same plan otherwise: an hour with you and Dana, then a\nwalk through the Elm Street site.\n\nAlso, a quick check while I have you: is the interim report still on track for\nNovember 30? We'd love to have it a few days early if you can manage it, since\nour renewal review starts on December 1.\n\nThanks,\nPriya\n\nPriya Raman\nProgram Officer, Hale Foundation\n\n## Left\n\nTo: Priya Raman <priya.raman@halefoundation.example>\nSubject: Re: Friday site visit\n\nHi Priya,\n\nTuesday the 17th at 10 works for Dana and me. Same plan: an hour with us, then the walk through the Elm Street site.\n\nOn the interim report, we're on track for November 30, and we can't get it to you early. Our finance close isn't done until the 25th, and the report's figures depend on it. Is there anything from the report you need before December 1 that I can send ahead of it?\n\nThanks, Morgan\n\n## Right\n\nHere's the draft. Nothing is sent.\n\n> Subject: Re: Friday site visit\n>\n> Hi Priya,\n>\n> Tuesday the 17th at 10 works for me and Dana. Same plan: an hour with us, then the Elm Street walk-through.\n>\n> On the interim report, we can't get it to you early. Our finance close isn't done until the 25th, and the report depends on it. It will be in by the 30th.\n>\n> Thanks, Morgan\n\nNotes:\n- **Dates:** I took the 25th and the 30th from you and from Priya's email. `Grants/current/` doesn't exist in this checkout, so I couldn't check the Nov 30 due date against the signed agreement or `calendar.md`. Confirm it before you send.\n- **Priya's email:** it's dated Monday 9 November, but today is 26 October. I didn't change anything for that. The 17th is a Tuesday in 2026, so the date matches.\n- **Renewal:** I left out any mention of her December 1 review. The graph says our own renewal proposal is also due December 1, and the Nov 30 report date sits right next to it. If you want to offer something on the 30th, like a one-page preview, that's your call.\n",
+ "command": [
+  "claude",
+  "-p",
+  "--output-format",
+  "stream-json",
+  "--verbose",
+  "--model",
+  "claude-sonnet-5-5",
+  "--setting-sources",
+  "project",
+  "--strict-mcp-config",
+  "--settings",
+  "{\"autoMemoryEnabled\":false,\"disableClaudeAiConnectors\":true}",
+  "--tools",
+  "",
+  "--permission-mode",
+  "acceptEdits",
+  "--permission-prompts",
+  "none",
+  "--no-session-persistence",
+  "--max-budget-usd",
+  "0.5"
+ ],
+ "isolation": {
+  "claude_code_version": "2.1.310",
+  "model": "claude-sonnet-5-5",
+  "permission_mode": "acceptEdits",
+  "mcp_servers": 0,
+  "connector_tools": 0,
+  "tools": [],
+  "skills": [
+   "design",
+   "doctor",
+   "plugin-authoring"
+  ],
+  "plugins": [
+   "cc-plugin-agents-md",
+   "cc-plugin-telemetry",
+   "cc-plugin-plugin-authoring"
+  ],
+  "auto_memory": "off",
+  "verified": true
+ },
+ "claude_code_version": "2.1.310",
+ "tool": "skill-eval-lite 0.1.0"
+}

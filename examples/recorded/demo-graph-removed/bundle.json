@@ -1,0 +1,298 @@
+{
+ "schema": "skill-eval-lite/bundle@1",
+ "tool": "skill-eval-lite 0.1.0",
+ "made_up": false,
+ "outputs": [
+  {
+   "prompt": "prep-dana-checkin",
+   "round": "A",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "# Check-in with Dana Whitfield - Wednesday 2026-10-28, 11:00\n\nSource note: everything below comes from the knowledge graph (kb/wiki). I could not open\nGrants/current/ from this machine, so the dates and the 120,000 figure are not re-checked\nagainst pipeline.xlsx or calendar.md. Check them there before you quote any of it.\n\n## Open between you\n\n1. Hale renewal narrative needs Dana's review before it goes.\n   - Request: 120,000 over two years (Funder pipeline, Hale row). Above 50,000, so Dana reviews.\n   - Proposal due to Hale 2026-12-01 (Grant calendar). The interim report on the current\n     grant is due 2026-11-30, the day before.\n   - The narrative is not drafted yet (Hale Foundation renewal page).\n2. Two quiet corporate partners: mark them inactive in the pipeline, or keep chasing?\n   - No reply from either since September (Funder pipeline, last-contact column).\n   - You held this for this check-in. Nothing has been decided.\n\n## What you need from Dana\n\n1. A review window for the Hale narrative. Ask how many days she needs to turn a draft,\n   and when she can take it. The interim report (11/30) and the proposal (12/01) land back\n   to back, so an earlier draft gives her more room.\n2. A decision on the two quiet partners. My recommendation: mark them inactive now so the\n   pipeline stays honest, and reopen if either replies. Ask Dana whether there is any\n   reason to keep them active.\n\n## If time allows\n\n- Does Dana want to see the interim report too, or only the renewal?\n\n## Flags\n\n- The graph records the Hale status and the quiet-partner hold \"as of 2026-10-28\", which\n  is the day of this meeting and two days after today. The date looks wrong. Treat \"not yet\n  drafted\" and \"nothing decided\" as unconfirmed until you check.\n- The graph has no other open items with Dana (no budget, staffing, or agreement threads).\n  If there are some, they are not in this brief. I have no access to your email or calendar\n  from here, so I did not check for recent threads.\n",
+   "message": "The brief is saved at `notes/dana-checkin-2026-10-28.md`. I couldn't open `Grants/current/` from this machine, so the dates and the 120,000 figure come from the knowledge graph and aren't checked against `pipeline.xlsx` or `calendar.md`. Check them there before you quote them. I also didn't check your email or calendar for recent threads with Dana.\n\n**Open between you**\n- **Hale renewal narrative:** Dana reviews it before it goes, because the request is 120,000 over two years. The proposal is due 2026-12-01, the day after the interim report on the current grant (11/30). The narrative isn't drafted yet.\n- **Two quiet corporate partners:** neither has replied since September. You held the \"mark inactive?\" decision for this check-in.\n\n**What you need from Dana**\n1. A review window for the Hale narrative: how many days she needs and when she can take it.\n2. A call on the two quiet partners. I'd mark them inactive now and reopen if either replies. Ask her whether there's any reason to keep them active.\n\nThe graph records the \"not drafted\" and \"nothing decided\" statuses as of 2026-10-28, which is the day of the meeting and two days after today. That date looks wrong, so confirm both statuses before relying on them.\n\nThe graph has no other open items with Dana. If there are others, they aren't in the brief.",
+   "output_from": "files: notes/dana-checkin-2026-10-28.md",
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search Dana Whitfield; echo ---; kb/kb node \"Dana Whitfield\"; echo ---; ls notes notes/briefs Grants/current 2>&1 | head -50"
+    ],
+    [
+     "Grep",
+     "Dana"
+    ],
+    [
+     "Bash",
+     "for n in \"Hale Foundation renewal\" \"Quiet corporate partners\" Calendars \"Session transcripts\"; do kb/kb node \"$n\"; echo ----; done; ls; ls ~/Documents/work 2>&1 | head",
+     "error"
+    ],
+    [
+     "Read",
+     "kb/wiki/Hale Foundation renewal.md"
+    ],
+    [
+     "Read",
+     "kb/wiki/Quiet corporate partners.md"
+    ],
+    [
+     "Read",
+     "kb/wiki/Calendars.md"
+    ],
+    [
+     "Glob",
+     "**/* in kb/wiki"
+    ],
+    [
+     "Read",
+     "kb/wiki/Session transcripts.md"
+    ],
+    [
+     "Read",
+     "kb/wiki/Funder pipeline.md"
+    ],
+    [
+     "Read",
+     "kb/wiki/Grant calendar.md"
+    ],
+    [
+     "Read",
+     "kb/wiki/Riverside Q1 finance packet.md"
+    ],
+    [
+     "Bash",
+     "mkdir -p notes && cat > notes/dana-checkin-2026-10-28.md <<'EOF'\n# Check-in with Dana Whitfield - Wednesday 2026-10-28, 11:00\n\nSource note: everything below comes from the knowledge graph (kb/wiki). I could not open\nGrants/current/ from this machine, so the dates and the 120,000 figure are not re-checked\nagainst pipeline.xlsx or calendar.md. Check them there before you quote any of it.\n\n## Open between you\n\n1. Hale renewal narrative needs Dana's review before it goes.\n   - Request: 120,000 over two years (Funder pipeline, Hale row). Above 50,000, so Dana reviews.\n   - Proposal due to Hale 2026-12-01 (Grant calendar). Interim report on the current grant is\n     due 2026-11-30, the day before.\n   - The narrative is not drafted yet (Hale Foundation renewal page).\n2. Two quiet corporate partners: mark them inactive in the pipeline, or keep chasing?\n   - No reply from either since September (Funder pipeline, last-contact column).\n   - You held this for this check-in. Nothing has been decided.\n\n## What you need from Dana\n\n1. A review slot for the Hale narrative. What I need from you, Dana, is a review window\n   that fits between the 11/30 interim report and the 12/01 due date - or earlier, if the\n   draft can be ready sooner. Suggested ask: when can she turn a draft, and how many days\n   does she need?\n2. A decision on the two quiet partners. My recommendation: mark them inactive now so the\n   pipeline stays honest, and reopen if either replies. Ask Dana whether she knows of any\n   reason to keep them active.\n\n## Worth a line if time allows\n\n- The interim report and the renewal land back to back. Does Dana want to see the interim\n  report too, or only the renewal?\n\n## Flags\n\n- The graph pages record the Hale status and the quiet-partner hold \"as of 2026-10-28\",\n  which is the day of this meeting and two days after today. The date looks wrong. Treat the\n  \"not yet drafted\" and \"nothing decided\" statuses as unconfirmed until you check.\n- I found nothing in the graph about other open items with Dana (no budget, staffing or\n  agreement threads). If there are some, they are not in this brief.\nEOF\ngrep -nP '[^\\x00-\\x7F]' notes/dana-checkin-2026-10-28.md || echo ascii-clean",
+     "error"
+    ],
+    [
+     "Write",
+     "notes/dana-checkin-2026-10-28.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 44.7,
+   "cost_usd": 0.13074480000000002,
+   "when": "2026-10-26T21:30:37Z"
+  },
+  {
+   "prompt": "prep-dana-checkin",
+   "round": "C",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "# Dana check-in brief - Wed 2026-10-28, 11:00 (America/Denver)\n\nStatus: NOT READY. I could not reach any source that says what is open between you and Dana. Nothing below is invented; the open sections are blank on purpose.\n\n## What I checked\n\n| Source | Result |\n|---|---|\n| Knowledge graph (`kb/`) | Not present in this directory. No pages on Dana. |\n| `Grants/current/` (pipeline, calendar) | Not present in this directory. |\n| `notes/` (prior briefs, kb updates) | Did not exist before this file. |\n| Google Workspace mail and calendar | No mail or calendar tool available in this session, so no threads or meeting details checked. |\n\n## Known standing facts (from user.md)\n\n- Dana Whitfield is Executive Director and your manager.\n- She reviews anything going to a funder above 50,000 dollars. Any draft in that range needs her eyes before it goes out.\n\n## Open between you and Dana\n\n[NOT FOUND - needs mail/calendar or your list]\n\n## What you need from her\n\n[NOT FOUND - needs mail/calendar or your list]\n\n## To finish this brief\n\nAny one of these is enough:\n\n1. Connect or point me at the Cedar Commons mail and calendar, and I will pull threads with Dana and the invite for Wednesday.\n2. Give me `Grants/current/` (pipeline.xlsx, calendar.md), and I will list funder items over 50,000 that need her review.\n3. Tell me the two or three items on your mind, and I will draft the asks.\n",
+   "message": "I can't write a real brief yet. I couldn't find anything that says what's open between you and Dana.\n\nI saved a placeholder at `notes/briefs/2026-10-28-dana-checkin.md`, with the \"open items\" and \"what you need from her\" sections left blank. I didn't want to guess at them.\n\nWhat I looked for and didn't find:\n- **Knowledge graph:** there's no `kb/` in this directory, so nothing on Dana.\n- **Grants files:** `Grants/current/` isn't here, so I couldn't check the pipeline or calendar.\n- **Mail and calendar:** I have no mail or calendar tool in this session, so I couldn't read your threads with Dana or the Wednesday invite.\n\nThe only thing in the note is that Dana reviews any funder item over 50,000.\n\nTo finish it, do one of these:\n1. Connect the Cedar Commons mail and calendar.\n2. Give me `Grants/current/`.\n3. Tell me the two or three items on your mind. This is the fastest. I'll turn them into the brief and the asks.",
+   "output_from": "files: notes/briefs/2026-10-28-dana-checkin.md",
+   "trace": [
+    [
+     "Bash",
+     "ls; ls notes notes/briefs 2>/dev/null | head -30; kb/kb search Dana 2>&1 | head -30"
+    ],
+    [
+     "Grep",
+     "Dana"
+    ],
+    [
+     "Bash",
+     "ls -la; ls Grants Grants/current notes 2>&1 | head"
+    ],
+    [
+     "Bash",
+     "cd .; pwd; ls -a; git log --oneline | head"
+    ],
+    [
+     "Glob",
+     "**/* in ."
+    ],
+    [
+     "Write",
+     "notes/briefs/2026-10-28-dana-checkin.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 25.0,
+   "cost_usd": 0.0846134,
+   "when": "2026-10-26T21:30:37Z"
+  },
+  {
+   "prompt": "prep-priya-call",
+   "round": "A",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "# Hale Foundation - brief for call with Priya Raman\n\nCall: Tuesday 2026-10-27, 2:00pm. Priya Raman is the program officer at the Hale\nFoundation, Cedar Commons' largest funder.\n\nSource note: dates below come from the knowledge graph pages \"Hale Foundation\" and\n\"Hale Foundation renewal\", which cite the grant calendar. `Grants/current/` is not\nin this repo, so I could not open `calendar.md` or `pipeline.xlsx` to confirm them.\nCheck against `Grants/current/calendar.md` before quoting any date to Priya.\n\n## What is open\n\n| Item | Date | Amount | Status |\n|---|---|---|---|\n| Site visit | 2026-11-13, 10:00 | n/a | Set per graph. Confirm attendees and agenda. |\n| Interim report | Due 2026-11-30 | [UNVERIFIED] | Open. |\n| Renewal proposal | Due 2026-12-01 | [UNVERIFIED] | In preparation. Request is above 50,000, so Dana Whitfield reviews the narrative before it goes. |\n\n## Gaps\n\n- No amounts for the current grant, the interim report, or the renewal request are\n  in the graph. They live in `Grants/current/pipeline.xlsx` (Hale row) and the signed\n  agreement. Pull them before the call if you expect to talk numbers.\n- The interim report and the renewal proposal are due one day apart (11/30 and\n  12/01). Worth deciding before the call whether to ask Priya about sequencing.\n- Dana's review comes before the renewal goes out, so her review window has to fit\n  between the 11/13 site visit and 12/01.\n\n## Questions to put to Priya\n\n1. Is the 11/13 site visit at 10:00 still good on her side, and who from Hale is coming?\n2. Does she want anything in the interim report beyond what the agreement requires?\n3. Is there anything she needs from us for the renewal ahead of 12/01?\n\nNothing here has been sent to Hale.\n",
+   "message": "The brief is saved at `notes/2026-10-27-hale-call-brief.md`, but it has dates only. I found no amounts for Hale, so those are marked `[UNVERIFIED]`.\n\n`Grants/current/` isn't in this repo, so I couldn't open `calendar.md` or `pipeline.xlsx`. The dates come from the knowledge graph pages for Hale, which cite the grant calendar. Check them against `calendar.md` before you quote any to Priya.\n\n| Item | Date | Amount |\n|---|---|---|\n| Site visit | 2026-11-13, 10:00 | n/a |\n| Interim report | Due 2026-11-30 | `[UNVERIFIED]` |\n| Renewal proposal | Due 2026-12-01 | `[UNVERIFIED]` |\n\n- **Renewal review:** the renewal request is above 50,000, so Dana reviews the narrative before it goes. That review has to fit between the site visit and 12/01.\n- **Close deadlines:** the interim report and the renewal are due one day apart. The brief suggests asking Priya about sequencing.\n- **Amounts:** to get them before the call, check the Hale row in `Grants/current/pipeline.xlsx` and the signed agreement. The brief also has three questions for Priya.\n\nI also tried to look at `~/Documents/work`, but that command was denied, so I haven't seen any files there.",
+   "output_from": "files: notes/2026-10-27-hale-call-brief.md",
+   "trace": [
+    [
+     "Skill",
+     "knowledge-graph"
+    ],
+    [
+     "Bash",
+     "ls Grants/current/ notes/ 2>&1; cat Grants/current/calendar.md 2>&1",
+     "error"
+    ],
+    [
+     "Bash",
+     "ls; kb/kb search Hale Foundation Priya Raman 2>&1 | head -40"
+    ],
+    [
+     "Bash",
+     "ls ~/Documents/work 2>&1 | head -30",
+     "error"
+    ],
+    [
+     "Bash",
+     "kb/kb node \"Hale Foundation renewal\""
+    ],
+    [
+     "Bash",
+     "kb/kb node \"Grant calendar\""
+    ],
+    [
+     "Bash",
+     "find . -path ./.git -prune -o \\( -iname '*calendar*' -o -iname '*pipeline*' -o -iname '*hale*' \\) -print | head; ls kb/wiki | head -50"
+    ],
+    [
+     "Bash",
+     "cd kb/wiki && cat \"Hale Foundation.md\" \"Funder pipeline.md\" \"Priya Raman.md\""
+    ],
+    [
+     "Bash",
+     "mkdir -p notes && cat > notes/2026-10-27-hale-call-brief.md <<'EOF'\n# Hale Foundation - brief for call with Priya Raman\n\nCall: Tuesday 2026-10-27, 2:00pm. Priya Raman is the program officer at the Hale\nFoundation, Cedar Commons' largest funder.\n\nSource note: dates below come from the knowledge graph pages \"Hale Foundation\" and\n\"Hale Foundation renewal\", which cite the grant calendar. `Grants/current/` is not\nin this repo, so I could not open `calendar.md` or `pipeline.xlsx` to confirm them.\nCheck against `Grants/current/calendar.md` before quoting any date to Priya.\n\n## What is open\n\n| Item | Date | Amount | Status |\n|---|---|---|---|\n| Site visit | 2026-11-13, 10:00 | n/a | Set per graph. Confirm attendees and agenda. |\n| Interim report | Due 2026-11-30 | [UNVERIFIED] | Open. |\n| Renewal proposal | Due 2026-12-01 | [UNVERIFIED] | In preparation. Request is above 50,000, so Dana Whitfield reviews the narrative before it goes. |\n\n## Gaps\n\n- No amounts for the current grant, the interim report, or the renewal request are\n  in the graph. They live in `Grants/current/pipeline.xlsx` (Hale row) and the signed\n  agreement. Pull them before the call if you expect to talk numbers.\n- The interim report and the renewal proposal are due one day apart (11/30 and\n  12/01). Worth deciding before the call whether to ask Priya about sequencing.\n- Dana's review comes before the renewal goes out, so her review window has to fit\n  between the 11/13 site visit and 12/01.\n\n## Questions to put to Priya\n\n1. Is the 11/13 site visit at 10:00 still good on her side, and who from Hale is coming?\n2. Does she want anything in the interim report beyond the agreement's requirements?\n3. Is there anything she needs from us for the renewal ahead of 12/01?\n\nNothing here has been sent to Hale.\nEOF\ncat notes/2026-10-27-hale-call-brief.md | grep -nP '[^\\x00-\\x7F]' || echo ascii-ok",
+     "error"
+    ],
+    [
+     "Write",
+     "notes/2026-10-27-hale-call-brief.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 54.0,
+   "cost_usd": 0.1301682,
+   "when": "2026-10-26T21:30:37Z"
+  },
+  {
+   "prompt": "prep-priya-call",
+   "round": "C",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "# Hale Foundation - brief for call with Priya Raman\n\nCall: Tuesday 2026-10-27, 2:00pm (time as you gave it; not checked against the calendar).\n\n## Status of this brief\n\nNo open items, dates, or amounts are listed here. I could not source any of them.\n\n- `Grants/current/` (budget workbook, signed agreement, pipeline.xlsx, calendar.md) is not in this repo or reachable from this session.\n- `kb/` does not exist, so there are no graph pages on Hale.\n- Google Drive, Gmail, and Calendar tools are not available in this session, so I could not check the thread history or the grant calendar.\n- Local `~/Documents/work` was blocked by permissions.\n\nPer the rules, I am not filling in figures from memory or from older copies.\n\n## What I know\n\n- Priya Raman is program officer at the Hale Foundation, Cedar Commons' largest funder. Warm relationship, formal paperwork (user.md).\n- Dana Whitfield reviews anything going to a funder above 50,000.\n\n## To fill in before 2pm\n\n| Item | Source to check | Value |\n|---|---|---|\n| Current award amount and term | Signed agreement, Grants/current/ | [UNVERIFIED] |\n| Next report due date and amount reported | Grants/current/calendar.md | [UNVERIFIED] |\n| Payments received / outstanding | Budget workbook | [UNVERIFIED] |\n| Renewal stage and ask | Grants/current/pipeline.xlsx | [UNVERIFIED] |\n| Open threads or asks from Priya | Cedar Commons email | [UNVERIFIED] |\n\n## Questions to settle\n\n- Is the call a renewal conversation, a report check-in, or something she raised?\n- Is anything promised to Hale that is not yet delivered?\n",
+   "message": "I couldn't build the real brief. I saved a skeleton with no Hale dates or amounts in it, because I had nothing to source them from.\n\n- **Missing sources:** `Grants/current/` and `kb/` aren't in this repo. This session also has no Drive, Gmail, or Calendar tools, and it blocked me from reading `~/Documents/work`.\n- **What the file has:** Priya's role, and a table of the five things to check, each marked `[UNVERIFIED]`. The five are award amount and term, next report due date, payments, renewal stage, and open asks from her. It also has two questions: what the call is for, and whether anything promised to Hale is still undelivered.\n- **Call time:** I used your 2pm tomorrow and didn't check it against the calendar.\n\nThe skeleton is at `notes/briefs/2026-10-27-hale-priya-call.md`.\n\nTo get the real brief, either give me access to the Drive folder and `~/Documents/work`, or paste in the Hale agreement terms and the pipeline row. I'll fill it in and name the source for each figure.",
+   "output_from": "files: notes/briefs/2026-10-27-hale-priya-call.md",
+   "trace": [
+    [
+     "Bash",
+     "ls; ls kb Grants/current notes 2>&1 | head -50; kb/kb search Hale 2>&1 | head -30"
+    ],
+    [
+     "Bash",
+     "ls -la; ls ~/Documents/work 2>&1 | head; find / -ipath '*grants*' -maxdepth 5 2>/dev/null | head",
+     "error"
+    ],
+    [
+     "Glob",
+     "**/* in ."
+    ],
+    [
+     "Glob",
+     "**/* in /root/Documents/work",
+     "error"
+    ],
+    [
+     "Grep",
+     "Hale in ."
+    ],
+    [
+     "Write",
+     "notes/briefs/2026-10-27-hale-priya-call.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 21.4,
+   "cost_usd": 0.08265190000000001,
+   "when": "2026-10-26T21:30:37Z"
+  }
+ ],
+ "judge": [
+  {
+   "comparison": "A|C",
+   "prompt": "prep-dana-checkin",
+   "repeat": 1,
+   "shown_left": "A",
+   "decision": "LEFT",
+   "winner": "A",
+   "note": "",
+   "response": "Left gives Morgan a usable brief: the Hale renewal and the two quiet partners as open items, concrete asks for Dana, and flags where the source data is shaky. Right produces no content, only a list of what it couldn't find and blank sections, so Morgan would have to redo the work. Left's caveats are a bit long, but it is something Morgan could read before the meeting and send largely as is.\n\nLEFT",
+   "model": "claude-sonnet-5-5",
+   "when": "2026-10-26T21:32:50Z",
+   "seconds": 3.6,
+   "cost_usd": 0.0137349,
+   "status": "ok",
+   "requested_model": "claude-sonnet-5-5"
+  },
+  {
+   "comparison": "A|C",
+   "prompt": "prep-priya-call",
+   "repeat": 1,
+   "shown_left": "C",
+   "decision": "RIGHT",
+   "winner": "A",
+   "note": "",
+   "response": "Right is the one Morgan could send without changes. It answers the request with a table of open items (site visit 11/13, interim report 11/30, renewal proposal 12/01) and flags clearly that the amounts are unverified and the dates should be checked against `calendar.md`. Left gives no dates or amounts at all, only a list of what it couldn't access and a fill-in-yourself table, so Morgan would still have to do the brief's work. Right's sourcing is a small risk, since Left says `kb/` doesn't exist and I can't confirm the graph pages. Even so, Right is more useful and just as plain in tone.\n\nRIGHT",
+   "model": "claude-sonnet-5-5",
+   "when": "2026-10-26T21:32:50Z",
+   "seconds": 6.7,
+   "cost_usd": 0.0175989,
+   "status": "ok",
+   "requested_model": "claude-sonnet-5-5"
+  }
+ ],
+ "files": {},
+ "experiment": {
+  "name": "demo-graph-removed.toml",
+  "text": "# Demonstration 1 of 3: round C removes the knowledge graph. Things should get worse.\n# A demonstration for the live session: two prompts, two rounds, one repeat\n# (4 runs; about 3 minutes with --jobs 4). It is not a full experiment: a\n# full one has both controls, at least four development prompts and two\n# repeats (see class-assistant/experiment.toml, whose prompts, round files and\n# starting files this file uses). Wren and Morgan Reyes are fictional.\nschema = \"skill-eval-lite/experiment@1\"\ndemo = true\nfiles_from = \"class-assistant\"\ntitle = \"Can the evaluation see the knowledge graph? (demonstration: the graph removed)\"\npurpose = \"\"\"\nWren drafts replies, summaries and briefs for Morgan Reyes, who sends them\nunder Morgan's own name. The outputs are for Morgan to send or read with as\nfew changes as possible.\"\"\"\ncriterion = \"\"\"\nA good output could go out under Morgan's name without changes: it answers\nwhat was asked, gets the facts from the request and the knowledge graph right,\nand reads as Morgan writes (plain, short, no stock openers or sign-offs).\"\"\"\njudging_question = \"Which draft would Morgan be more willing to send under their own name without changes?\"\nrepeats = 1\nseed = 5502\n\n[system]\nname = \"Wren, Morgan Reyes's assistant (the class assistant; fictional)\"\nkind = \"assistant\"\nfolder = \"the class assistant: python3 run_ab.py setup ../class-assistant\"\n\n[[system.parts]]\nid = \"knowledge-graph\"\npath = \"kb/ and .claude/skills/knowledge-graph*/\"\npaths = [\"kb/\", \".claude/skills/knowledge-graph/\", \".claude/skills/knowledge-graph-maintain/\"]\nreaches_model = \"the skills load when the agent chooses; pages are searched with kb/kb\"\n\n[[rounds]]\nid = \"A\"\nlabel = \"As it is\"\nrole = \"baseline\"\nchange = { how = \"as-is\" }\n\n[[rounds]]\nid = \"C\"\nlabel = \"Knowledge graph removed\"\nrole = \"control-should-change\"\nchange = { part = \"knowledge-graph\", how = \"removed\" }\nexpected = { direction = \"worse\", tags = [\"in-graph\"], sources = [\"people\", \"judge\", \"searched-the-graph\", \"names-the-renewal-amount\"] }\nwhy = \"Without kb/ the assistant can't know who Dana and Priya are or what is open with them. If nothing in the evaluation moves, the evaluation can't see the graph.\"\n\n[[comparisons]]\nbaseline = \"A\"\nnew = \"C\"\n\n[controls]\ntolerance = 0.10\n\n[[behaviors]]\nid = \"uses-the-graph\"\ndescription = \"Searches the knowledge graph before writing about someone in it; doesn't need to when the request holds everything.\"\n\n[prompts]\ndevelopment = [\"prep-dana-checkin\", \"prep-priya-call\"]\nheld_out = [\"reply-to-school\"]\nsealed = true\n\n[[prompt]]\nid = \"prep-dana-checkin\"\ntitle = \"A brief for the check-in with Dana\"\ntags = [\"briefing\", \"in-graph\"]\nshould = [\"uses-the-graph\"]\nshould_not = [\"uses-the-board-register\"]\ntext = \"\"\"\nMy check-in with Dana is Wednesday at 11. Give me a short brief to read\nbeforehand: what's open between us, and what I need from her. Save it in\nnotes/.\"\"\"\nreference = \"\"\"\nCheck-in with Dana, Wednesday at 11\n\nOpen between us\n1. The Hale Foundation renewal narrative. The request is 120,000 over two years, above the 50,000 that Dana reviews, and it is due to Hale on 1 December. I need her review dates.\n2. The two quiet corporate partners. We haven't decided whether to mark them inactive. I need her decision.\n\nFrom the graph pages for Dana Whitfield and the Hale Foundation.\"\"\"\n\n[[prompt]]\nid = \"prep-priya-call\"\ntitle = \"A brief for a call with Priya at the Hale Foundation\"\ntags = [\"briefing\", \"funder\", \"in-graph\"]\nshould = [\"uses-the-graph\"]\ntext = \"\"\"\nPriya Raman is calling me tomorrow at 2. Give me a short brief to read first:\nwhat's open with the Hale Foundation, with the dates and amounts. Save it in\nnotes/.\"\"\"\nreference = \"\"\"\nCall with Priya Raman, Hale Foundation, tomorrow at 2\n\nOpen with Hale\n1. The interim report on the current grant, due Monday 30 November.\n2. The renewal proposal: 120,000 over two years, due Tuesday 1 December. The narrative isn't drafted yet, and Dana reviews it before it goes, because the request is above 50,000.\n\nFrom the graph pages for the Hale Foundation renewal and the grant calendar.\"\"\"\n\n[[prompt]]\nid = \"reply-to-school\"\ntitle = \"Answer Ms. Okafor about the trip\"\ntags = [\"voice\", \"reply\", \"household\", \"not-in-graph\"]\nshould_not = [\"uses-the-graph\", \"uses-the-board-register\"]\nfiles = [\"input/school-email.md\"]\ntext = \"\"\"\nCan you answer Ms. Okafor for me? Her email is in input/school-email.md. Yes to\nthe trip, and I've signed the form and will send it in with the fee tomorrow.\nI can't chaperone that day, sorry.\"\"\"\nreference = \"\"\"\nMs. Okafor,\n\nYes to the trip. I've signed the form, and it'll come in with the fee tomorrow. I can't chaperone that day, sorry.\n\nMorgan\"\"\"\n\n[model]\nrunner = \"claude-code\"\nmodel = \"claude-sonnet-5-5\"\nallowed_tools = [\"Read\", \"Write\", \"Edit\", \"Glob\", \"Grep\", \"Skill\", \"Bash kb/kb *\"]\ntimeout_seconds = 300\nmax_budget_usd = 1.00\nnote = \"The same model and settings for every round. Personal settings, memory and connectors are left out of every run.\"\n\n# Checks run by the wizard on every output. contains: every text must appear;\n# not-contains: none may appear. A failed or timed-out run fails every check.\n\n[[checks]]\nid = \"searched-the-graph\"\nkind = \"trace-ran-command\"\nobject = \"process\"\npattern = \"kb/kb search*\"\ntags = [\"in-graph\"]\nshows = \"The run searched the knowledge graph, as CLAUDE.md asks before answering anything about a person.\"\ndoes_not_show = \"That it used what it found, or searched for the right person.\"\n\n[[checks]]\nid = \"names-the-renewal-amount\"\nkind = \"matches\"\nobject = \"product\"\npattern = \"120,?000|120 ?[kK]\"\nprompts = [\"prep-dana-checkin\", \"prep-priya-call\"]\nshows = \"The brief gives the Hale renewal's amount, which only the knowledge graph holds.\"\ndoes_not_show = \"That the rest of the brief is right.\"\n\n[[checks]]\nid = \"stayed-in-bounds\"\nkind = \"trace-no-tool-outside\"\nobject = \"process\"\nallowed = [\"Read\", \"Write\", \"Edit\", \"Glob\", \"Grep\", \"Skill\", \"Bash kb/kb *\"]\nshows = \"Every step used a tool on the allowed list.\"\ndoes_not_show = \"That each step was a good one.\"\n\n[[checks]]\nid = \"no-forbidden-characters\"\nkind = \"not-contains\"\nobject = \"product\"\ntext = [\"—\", \"–\", \"“\", \"”\", \"‘\", \"’\", \"…\"]\nshows = \"The voice file's character rule held: no em or en dashes, curly quotes or ellipsis characters.\"\ndoes_not_show = \"That the draft sounds like Morgan, or that it is right.\"\n\n[judge]\nmodel = \"claude-sonnet-5-5\"\ndecision = \"The last line of the response is LEFT, RIGHT, TIE or UNKNOWN.\"\nprompt = \"\"\"\nYou are judging two drafts that an assistant wrote for Morgan Reyes. Morgan\nsends drafts under their own name. Read the request, the starting file if\nthere is one, and the two drafts.\n\nQuestion: Which draft would Morgan be more willing to send under their own\nname without changes?\n\nJudge what is on the page: whether it answers what was asked, whether its\nfacts match the request, and whether it reads as Morgan writes (plain, short,\nno stock openers or sign-offs). Do not prefer a draft because it is longer.\n\nGive two or three sentences of reasons. Then, on the last line, write only\nLEFT, RIGHT or TIE, or UNKNOWN if you can't tell.\"\"\"\n\n[frozen]\ndate = \"\"\nhash = \"\"\n\n[provenance]\nwritten_by = \"Claude (claude-opus-5-5), by hand, from the class intake\"\ndate = \"2026-10-26\"\nskill = \"experiment-intake 1\"\n",
+  "sha256": "sha256:9b9c9f1f3a5670f55b1851770110a8330b6d7fc3996e9b883b1d90076a5f5fda"
+ },
+ "assistant": {
+  "name": "class-assistant",
+  "git": {
+   "commit": "53bba55",
+   "uncommitted_changes": false
+  }
+ },
+ "runner": {
+  "claude_code_version": "2.1.310",
+  "flags": [
+   "-p",
+   "--output-format",
+   "stream-json",
+   "--verbose",
+   "--model",
+   "claude-sonnet-5-5",
+   "--setting-sources",
+   "project",
+   "--strict-mcp-config",
+   "--settings",
+   "{\"autoMemoryEnabled\":false,\"disableClaudeAiConnectors\":true}",
+   "--tools",
+   "Read,Write,Edit,Glob,Grep,Skill,Bash",
+   "--permission-mode",
+   "acceptEdits",
+   "--permission-prompts",
+   "none",
+   "--no-session-persistence",
+   "--max-budget-usd",
+   "1",
+   "--allowedTools",
+   "Skill,Bash(kb/kb *)"
+  ],
+  "env": {
+   "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+   "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+   "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS": "1"
+  }
+ },
+ "updated": "2026-10-26T21:31:31Z"
+}

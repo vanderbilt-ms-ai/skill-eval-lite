@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 251" width="400" height="251" role="img" aria-labelledby="steps-group-04-t steps-group-04-d"><title id="steps-group-04-t">Claude Code: Answer its questions, together</title><desc id="steps-group-04-d"> You should see: “I wrote experiments/…/experiment.toml” and a checklist.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .tw{fill:#1E2A33;stroke:#13202A}
+.dg .twbar{fill:#2B3945}
+.dg .twdot{fill:#5B6B78}
+.dg .tw-t{fill:#E6EDF3}
+.dg .tw-o{fill:#A9B8C4}
+.dg .tw-ag{fill:#CDB4F2}
+.dg .tw-box{fill:none;stroke:#6C7C89}
+.dg .tw-cur{fill:#E6EDF3}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .tw{fill:#0A0F13;stroke:#2A3640}
+.dg .twbar{fill:#18222A}
+.dg .twdot{fill:#5B6B78}
+.dg .tw-t{fill:#E6EDF3}
+.dg .tw-o{fill:#A9B8C4}
+.dg .tw-ag{fill:#CDB4F2}
+.dg .tw-box{fill:none;stroke:#6C7C89}
+.dg .tw-cur{fill:#E6EDF3}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="399" height="250" rx="12"/><rect x="8" y="8" width="384" height="235" rx="10" class="tw"/><path d="M8 18 Q8 8 18 8 H382 Q392 8 392 18 V32 H8 Z" class="twbar"/><circle cx="22" cy="20" r="3.6" class="twdot"/><circle cx="35" cy="20" r="3.6" class="twdot"/><circle cx="48" cy="20" r="3.6" class="twdot"/><text x="200" y="24.5" font-size="11" class="tw-o" text-anchor="middle">Claude Code</text><text x="22" y="60" font-size="12.5" class="m"><tspan class="tw-ag b">Claude Code</tspan><tspan class="tw-o">  in skill-eval-lite</tspan></text><text x="22" y="85" font-size="12"><tspan class="tw-o it">(for example, you might answer:)</tspan></text><rect x="16" y="90" width="368" height="46" rx="6" class="tw-box"/><text x="26.7" y="110" font-size="12.5" class="m"><tspan class="tw-ag">&gt; </tspan><tspan class="tw-t">Our assistant drafts replies. We want to</tspan></text><text x="42.2" y="129" font-size="12.5" class="m"><tspan class="tw-ag"></tspan><tspan class="tw-t">improve its voice file.</tspan></text><text x="22" y="156" font-size="12"><tspan class="tw-o it">(it asks up to five questions, then writes the</tspan></text><text x="22" y="175" font-size="12"><tspan class="tw-o it">file)</tspan></text><text x="22" y="194" font-size="12.5" class="m"><tspan class="tw-ag">Wrote experiments/&lt;name&gt;/experiment.toml</tspan></text><rect x="16" y="201" width="368" height="26" rx="6" class="tw-box"/><text x="24" y="218.5" font-size="12.5" class="m tw-ag">&gt;</text><rect x="36.4" y="208" width="7.4" height="14" rx="1" class="tw-cur"/></svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 83" width="400" height="83" role="img" aria-labelledby="steps-first-05-t steps-first-05-d"><title id="steps-first-05-t">Terminal: Go into the folder</title><desc id="steps-first-05-d">Type: cd skill-eval-lite.  You should see: The prompt now shows skill-eval-lite.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .tw{fill:#1E2A33;stroke:#13202A}
+.dg .twbar{fill:#2B3945}
+.dg .twdot{fill:#5B6B78}
+.dg .tw-t{fill:#E6EDF3}
+.dg .tw-p{fill:#62D2C0}
+.dg .tw-o{fill:#A9B8C4}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .tw{fill:#0A0F13;stroke:#2A3640}
+.dg .twbar{fill:#18222A}
+.dg .twdot{fill:#5B6B78}
+.dg .tw-t{fill:#E6EDF3}
+.dg .tw-p{fill:#62D2C0}
+.dg .tw-o{fill:#A9B8C4}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="399" height="82" rx="12"/><rect x="8" y="8" width="384" height="67" rx="10" class="tw"/><path d="M8 18 Q8 8 18 8 H382 Q392 8 392 18 V32 H8 Z" class="twbar"/><circle cx="22" cy="20" r="3.6" class="twdot"/><circle cx="35" cy="20" r="3.6" class="twdot"/><circle cx="48" cy="20" r="3.6" class="twdot"/><text x="200" y="24.5" font-size="11" class="tw-o" text-anchor="middle">Terminal</text><text x="22" y="60" font-size="12.5" class="m"><tspan class="tw-p">~ $ </tspan><tspan class="tw-t">cd skill-eval-lite</tspan></text></svg>

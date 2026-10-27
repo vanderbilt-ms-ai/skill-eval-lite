@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 440 630" width="440" height="630" role="img" aria-labelledby="which-path-t which-path-d"><title id="which-path-t">Which path are you on?</title><desc id="which-path-d">Four paths through Skill Eval Lite. A demonstration: setup, run and judge in the terminal, then steps 1 to 5 in the wizard. The class experiment: setup, copy and check in the terminal, freeze in the wizard, put the frozen file back, then run and judge, then wizard steps 3 to 5. Your group’s experiment: the intake skill in Claude Code, check, freeze, put the frozen file back, run, judge, wizard steps 3 to 5. Personal I suites: copy, suite, then the wizard’s checks-only mode.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#45515B}
+.dg .inv{fill:#FFFFFF}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .pl{fill:#F8F8F4;stroke:#D9DAD2}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .h-ink{fill:#16212B}
+.dg .f-term{fill:rgba(28,124,110,.14);stroke:#1C7C6E}
+.dg .t-term{fill:#187062}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-agent{fill:rgba(122,79,168,.12);stroke:#7A4FA8}
+.dg .h-agent{fill:#7A4FA8}
+.dg .t-agent{fill:#7A4FA8}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+.dg .t-file{fill:#85590A}
+.dg .s-n{stroke:#7A8791}
+.dg .h-n{fill:#7A8791}
+.dg .tw{fill:#1E2A33;stroke:#13202A}
+.dg .tw-arrow{stroke:#62D2C0}
+.dg .tw-cur{fill:#E6EDF3}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#A7B4BF}
+.dg .inv{fill:#141C23}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .pl{fill:#18222A;stroke:#2A3640}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .h-ink{fill:#E2E8EE}
+.dg .f-term{fill:rgba(76,192,174,.16);stroke:#4CC0AE}
+.dg .t-term{fill:#4CC0AE}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-agent{fill:rgba(180,148,222,.15);stroke:#B494DE}
+.dg .h-agent{fill:#B494DE}
+.dg .t-agent{fill:#B494DE}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+.dg .t-file{fill:#E2AE4A}
+.dg .s-n{stroke:#8E9BA5}
+.dg .h-n{fill:#8E9BA5}
+.dg .tw{fill:#0A0F13;stroke:#2A3640}
+.dg .tw-arrow{stroke:#62D2C0}
+.dg .tw-cur{fill:#E6EDF3}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="439" height="629" rx="12"/><text x="16" y="28" font-size="15" class="b">Which path are you on?</text><rect x="16" y="44" width="408" height="111" rx="10" class="pl"/><g transform="translate(0 44)"><circle cx="30" cy="22" r="11" class="h-ink"/><text x="30" y="26.2" font-size="12" class="b inv" text-anchor="middle">1</text><text x="50" y="27" font-size="14" class="b">A demonstration</text><text x="50" y="46" font-size="12.5" class="t2">See the whole cycle on a small, ready-made</text><text x="50" y="63" font-size="12.5" class="t2">example.</text><rect x="50" y="75" width="51.7" height="22" rx="11" class="f-term"/><text x="58" y="90.1" font-size="11.5" class="m t-term">setup</text><path d="M104.7 86 L111.7 86" class="ln s-n"/><path d="M118.7 86 L109.7 90.8 L109.7 81.2 Z" class="h-n"/><rect x="121.7" y="75" width="37.4" height="22" rx="11" class="f-term"/><text x="129.7" y="90.1" font-size="11.5" class="m t-term">run</text><path d="M162 86 L169 86" class="ln s-n"/><path d="M176 86 L167 90.8 L167 81.2 Z" class="h-n"/><rect x="179" y="75" width="51.7" height="22" rx="11" class="f-term"/><text x="187" y="90.1" font-size="11.5" class="m t-term">judge</text><path d="M233.7 86 L240.7 86" class="ln s-n"/><path d="M247.7 86 L238.7 90.8 L238.7 81.2 Z" class="h-n"/><rect x="250.7" y="75" width="80.2" height="22" rx="11" class="f-web"/><text x="258.7" y="90.1" font-size="11.5" class="m t-web">steps 1–5</text></g><rect x="16" y="165" width="408" height="143" rx="10" class="pl"/><g transform="translate(0 165)"><circle cx="30" cy="22" r="11" class="h-ink"/><text x="30" y="26.2" font-size="12" class="b inv" text-anchor="middle">2</text><text x="50" y="27" font-size="14" class="b">The class experiment</text><text x="50" y="46" font-size="12.5" class="t2">Shared I, on the class assistant, with the</text><text x="50" y="63" font-size="12.5" class="t2">class’s experiment file.</text><rect x="50" y="75" width="51.7" height="22" rx="11" class="f-term"/><text x="58" y="90.1" font-size="11.5" class="m t-term">setup</text><path d="M104.7 86 L111.7 86" class="ln s-n"/><path d="M118.7 86 L109.7 90.8 L109.7 81.2 Z" class="h-n"/><rect x="121.7" y="75" width="44.5" height="22" rx="11" class="f-term"/><text x="129.7" y="90.1" font-size="11.5" class="m t-term">copy</text><path d="M169.2 86 L176.2 86" class="ln s-n"/><path d="M183.2 86 L174.2 90.8 L174.2 81.2 Z" class="h-n"/><rect x="186.2" y="75" width="51.7" height="22" rx="11" class="f-term"/><text x="194.2" y="90.1" font-size="11.5" class="m t-term">check</text><path d="M240.8 86 L247.8 86" class="ln s-n"/><path d="M254.8 86 L245.8 90.8 L245.8 81.2 Z" class="h-n"/><rect x="257.8" y="75" width="58.8" height="22" rx="11" class="f-web"/><text x="265.8" y="90.1" font-size="11.5" class="m t-web">freeze</text><path d="M319.6 86 L326.6 86" class="ln s-n"/><path d="M333.6 86 L324.6 90.8 L324.6 81.2 Z" class="h-n"/><rect x="336.6" y="75" width="73" height="22" rx="11" class="f-file"/><text x="344.6" y="90.1" font-size="11.5" class="m t-file">put back</text><path d="M53 118 L60 118" class="ln s-n"/><path d="M67 118 L58 122.8 L58 113.2 Z" class="h-n"/><rect x="70" y="107" width="37.4" height="22" rx="11" class="f-term"/><text x="78" y="122.1" font-size="11.5" class="m t-term">run</text><path d="M110.4 118 L117.4 118" class="ln s-n"/><path d="M124.4 118 L115.4 122.8 L115.4 113.2 Z" class="h-n"/><rect x="127.4" y="107" width="51.7" height="22" rx="11" class="f-term"/><text x="135.4" y="122.1" font-size="11.5" class="m t-term">judge</text><path d="M182 118 L189 118" class="ln s-n"/><path d="M196 118 L187 122.8 L187 113.2 Z" class="h-n"/><rect x="199" y="107" width="80.2" height="22" rx="11" class="f-web"/><text x="207" y="122.1" font-size="11.5" class="m t-web">steps 3–5</text></g><rect x="16" y="318" width="408" height="126" rx="10" class="pl"/><g transform="translate(0 318)"><circle cx="30" cy="22" r="11" class="h-ink"/><text x="30" y="26.2" font-size="12" class="b inv" text-anchor="middle">3</text><text x="50" y="27" font-size="14" class="b">Your group’s experiment</text><text x="50" y="46" font-size="12.5" class="t2">Shared I, with an experiment your group writes.</text><rect x="50" y="58" width="58.8" height="22" rx="11" class="f-agent"/><text x="58" y="73.1" font-size="11.5" class="m t-agent">intake</text><path d="M111.8 69 L118.8 69" class="ln s-n"/><path d="M125.8 69 L116.8 73.8 L116.8 64.2 Z" class="h-n"/><rect x="128.8" y="58" width="51.7" height="22" rx="11" class="f-term"/><text x="136.8" y="73.1" font-size="11.5" class="m t-term">check</text><path d="M183.4 69 L190.4 69" class="ln s-n"/><path d="M197.4 69 L188.4 73.8 L188.4 64.2 Z" class="h-n"/><rect x="200.4" y="58" width="58.8" height="22" rx="11" class="f-web"/><text x="208.4" y="73.1" font-size="11.5" class="m t-web">freeze</text><path d="M262.2 69 L269.2 69" class="ln s-n"/><path d="M276.2 69 L267.2 73.8 L267.2 64.2 Z" class="h-n"/><rect x="279.2" y="58" width="73" height="22" rx="11" class="f-file"/><text x="287.2" y="73.1" font-size="11.5" class="m t-file">put back</text><path d="M355.3 69 L362.3 69" class="ln s-n"/><path d="M369.3 69 L360.3 73.8 L360.3 64.2 Z" class="h-n"/><rect x="372.3" y="58" width="37.4" height="22" rx="11" class="f-term"/><text x="380.3" y="73.1" font-size="11.5" class="m t-term">run</text><path d="M53 101 L60 101" class="ln s-n"/><path d="M67 101 L58 105.8 L58 96.2 Z" class="h-n"/><rect x="70" y="90" width="51.7" height="22" rx="11" class="f-term"/><text x="78" y="105.1" font-size="11.5" class="m t-term">judge</text><path d="M124.7 101 L131.7 101" class="ln s-n"/><path d="M138.7 101 L129.7 105.8 L129.7 96.2 Z" class="h-n"/><rect x="141.7" y="90" width="80.2" height="22" rx="11" class="f-web"/><text x="149.7" y="105.1" font-size="11.5" class="m t-web">steps 3–5</text></g><rect x="16" y="454" width="408" height="94" rx="10" class="pl"/><g transform="translate(0 454)"><circle cx="30" cy="22" r="11" class="h-ink"/><text x="30" y="26.2" font-size="12" class="b inv" text-anchor="middle">4</text><text x="50" y="27" font-size="14" class="b">Personal I: suites</text><text x="50" y="46" font-size="12.5" class="t2">Your own suites of tests, run on every case.</text><rect x="50" y="58" width="44.5" height="22" rx="11" class="f-term"/><text x="58" y="73.1" font-size="11.5" class="m t-term">copy</text><path d="M97.5 69 L104.5 69" class="ln s-n"/><path d="M111.5 69 L102.5 73.8 L102.5 64.2 Z" class="h-n"/><rect x="114.5" y="58" width="51.7" height="22" rx="11" class="f-term"/><text x="122.5" y="73.1" font-size="11.5" class="m t-term">suite</text><path d="M169.2 69 L176.2 69" class="ln s-n"/><path d="M183.2 69 L174.2 73.8 L174.2 64.2 Z" class="h-n"/><rect x="186.2" y="58" width="130.1" height="22" rx="11" class="f-web"/><text x="194.2" y="73.1" font-size="11.5" class="m t-web">checks-only mode</text></g><rect x="16" y="562" width="91.4" height="24" rx="12" class="f-term"/><rect x="23" y="567" width="17" height="14" rx="3" class="tw"/><path d="M26.5 571 L30 574 L26.5 577" class="ln thin tw-arrow"/><rect x="31.5" y="576.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="46" y="578.1" font-size="11.5" class="t-term">Terminal</text><rect x="115.4" y="562" width="111.4" height="24" rx="12" class="f-agent"/><path d="M125.36 567.5 H136.36 Q139.36 567.5 139.36 570.5 V575.5 Q139.36 578.5 136.36 578.5 H130.36 L126.86 581.5 V578.5 H125.36 Q122.36 578.5 122.36 575.5 V570.5 Q122.36 567.5 125.36 567.5 Z" class="f-agent"/><circle cx="127.6" cy="573" r="1.1" class="h-agent"/><circle cx="130.9" cy="573" r="1.1" class="h-agent"/><circle cx="134.2" cy="573" r="1.1" class="h-agent"/><text x="145.4" y="578.1" font-size="11.5" class="t-agent">Claude Code</text><rect x="234.7" y="562" width="104.7" height="24" rx="12" class="f-web"/><rect x="241.7" y="567" width="17" height="14" rx="3" class="f-web"/><path d="M241.7 571.5 L258.7 571.5" class="ln s-web thin"/><circle cx="244.7" cy="569.3" r="0.9" class="h-web"/><circle cx="247.3" cy="569.3" r="0.9" class="h-web"/><text x="264.7" y="578.1" font-size="11.5" class="t-web">The wizard</text><rect x="16" y="594" width="104.7" height="24" rx="12" class="f-file"/><path transform="translate(23 598) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="46" y="610.1" font-size="11.5" class="t-file">Your files</text></svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 254" width="300" height="254" role="img" aria-labelledby="dz-assistant-t dz-assistant-d"><title id="dz-assistant-t">The designer reads your assistant</title><desc id="dz-assistant-d">The page reads your assistant’s folder (CLAUDE.md, .claude/identity/, kb/, .claude/skills/) and lists its parts. It never changes the folder, and nothing leaves your computer.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#45515B}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .ed{fill:#FFFFFF;stroke:#5F6A73}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-agent{fill:rgba(122,79,168,.12);stroke:#7A4FA8}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+.dg .h-ok{fill:#1F7D55}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#A7B4BF}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .ed{fill:#141C23;stroke:#8593A0}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-agent{fill:rgba(180,148,222,.15);stroke:#B494DE}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+.dg .h-ok{fill:#4CC08B}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="253" rx="12"/><text x="12" y="22" font-size="12.5" class="b">The designer reads your assistant</text><rect x="12" y="34" width="172" height="132" rx="9" class="f-agent"/><path transform="translate(22 49) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="42" y="60.5" font-size="11.5" class="m">your-assistant/</text><path d="M28 71 V84 H35" class="ln thin s-rule"/><g transform="translate(38 72) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="ed"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin"/></g><text x="58" y="84.5" font-size="11.5" class="m">CLAUDE.md</text><path d="M28 95 V108 H35" class="ln thin s-rule"/><path transform="translate(38 97) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="58" y="108.5" font-size="11.5" class="m">.claude/identity/</text><path d="M28 119 V132 H35" class="ln thin s-rule"/><path transform="translate(38 121) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="58" y="132.5" font-size="11.5" class="m">kb/</text><path d="M28 143 V156 H35" class="ln thin s-rule"/><path transform="translate(38 145) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="58" y="156.5" font-size="11.5" class="m">.claude/skills/</text><rect x="238" y="81" width="17" height="14" rx="3" class="f-web"/><path d="M238 85.5 L255 85.5" class="ln s-web thin"/><circle cx="241" cy="83.3" r="0.9" class="h-web"/><circle cx="243.6" cy="83.3" r="0.9" class="h-web"/><text x="246" y="114" font-size="10.5" class="t-web" text-anchor="middle">this page</text><path d="M186 88 L225 88" class="ln s-web dash"/><path d="M232 88 L223 92.8 L223 83.2 Z" class="h-web"/><text x="208" y="80" font-size="10.5" class="t-web b" text-anchor="middle">reads</text><circle cx="20" cy="186" r="8" class="h-ok"/><path d="M16.3 186.3 L19 189 L23.8 183.6" class="ln" style="stroke:#fff;stroke-width:2"/><text x="34" y="190" font-size="11.5" class="t2">Read only: it never changes the folder.</text><circle cx="20" cy="210" r="8" class="h-ok"/><path d="M16.3 210.3 L19 213 L23.8 207.6" class="ln" style="stroke:#fff;stroke-width:2"/><text x="34" y="214" font-size="11.5" class="t2">Nothing leaves your computer.</text><circle cx="20" cy="234" r="8" class="h-ok"/><path d="M16.3 234.3 L19 237 L23.8 231.6" class="ln" style="stroke:#fff;stroke-width:2"/><text x="34" y="238" font-size="11.5" class="t2">Each file is a part you can change.</text></svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 276" width="300" height="276" role="img" aria-labelledby="help-step-5-t help-step-5-d"><title id="help-step-5-t">Step 5: save your results</title><desc id="help-step-5-d">Export judgments.csv and results.json. They go to Downloads; move both into skill-eval-lite/runs/&lt;name&gt;/. Import a teammate’s judgments.csv here.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
+.dg .inv{fill:#FFFFFF}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .btn{fill:#16212B;stroke:#16212B}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+.dg .f-n{fill:rgba(122,135,145,.16);stroke:#7A8791}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
+.dg .inv{fill:#141C23}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .btn{fill:#E2E8EE;stroke:#E2E8EE}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+.dg .f-n{fill:rgba(142,155,165,.18);stroke:#8E9BA5}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="275" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Save your results with the runs</text><rect x="12" y="42" width="155.4" height="26" rx="6" class="btn"/><text x="89.7" y="59.1" font-size="11.5" class="inv" text-anchor="middle">Export judgments.csv</text><rect x="12" y="74" width="148.7" height="26" rx="6" class="btn"/><text x="86.4" y="91.1" font-size="11.5" class="inv" text-anchor="middle">Export results.json</text><path d="M30 104 L30 119" class="ln s-web"/><path d="M30 126 L25.2 117 L34.8 117 Z" class="h-web"/><text x="42" y="119" font-size="10.5" class="t3 it">they go to Downloads</text><path transform="translate(12 136) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-n"/><text x="32" y="148" font-size="11.5" class="m b">Downloads/</text><path d="M30 160 L30 175" class="ln s-web"/><path d="M30 182 L25.2 173 L34.8 173 Z" class="h-web"/><text x="42" y="175" font-size="10.5" class="t3 it">move both here</text><path transform="translate(12 185) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="32" y="196.5" font-size="11.5" class="m">skill-eval-lite/runs/&lt;name&gt;/</text><path d="M18 205 V218 H25" class="ln thin s-rule"/><g transform="translate(28 206) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="48" y="218.5" font-size="11.5" class="m b t-web">judgments.csv</text><text x="288" y="218.5" font-size="10.5" class="t3 it" text-anchor="end">yours</text><path d="M18 227 V240 H25" class="ln thin s-rule"/><g transform="translate(28 228) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="48" y="240.5" font-size="11.5" class="m b t-web">results.json</text><text x="288" y="240.5" font-size="10.5" class="t3 it" text-anchor="end">the results</text><text x="12" y="264" font-size="11.5" class="t2">A teammate’s judgments.csv: import it here.</text></svg>

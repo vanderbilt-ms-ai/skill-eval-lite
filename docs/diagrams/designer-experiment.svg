@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 545" width="400" height="545" role="img" aria-labelledby="designer-experiment-t designer-experiment-d"><title id="designer-experiment-t">The experiment designer, screen by screen</title><desc id="designer-experiment-d">Nine screens: start (the class experiment, a demonstration, or blank), the assistant and its parts, the question, the change (round B), the two controls (rounds C and D), the prompts, the checks and the AI judge, the runs, and a review. Then save: experiments/&lt;name&gt;/ with experiment.toml, rounds/ and prompts/. Next, check it in the terminal and freeze it in the wizard.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
+.dg .inv{fill:#FFFFFF}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .pl{fill:#F8F8F4;stroke:#D9DAD2}
+.dg .ed{fill:#FFFFFF;stroke:#5F6A73}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
+.dg .inv{fill:#141C23}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .pl{fill:#18222A;stroke:#2A3640}
+.dg .ed{fill:#141C23;stroke:#8593A0}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="399" height="544" rx="12"/><text x="16" y="28" font-size="15" class="b">The experiment designer, screen by screen</text><text x="16" y="48" font-size="12" class="t2">One thing on each screen, with a picture and an</text><text x="16" y="64.3" font-size="12" class="t2">example. The file grows as you go, and this browser</text><text x="16" y="80.6" font-size="12" class="t2">keeps your work.</text><path d="M30 110.64 V350.64" class="ln thin dash s-web"/><circle cx="30" cy="110.6" r="10" class="h-web"/><text x="30" y="114.6" font-size="11" class="b inv" text-anchor="middle">1</text><text x="50" y="115.1" font-size="13" class="b">Start</text><text x="100" y="115.1" font-size="11.5" class="t3">the class, a demo, or blank</text><circle cx="30" cy="140.6" r="10" class="h-web"/><text x="30" y="144.6" font-size="11" class="b inv" text-anchor="middle">2</text><text x="50" y="145.1" font-size="13" class="b">The assistant</text><text x="163.9" y="145.1" font-size="11.5" class="t3">its parts</text><circle cx="30" cy="170.6" r="10" class="h-web"/><text x="30" y="174.6" font-size="11" class="b inv" text-anchor="middle">3</text><text x="50" y="175.1" font-size="13" class="b">The question</text><text x="155.9" y="175.1" font-size="11.5" class="t3">what good looks like</text><circle cx="30" cy="200.6" r="10" class="h-web"/><text x="30" y="204.6" font-size="11" class="b inv" text-anchor="middle">4</text><text x="50" y="205.1" font-size="13" class="b">The change</text><text x="139.9" y="205.1" font-size="11.5" class="t3">round B</text><circle cx="30" cy="230.6" r="10" class="h-web"/><text x="30" y="234.6" font-size="11" class="b inv" text-anchor="middle">5</text><text x="50" y="235.1" font-size="13" class="b">The controls</text><text x="155.9" y="235.1" font-size="11.5" class="t3">rounds C and D</text><circle cx="30" cy="260.6" r="10" class="h-web"/><text x="30" y="264.6" font-size="11" class="b inv" text-anchor="middle">6</text><text x="50" y="265.1" font-size="13" class="b">The prompts</text><text x="147.9" y="265.1" font-size="11.5" class="t3">requests, held out</text><circle cx="30" cy="290.6" r="10" class="h-web"/><text x="30" y="294.6" font-size="11" class="b inv" text-anchor="middle">7</text><text x="50" y="295.1" font-size="13" class="b">The checks</text><text x="139.9" y="295.1" font-size="11.5" class="t3">and the AI judge</text><circle cx="30" cy="320.6" r="10" class="h-web"/><text x="30" y="324.6" font-size="11" class="b inv" text-anchor="middle">8</text><text x="50" y="325.1" font-size="13" class="b">The runs</text><text x="123.9" y="325.1" font-size="11.5" class="t3">repeats, tool, model</text><circle cx="30" cy="350.6" r="10" class="h-web"/><text x="30" y="354.6" font-size="11" class="b inv" text-anchor="middle">9</text><text x="50" y="355.1" font-size="13" class="b">Review and save</text><text x="179.9" y="355.1" font-size="11.5" class="t3">the folder</text><path d="M30 374.6 L30 391.6" class="ln s-web"/><path d="M30 398.6 L25.2 389.6 L34.8 389.6 Z" class="h-web"/><text x="44" y="390.6" font-size="11.5" class="t-web b">Save</text><rect x="16" y="402.6" width="368" height="108" rx="10" class="pl"/><path transform="translate(30 413.6) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="52" y="425.1" font-size="12" class="m b">experiments/&lt;name&gt;/</text><text x="226" y="425.1" font-size="11.5" class="t3">in skill-eval-lite</text><path d="M38 434.6 V448.6 H47" class="ln thin s-rule"/><g transform="translate(50 436.6) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="ed"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin"/></g><text x="72" y="449.1" font-size="12" class="m">experiment.toml</text><text x="226" y="449.1" font-size="11.5" class="t3">the plan for the test</text><path d="M38 458.6 V472.6 H47" class="ln thin s-rule"/><path transform="translate(50 461.6) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="72" y="473.1" font-size="12" class="m">rounds/</text><text x="226" y="473.1" font-size="11.5" class="t3">the changed files</text><path d="M38 482.6 V496.6 H47" class="ln thin s-rule"/><path transform="translate(50 485.6) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="72" y="497.1" font-size="12" class="m">prompts/</text><text x="226" y="497.1" font-size="11.5" class="t3">the starting files</text><text x="16" y="530.6" font-size="12.5" class="b">Next, in the terminal: check it. Then freeze it in the wizard.</text></svg>

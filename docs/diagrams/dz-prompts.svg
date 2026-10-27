@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 202" width="300" height="202" role="img" aria-labelledby="dz-prompts-t dz-prompts-d"><title id="dz-prompts-t">Prompts to work with, and held out</title><desc id="dz-prompts-d">Four development prompts, whose outputs you read, and two held out, sealed until the end. Each behavior has prompts where it should happen and prompts where it should not.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .b{font-weight:600}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .bar2{fill:#D9DAD2;stroke:none}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-agent{fill:rgba(122,79,168,.12);stroke:#7A4FA8}
+.dg .s-agent{stroke:#7A4FA8}
+.dg .h-agent{fill:#7A4FA8}
+.dg .t-agent{fill:#7A4FA8}
+.dg .f-ok{fill:rgba(31,125,85,.12);stroke:#1F7D55}
+.dg .t-ok{fill:#1A6E4A}
+.dg .f-bad{fill:rgba(201,86,27,.12);stroke:#C9561B}
+.dg .t-bad{fill:#B24A12}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .b{font-weight:600}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .bar2{fill:#2A3640;stroke:none}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-agent{fill:rgba(180,148,222,.15);stroke:#B494DE}
+.dg .s-agent{stroke:#B494DE}
+.dg .h-agent{fill:#B494DE}
+.dg .t-agent{fill:#B494DE}
+.dg .f-ok{fill:rgba(76,192,139,.14);stroke:#4CC08B}
+.dg .t-ok{fill:#4CC08B}
+.dg .f-bad{fill:rgba(240,132,75,.15);stroke:#F0844B}
+.dg .t-bad{fill:#F0844B}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="201" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Prompts to work with, and held out</text><rect x="12" y="34" width="50" height="40" rx="6" class="f-web"/><rect x="19" y="43" width="36" height="4" rx="2" class="bar2"/><rect x="19" y="52" width="28.8" height="4" rx="2" class="bar2"/><rect x="19" y="61" width="21.6" height="4" rx="2" class="bar2"/><rect x="68" y="34" width="50" height="40" rx="6" class="f-web"/><rect x="75" y="43" width="36" height="4" rx="2" class="bar2"/><rect x="75" y="52" width="28.8" height="4" rx="2" class="bar2"/><rect x="75" y="61" width="21.6" height="4" rx="2" class="bar2"/><rect x="124" y="34" width="50" height="40" rx="6" class="f-web"/><rect x="131" y="43" width="36" height="4" rx="2" class="bar2"/><rect x="131" y="52" width="28.8" height="4" rx="2" class="bar2"/><rect x="131" y="61" width="21.6" height="4" rx="2" class="bar2"/><rect x="180" y="34" width="50" height="40" rx="6" class="f-web"/><rect x="187" y="43" width="36" height="4" rx="2" class="bar2"/><rect x="187" y="52" width="28.8" height="4" rx="2" class="bar2"/><rect x="187" y="61" width="21.6" height="4" rx="2" class="bar2"/><text x="12" y="90" font-size="10.5" class="t-web">development: you read their outputs</text><rect x="12" y="102" width="50" height="40" rx="6" class="f-agent"/><rect x="29" y="120" width="16" height="13" rx="2" class="h-agent"/><path d="M32 120 V116 Q37 109 42 116 V120" class="ln s-agent"/><rect x="68" y="102" width="50" height="40" rx="6" class="f-agent"/><rect x="85" y="120" width="16" height="13" rx="2" class="h-agent"/><path d="M88 120 V116 Q93 109 98 116 V120" class="ln s-agent"/><text x="132" y="118" font-size="10.5" class="t-agent b">held out: sealed</text><text x="132" y="132" font-size="10.5" class="t-agent">until the end</text><text x="12" y="162" font-size="11.5" class="b">Balanced: for each behavior,</text><rect x="12" y="172" width="168.3" height="22" rx="12" class="f-ok"/><text x="20" y="186.8" font-size="10.5" class="t-ok">✓ prompts where it should</text><rect x="186.3" y="172" width="107.4" height="22" rx="12" class="f-bad"/><text x="194.3" y="186.8" font-size="10.5" class="t-bad">✗ and where not</text></svg>

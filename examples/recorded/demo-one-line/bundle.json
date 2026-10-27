@@ -1,0 +1,304 @@
+{
+ "schema": "skill-eval-lite/bundle@1",
+ "tool": "skill-eval-lite 0.1.0",
+ "made_up": false,
+ "outputs": [
+  {
+   "prompt": "reply-to-priya",
+   "round": "A",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "To: Priya Raman <priya.raman@halefoundation.example>\nSubject: Re: Friday site visit\n\nHi Priya,\n\nTuesday the 17th at 10 works for me and Dana. Same plan: an hour with us, then the walk through the Elm Street site.\n\nOn the interim report, we can't send it early. Our finance close isn't done until the 25th, and the report needs those final figures. It will be in your hands by November 30, ahead of your December 1 review start.\n\nIf it would help your review to see anything sooner, tell me and I'll see what we can share without the final numbers.\n\nThanks,\nMorgan\n",
+   "message": "The draft is saved at `drafts/reply-priya-site-visit.md`. Nothing has been sent.\n\n- **Site visit:** It confirms Tuesday the 17th at 10 for you and Dana, with the same plan as before (an hour, then the Elm Street walk).\n- **Interim report:** It says no to early delivery, with the reason in the same sentence (finance close isn't done until the 25th). It commits to the 30th, ahead of her December 1 review start.\n- **One addition from me:** The last paragraph offers to share something sooner without the final numbers. That's my idea, not yours. Cut it if you don't want to offer it.\n- **Figures:** The dates all come from you and Priya's email. I couldn't check them against `Grants/current/calendar.md` because that folder doesn't exist in this checkout. The knowledge graph has no entry for the November 30 report deadline.\n- **Date mismatch:** Priya's email is dated 9 November, but today is 27 October. I didn't change anything for that.\n- **Character check:** I couldn't run the check for non-ASCII characters because the shell command was denied. I wrote the text in plain ASCII, so it should be clean.",
+   "output_from": "files: drafts/reply-priya-site-visit.md",
+   "trace": [
+    [
+     "Read",
+     "input/priya-email.md"
+    ],
+    [
+     "Bash",
+     "kb/kb search Priya Hale site visit; ls drafts Grants/current 2>&1 | head -30"
+    ],
+    [
+     "Bash",
+     "mkdir -p drafts && cat > drafts/reply-priya-site-visit.md <<'EOF'\nTo: Priya Raman <priya.raman@halefoundation.example>\nSubject: Re: Friday site visit\n\nHi Priya,\n\nTuesday the 17th at 10 works for me and Dana. Same plan: an hour with us, then the walk through the Elm Street site.\n\nOn the interim report, we can't send it early. Our finance close isn't done until the 25th, and the report needs those final figures. It will be in your hands by November 30, ahead of your December 1 review start.\n\nIf it would help your review to see anything sooner, tell me and I'll see what we can share without the final numbers.\n\nThanks,\nMorgan\nEOF\ngrep -nP '[^\\x00-\\x7F]' drafts/reply-priya-site-visit.md || echo ascii-clean",
+     "error"
+    ],
+    [
+     "Write",
+     "drafts/reply-priya-site-visit.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 15.7,
+   "cost_usd": 0.0562272,
+   "when": "2026-10-27T19:17:40Z",
+   "runner": "claude-code"
+  },
+  {
+   "prompt": "reply-to-priya",
+   "round": "B",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "To: Priya Raman\nSubject: Re: Friday site visit\n\nHi Priya,\n\nTuesday the 17th at 10 works for Dana and me. We can't send the interim report early because our finance close isn't done until the 25th. It will be in by the 30th.\n\nThanks,\nMorgan\n",
+   "message": "I saved the draft to `drafts/priya-site-visit-reply.md`. Nothing is sent. It's 38 words, plain ASCII, and signed \"Thanks, Morgan\".\n\nIt confirms Tuesday the 17th at 10 for you and Dana. It also says the interim report can't come early because finance close runs to the 25th, and that it will be in by the 30th.\n\n- **Not checked against the grant calendar:** the 25th and the 30th come from you. `Grants/current/` doesn't exist in this checkout, so I couldn't check the Nov 30 deadline against the calendar. The knowledge graph points to that calendar as the record for the date.\n- **Close timing:** a close that ends the 25th leaves five days to the report. Priya's renewal review starts December 1, so there's no slack if the close slips.\n- **Dana:** the knowledge graph says she reviews anything going to a funder above 50,000. I don't know if the interim report counts, so you may want to check her review window.\n- **Draft not verified:** my command to count words and check for non-ASCII characters was denied, so I counted by hand.",
+   "output_from": "files: drafts/priya-site-visit-reply.md",
+   "trace": [
+    [
+     "Read",
+     "input/priya-email.md"
+    ],
+    [
+     "Bash",
+     "kb/kb search Priya Raman Hale; ls drafts Grants/current 2>&1 | head -30"
+    ],
+    [
+     "Bash",
+     "mkdir -p drafts && cat > drafts/priya-site-visit-reply.md <<'EOF'\nTo: Priya Raman\nSubject: Re: Friday site visit\n\nHi Priya,\n\nTuesday the 17th at 10 works for Dana and me. We can't send the interim report early because our finance close isn't done until the 25th. It will be in by the 30th.\n\nThanks,\nMorgan\nEOF\nwc -w drafts/priya-site-visit-reply.md; grep -P '[^\\x00-\\x7F]' drafts/priya-site-visit-reply.md",
+     "error"
+    ],
+    [
+     "Write",
+     "drafts/priya-site-visit-reply.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 14.3,
+   "cost_usd": 0.0575075,
+   "when": "2026-10-27T19:17:40Z",
+   "runner": "claude-code"
+  },
+  {
+   "prompt": "reply-to-sam",
+   "round": "A",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "To: sam.reyes@reyes-home.example\nSubject: Re: Saturday\n\nYes, we're both going. Thanks for driving, and 10 works. Please let the front desk know.\n",
+   "message": "I saved the draft to `drafts/reply-to-sam-saturday.md`. It's short, so here's the full text:\n\n> Yes, we're both going. Thanks for driving, and 10 works. Please let the front desk know.\n\nIt's a household reply, so I signed it with nothing, as your voice guide allows on short threads. Nothing has been sent.\n\nSam's message is dated Tuesday 10 November 2026, but today is 27 October. I didn't change anything for that, but check the date before you send.",
+   "output_from": "files: drafts/reply-to-sam-saturday.md",
+   "trace": [
+    [
+     "Read",
+     "input/sam-message.md"
+    ],
+    [
+     "Bash",
+     "ls drafts",
+     "error"
+    ],
+    [
+     "Write",
+     "drafts/reply-to-sam-saturday.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 6.7,
+   "cost_usd": 0.0392444,
+   "when": "2026-10-27T19:17:40Z",
+   "runner": "claude-code"
+  },
+  {
+   "prompt": "reply-to-sam",
+   "round": "B",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "Yes, we are both going. You drive, and 10 works.\n\nThanks for letting the front desk know.\n",
+   "message": "Draft saved at `drafts/reply-to-sam-saturday.md`:\n\n> Yes, we are both going. You drive, and 10 works.\n>\n> Thanks for letting the front desk know.\n\nIt's not sent. One thing to check: Sam's message is dated Tuesday 10 November 2026, but today is 27 October. Make sure \"Saturday\" is the one you mean.",
+   "output_from": "files: drafts/reply-to-sam-saturday.md",
+   "trace": [
+    [
+     "Read",
+     "input/sam-message.md"
+    ],
+    [
+     "Bash",
+     "ls drafts",
+     "error"
+    ],
+    [
+     "Bash",
+     "mkdir -p drafts && printf 'Yes, we are both going. You drive, and 10 works.\\n\\nThanks for letting the front desk know.\\n' > drafts/reply-to-sam-saturday.md && cat drafts/reply-to-sam-saturday.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 5.4,
+   "cost_usd": 0.039256000000000006,
+   "when": "2026-10-27T19:17:40Z",
+   "runner": "claude-code"
+  },
+  {
+   "prompt": "reply-to-school",
+   "round": "A",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "I couldn't save the draft. The file write was denied automatically because this session has no way to approve it, so `drafts/okafor-trip-reply.md` doesn't exist. The draft is below to paste or save yourself. I haven't sent anything.\n\n**To:** j.okafor@lindenelementary.example\n**Subject:** Re: Fourth grade trip to the science museum, Thursday 19 November\n\nHi Ms. Okafor,\n\nYes to the trip on Thursday 19 November. I've signed the permission form and will send it in with the 12 dollar fee tomorrow.\n\nI can't chaperone that day, sorry. Thanks for organizing this!\n\nMorgan\n\n- **Source:** the fee (12 dollars), the date, and the form are from her email in `input/school-email.md`.\n- **Deadline:** the form and fee are due Friday 13 November. Her email is dated 10 November 2026, which is after today (27 October). Check that date, and that \"tomorrow\" still makes the deadline.\n- **Child's name:** the draft doesn't include it. Add it if she needs to match the form to a student.\n\nI can save the file if you approve writing to `drafts/`.\n",
+   "message": "I couldn't save the draft. The file write was denied automatically because this session has no way to approve it, so `drafts/okafor-trip-reply.md` doesn't exist. The draft is below to paste or save yourself. I haven't sent anything.\n\n**To:** j.okafor@lindenelementary.example\n**Subject:** Re: Fourth grade trip to the science museum, Thursday 19 November\n\nHi Ms. Okafor,\n\nYes to the trip on Thursday 19 November. I've signed the permission form and will send it in with the 12 dollar fee tomorrow.\n\nI can't chaperone that day, sorry. Thanks for organizing this!\n\nMorgan\n\n- **Source:** the fee (12 dollars), the date, and the form are from her email in `input/school-email.md`.\n- **Deadline:** the form and fee are due Friday 13 November. Her email is dated 10 November 2026, which is after today (27 October). Check that date, and that \"tomorrow\" still makes the deadline.\n- **Child's name:** the draft doesn't include it. Add it if she needs to match the form to a student.\n\nI can save the file if you approve writing to `drafts/`.",
+   "output_from": "the final message",
+   "trace": [
+    [
+     "Read",
+     "input/school-email.md"
+    ],
+    [
+     "Bash",
+     "ls drafts/ kb/ 2>&1 | head -30; kb/kb search Okafor 2>&1 | head -20"
+    ],
+    [
+     "Bash",
+     "mkdir -p drafts && cat > drafts/okafor-trip-reply.md <<'EOF'\nTo: j.okafor@lindenelementary.example\nSubject: Re: Fourth grade trip to the science museum, Thursday 19 November\n\nHi Ms. Okafor,\n\nYes to the trip on Thursday 19 November. I've signed the permission form and will send it in with the 12 dollar fee tomorrow.\n\nI can't chaperone that day, sorry. Thanks for organizing this!\n\nMorgan\nEOF",
+     "error"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 13.2,
+   "cost_usd": 0.047874799999999995,
+   "when": "2026-10-27T19:17:40Z",
+   "runner": "claude-code"
+  },
+  {
+   "prompt": "reply-to-school",
+   "round": "B",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "To: j.okafor@lindenelementary.example\nSubject: Re: Fourth grade trip to the science museum, Thursday 19 November\n\nHi Ms. Okafor,\n\nYes to the trip. The signed form and the 12 dollar fee will come in tomorrow. I can't chaperone that day, sorry.\n\nMorgan\n",
+   "message": "I saved the draft to `drafts/okafor-trip-reply.md`. I haven't sent it.\n\n> Hi Ms. Okafor,\n>\n> Yes to the trip. The signed form and the 12 dollar fee will come in tomorrow. I can't chaperone that day, sorry.\n>\n> Morgan\n\n- **Fee and deadline:** The 12 dollar fee and the Friday 13 November deadline both come from her email.\n- **Email date:** Her email is dated 10 November, but today is 27 October. If \"tomorrow\" lands after the 13th, the form will be late.\n- **Word count:** The body is 26 words, under your 40-word house rule.\n- **Folder and graph:** `drafts/` didn't exist, so I created it. The knowledge graph had nothing on Okafor.",
+   "output_from": "files: drafts/okafor-trip-reply.md",
+   "trace": [
+    [
+     "Read",
+     "input/school-email.md"
+    ],
+    [
+     "Bash",
+     "kb/kb search Okafor; ls drafts",
+     "error"
+    ],
+    [
+     "Bash",
+     "mkdir -p drafts && cat > drafts/okafor-trip-reply.md <<'EOF'\nTo: j.okafor@lindenelementary.example\nSubject: Re: Fourth grade trip to the science museum, Thursday 19 November\n\nHi Ms. Okafor,\n\nYes to the trip. The signed form and the 12 dollar fee will come in tomorrow. I can't chaperone that day, sorry.\n\nMorgan\nEOF\nwc -w drafts/okafor-trip-reply.md",
+     "error"
+    ],
+    [
+     "Write",
+     "drafts/okafor-trip-reply.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 11.2,
+   "cost_usd": 0.0494184,
+   "when": "2026-10-27T19:17:40Z",
+   "runner": "claude-code"
+  }
+ ],
+ "judge": [
+  {
+   "comparison": "A|B",
+   "prompt": "reply-to-priya",
+   "repeat": 1,
+   "shown_left": "B",
+   "decision": "LEFT",
+   "winner": "B",
+   "note": "",
+   "response": "Left covers what Morgan asked for and nothing else: it confirms Tuesday the 17th at 10 for Morgan and Dana, declines the early report because the finance close isn't done until the 25th, and promises it by the 30th. It is also short and plain, the way Morgan writes. Right adds things Morgan didn't say: that the report needs the final figures, and an offer to share material without the final numbers. That offer commits Morgan to something they never approved, so they would likely cut it before sending.\n\nLEFT",
+   "model": "claude-sonnet-5-5",
+   "when": "2026-10-27T19:17:56Z",
+   "seconds": 6.4,
+   "cost_usd": 0.0088664,
+   "status": "ok",
+   "requested_model": "claude-sonnet-5-5",
+   "runner": "claude-code"
+  },
+  {
+   "comparison": "A|B",
+   "prompt": "reply-to-sam",
+   "repeat": 1,
+   "shown_left": "A",
+   "decision": "LEFT",
+   "winner": "A",
+   "note": "",
+   "response": "Both drafts answer the question accurately: both are going, Sam drives, and 10 is fine. Left also includes the To and Subject lines, with Sam's address matching the original message, so it can be sent as is. It also asks Sam to let the front desk know, which follows from Sam's \"If yes, I'll let the front desk know.\" Right's \"You drive\" reads a little more like an instruction than an acceptance of Sam's offer, and it has no headers.\n\nLEFT",
+   "model": "claude-sonnet-5-5",
+   "when": "2026-10-27T19:17:56Z",
+   "seconds": 5.7,
+   "cost_usd": 0.008988899999999998,
+   "status": "ok",
+   "requested_model": "claude-sonnet-5-5",
+   "runner": "claude-code"
+  },
+  {
+   "comparison": "A|B",
+   "prompt": "reply-to-school",
+   "repeat": 1,
+   "shown_left": "A",
+   "decision": "RIGHT",
+   "winner": "B",
+   "note": "",
+   "response": "Right is the one Morgan could send as-is. It covers all three points (yes to the trip, form and fee coming tomorrow, can't chaperone) in a few plain lines. Left's draft is also accurate, but it adds a \"Thanks for organizing this!\" line that Morgan didn't ask for. It also comes wrapped in notes, including a confused remark about the email's date being \"after today\", that Morgan would have to read past and ignore.\n\nRIGHT",
+   "model": "claude-sonnet-5-5",
+   "when": "2026-10-27T19:17:56Z",
+   "seconds": 5.1,
+   "cost_usd": 0.0091664,
+   "status": "ok",
+   "requested_model": "claude-sonnet-5-5",
+   "runner": "claude-code"
+  }
+ ],
+ "files": {
+  "reply-to-school:input/school-email.md": "From: Joy Okafor <j.okafor@lindenelementary.example>\nTo: Fourth grade families\nDate: Tuesday 10 November 2026, 07:40\nSubject: Fourth grade trip to the science museum, Thursday 19 November\n\nDear families,\n\nOur fourth graders will visit the science museum on Thursday 19 November,\nleaving school at 9:00 and returning by 2:30. Please return the signed\npermission form and the 12 dollar fee by Friday 13 November.\n\nWe still need two parent chaperones. If you can come, please reply to this\nemail and let me know.\n\nThank you!\nMs. Okafor\n",
+  "reply-to-priya:input/priya-email.md": "From: Priya Raman <priya.raman@halefoundation.example>\nTo: Morgan Reyes <morgan.reyes@cedarcommons.example>\nDate: Monday 9 November 2026, 08:14\nSubject: Friday site visit\n\nHi Morgan,\n\nI'm sorry to do this on short notice, but our team retreat now overlaps with\nFriday's site visit. Could we move it to Tuesday the 17th or Wednesday the\n18th, at 10 either day? Same plan otherwise: an hour with you and Dana, then a\nwalk through the Elm Street site.\n\nAlso, a quick check while I have you: is the interim report still on track for\nNovember 30? We'd love to have it a few days early if you can manage it, since\nour renewal review starts on December 1.\n\nThanks,\nPriya\n\nPriya Raman\nProgram Officer, Hale Foundation\n",
+  "reply-to-sam:input/sam-message.md": "From: Sam Reyes <sam.reyes@reyes-home.example>\nTo: morgan.reyes.home@reyes-home.example\nDate: Tuesday 10 November 2026, 12:05\nSubject: Saturday\n\nAre we both going on Saturday morning? I'll drive. If yes, I'll let the front desk know we're coming at 10.\n\nS\n"
+ },
+ "experiment": {
+  "name": "demo-one-line.toml",
+  "text": "# The class's line: round B adds one line to Wren's voice file. What changes?\n# A demonstration for the live session of 27 October: three short replies,\n# two rounds, one repeat (6 runs; about a minute with --jobs 6). The line is\n# in rounds/one-line/.claude/identity/voice.md, under \"House rule\", and the\n# room may choose another before the run. It is not a full experiment: a full\n# one has both controls, at least four development prompts and two repeats\n# (see class-assistant/experiment.toml, whose prompts and starting files this\n# file uses). Wren and Morgan Reyes are fictional.\nschema = \"skill-eval-lite/experiment@1\"\ndemo = true\nfiles_from = \"class-assistant\"\ntitle = \"Does one line in the voice file make Wren's replies better? (demonstration: the class's line)\"\npurpose = \"\"\"\nWren drafts replies, summaries and briefs for Morgan Reyes, who sends them\nunder Morgan's own name. The outputs are for Morgan to send or read with as\nfew changes as possible.\"\"\"\ncriterion = \"\"\"\nA good output could go out under Morgan's name without changes: it answers\nwhat was asked, gets the facts from the request right, and reads as Morgan\nwrites (plain, short, no stock openers or sign-offs).\"\"\"\njudging_question = \"Which draft would Morgan be more willing to send under their own name without changes?\"\nrepeats = 1\nseed = 5502\n\n[system]\nname = \"Wren, Morgan Reyes's assistant (the class assistant; fictional)\"\nkind = \"assistant\"\nfolder = \"the class assistant: python3 run_ab.py setup ../class-assistant\"\n\n[[system.parts]]\nid = \"voice\"\npath = \".claude/identity/voice.md\"\nwords = 1173\nreaches_model = \"imported by CLAUDE.md\"\n\n[[rounds]]\nid = \"A\"\nlabel = \"As it is\"\nrole = \"baseline\"\nchange = { how = \"as-is\" }\n\n[[rounds]]\nid = \"B\"\nlabel = \"The class's line added\"\nrole = \"improvement\"\nchange = { part = \"voice\", how = \"revised\", file = \"rounds/one-line/.claude/identity/voice.md\" }\nexpected = { direction = \"better\", tags = [\"reply\"], sources = [\"people\", \"judge\", \"length\"] }\nwhy = \"The line under House rule in round B's voice file. The room predicts, before the run, which way the replies move and which evidence will show it.\"\n\n[[comparisons]]\nbaseline = \"A\"\nnew = \"B\"\n\n[controls]\ntolerance = 0.10\n\n[[behaviors]]\nid = \"uses-the-graph\"\ndescription = \"Searches the knowledge graph before writing about someone in it; doesn't need to when the request holds everything.\"\n\n[prompts]\ndevelopment = [\"reply-to-sam\", \"reply-to-school\", \"reply-to-priya\"]\nheld_out = []\nsealed = false\n\n[[prompt]]\nid = \"reply-to-sam\"\ntitle = \"Answer Sam about Saturday\"\ntags = [\"voice\", \"reply\", \"household\"]\nfiles = [\"input/sam-message.md\"]\ntext = \"\"\"\nSam's message about Saturday is in input/sam-message.md. Yes, we're both\ngoing, Sam can drive, and 10 is fine. Draft a short reply I can send, and\nsave it in drafts/.\"\"\"\nreference = \"\"\"\nYes, both of us. You drive, and 10 is fine. Thanks for telling the front desk.\n\nM\"\"\"\n\n[[prompt]]\nid = \"reply-to-school\"\ntitle = \"Answer Ms. Okafor about the trip\"\ntags = [\"voice\", \"reply\", \"household\"]\nfiles = [\"input/school-email.md\"]\ntext = \"\"\"\nCan you answer Ms. Okafor for me? Her email is in input/school-email.md. Yes to\nthe trip, and I've signed the form and will send it in with the fee tomorrow.\nI can't chaperone that day, sorry. Save the draft in drafts/.\"\"\"\nreference = \"\"\"\nMs. Okafor,\n\nYes to the trip. I've signed the form, and it'll come in with the fee tomorrow. I can't chaperone that day, sorry.\n\nMorgan\"\"\"\n\n[[prompt]]\nid = \"reply-to-priya\"\ntitle = \"Reply to Priya about the site visit and the report\"\ntags = [\"voice\", \"reply\", \"funder\"]\nfiles = [\"input/priya-email.md\"]\ntext = \"\"\"\nPriya wants to move Friday's site visit. Her email is in input/priya-email.md.\nTuesday the 17th at 10 works for me and Dana. We can't send the interim report\nearly, because our finance close isn't done until the 25th, but it will be in\nby the 30th. Draft a reply and save it in drafts/.\"\"\"\nreference = \"\"\"\nPriya,\n\nTuesday the 17th at 10 works for Dana and me. Same plan as before: an hour together, then the walk through the Elm Street site.\n\nWe can't send the interim report early. Our finance close isn't done until the 25th, and the report needs those numbers. It will be with you by November 30.\n\nMorgan\"\"\"\n\n[model]\nrunner = \"claude-code\"\nmodel = \"claude-sonnet-5-5\"\nallowed_tools = [\"Read\", \"Write\", \"Edit\", \"Glob\", \"Grep\", \"Skill\", \"Bash kb/kb *\"]\ntimeout_seconds = 300\nmax_budget_usd = 1.00\nnote = \"The same model and settings for every round. Personal settings, memory and connectors are left out of every run.\"\n\n# Checks run by the wizard on every output. contains: every text must appear;\n# not-contains: none may appear. A failed or timed-out run fails every check.\n\n[[checks]]\nid = \"length\"\nkind = \"word-count\"\nobject = \"product\"\nmax = 40\nshows = \"The reply is 40 words or fewer.\"\ndoes_not_show = \"That it still says everything it needs to.\"\n\n[[checks]]\nid = \"keeps-both-dates\"\nkind = \"contains\"\nobject = \"product\"\ntext = [\"17\", \"30\"]\nprompts = [\"reply-to-priya\"]\nshows = \"The reply to Priya gives the new visit date and the report's date.\"\ndoes_not_show = \"That the dates are right, or that the reason is there.\"\n\n[[checks]]\nid = \"no-stock-phrases\"\nkind = \"not-contains\"\nobject = \"product\"\ntext = [\"Dear \", \"Best regards\", \"Warmly\", \"Sincerely\", \"I hope this email finds you well\", \"Please be advised\", \"As per our discussion\", \"circle back\", \"touch base\"]\nshows = \"None of the openers, sign-offs and phrases the voice file says Morgan never uses.\"\ndoes_not_show = \"That the reply avoids every phrase Morgan would not use.\"\n\n[judge]\nmodel = \"claude-sonnet-5-5\"\ndecision = \"The last line of the response is LEFT, RIGHT, TIE or UNKNOWN.\"\nprompt = \"\"\"\nYou are judging two drafts that an assistant wrote for Morgan Reyes. Morgan\nsends drafts under their own name. Read the request, the starting file if\nthere is one, and the two drafts.\n\nQuestion: Which draft would Morgan be more willing to send under their own\nname without changes?\n\nJudge what is on the page: whether it answers what was asked, whether its\nfacts match the request, and whether it reads as Morgan writes (plain, short,\nno stock openers or sign-offs). Do not prefer a draft because it is longer.\n\nGive two or three sentences of reasons. Then, on the last line, write only\nLEFT, RIGHT or TIE, or UNKNOWN if you can't tell.\"\"\"\n\n[frozen]\ndate = \"\"\nhash = \"\"\n\n[provenance]\nwritten_by = \"Claude (claude-opus-5-5), by hand, for the live session of 27 October\"\ndate = \"2026-10-27\"\nskill = \"experiment-intake 1\"\n",
+  "sha256": "sha256:1389c8881bb194a3fd959192082aeff02d304354b9d1a37a47cf21b953d7bfba"
+ },
+ "assistant": {
+  "name": "class-assistant",
+  "git": {
+   "commit": "e4a64dc",
+   "uncommitted_changes": false
+  }
+ },
+ "runner": {
+  "name": "claude-code",
+  "claude_code_version": "2.1.311",
+  "flags": [
+   "-p",
+   "--output-format",
+   "stream-json",
+   "--verbose",
+   "--model",
+   "claude-sonnet-5-5",
+   "--setting-sources",
+   "project",
+   "--strict-mcp-config",
+   "--settings",
+   "{\"autoMemoryEnabled\":false,\"disableClaudeAiConnectors\":true}",
+   "--tools",
+   "Read,Write,Edit,Glob,Grep,Skill,Bash",
+   "--permission-mode",
+   "acceptEdits",
+   "--permission-prompts",
+   "none",
+   "--no-session-persistence",
+   "--max-budget-usd",
+   "1",
+   "--allowedTools",
+   "Skill,Bash(kb/kb *)"
+  ],
+  "env": {
+   "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+   "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+   "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS": "1"
+  }
+ },
+ "updated": "2026-10-27T19:17:56Z"
+}

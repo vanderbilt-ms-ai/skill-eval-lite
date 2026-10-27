@@ -1,0 +1,1 @@
+Saved [the brief](notes/dana-check-in-2026-10-28.md). I couldn't verify open items: no correspondence or meeting notes are available, and no connectors are live. The file flags that gap and includes three suggested prompts for Dana.

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 142" width="300" height="142" role="img" aria-labelledby="dz-question-t dz-question-d"><title id="dz-question-t">Three questions about every output</title><desc id="dz-question-d">For a draft: who reads it (what the outputs are for), is it good enough to send (the criterion), and which of two is better, Left or Right (the judging question).</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .b{font-weight:600}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .wh{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .ed{fill:#FFFFFF;stroke:#5F6A73}
+.dg .bar{fill:#E9EAE3;stroke:none}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-term{fill:rgba(28,124,110,.14);stroke:#1C7C6E}
+.dg .s-term{stroke:#1C7C6E}
+.dg .h-term{fill:#1C7C6E}
+.dg .t-term{fill:#187062}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-ok{fill:rgba(31,125,85,.12);stroke:#1F7D55}
+.dg .s-ok{stroke:#1F7D55}
+.dg .h-ok{fill:#1F7D55}
+.dg .t-ok{fill:#1A6E4A}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .b{font-weight:600}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .wh{fill:#141C23;stroke:#2A3640}
+.dg .ed{fill:#141C23;stroke:#8593A0}
+.dg .bar{fill:#1F2A33;stroke:none}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-term{fill:rgba(76,192,174,.16);stroke:#4CC0AE}
+.dg .s-term{stroke:#4CC0AE}
+.dg .h-term{fill:#4CC0AE}
+.dg .t-term{fill:#4CC0AE}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-ok{fill:rgba(76,192,139,.14);stroke:#4CC08B}
+.dg .s-ok{stroke:#4CC08B}
+.dg .h-ok{fill:#4CC08B}
+.dg .t-ok{fill:#4CC08B}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="141" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Three questions about every output</text><rect x="12" y="34" width="92" height="96" rx="8" class="wh"/><g transform="translate(20 42) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="ed"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin"/></g><text x="40" y="55" font-size="11.5" class="b">a draft</text><rect x="20" y="70" width="66.5" height="5" rx="2.5" class="bar"/><rect x="20" y="82" width="59.5" height="5" rx="2.5" class="bar"/><rect x="20" y="94" width="52.5" height="5" rx="2.5" class="bar"/><rect x="20" y="106" width="35" height="5" rx="2.5" class="bar"/><rect x="124" y="34" width="164" height="28" rx="7" class="f-term"/><text x="132" y="46" font-size="11" class="b t-term">Who reads it?</text><text x="132" y="57.5" font-size="10" class="t-term">what it is for</text><path d="M104 52 C112 52 107 48 115 48" class="ln s-term"/><path d="M122 48 L113 52.8 L113 43.2 Z" class="h-term"/><rect x="124" y="68" width="164" height="28" rx="7" class="f-ok"/><text x="132" y="80" font-size="11" class="b t-ok">Good enough to send?</text><text x="132" y="91.5" font-size="10" class="t-ok">the criterion</text><path d="M104 66 C112 66 107 82 115 82" class="ln s-ok"/><path d="M122 82 L113 86.8 L113 77.2 Z" class="h-ok"/><rect x="124" y="102" width="164" height="28" rx="7" class="f-web"/><text x="132" y="114" font-size="11" class="b t-web">Left or Right?</text><text x="132" y="125.5" font-size="10" class="t-web">the judging question</text><path d="M104 80 C112 80 107 116 115 116" class="ln s-web"/><path d="M122 116 L113 120.8 L113 111.2 Z" class="h-web"/></svg>

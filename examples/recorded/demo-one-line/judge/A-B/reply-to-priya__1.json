@@ -1,0 +1,63 @@
+{
+ "comparison": "A|B",
+ "prompt": "reply-to-priya",
+ "repeat": 1,
+ "shown_left": "B",
+ "decision": "LEFT",
+ "winner": "B",
+ "note": "",
+ "response": "Left covers what Morgan asked for and nothing else: it confirms Tuesday the 17th at 10 for Morgan and Dana, declines the early report because the finance close isn't done until the 25th, and promises it by the 30th. It is also short and plain, the way Morgan writes. Right adds things Morgan didn't say: that the report needs the final figures, and an offer to share material without the final numbers. That offer commits Morgan to something they never approved, so they would likely cut it before sending.\n\nLEFT",
+ "model": "claude-sonnet-5-5",
+ "when": "2026-10-27T19:17:56Z",
+ "seconds": 6.4,
+ "cost_usd": 0.0088664,
+ "status": "ok",
+ "requested_model": "claude-sonnet-5-5",
+ "runner": "claude-code",
+ "input": "You are judging two drafts that an assistant wrote for Morgan Reyes. Morgan\nsends drafts under their own name. Read the request, the starting file if\nthere is one, and the two drafts.\n\nQuestion: Which draft would Morgan be more willing to send under their own\nname without changes?\n\nJudge what is on the page: whether it answers what was asked, whether its\nfacts match the request, and whether it reads as Morgan writes (plain, short,\nno stock openers or sign-offs). Do not prefer a draft because it is longer.\n\nGive two or three sentences of reasons. Then, on the last line, write only\nLEFT, RIGHT or TIE, or UNKNOWN if you can't tell.\n\n## The request\n\nPriya wants to move Friday's site visit. Her email is in input/priya-email.md.\nTuesday the 17th at 10 works for me and Dana. We can't send the interim report\nearly, because our finance close isn't done until the 25th, but it will be in\nby the 30th. Draft a reply and save it in drafts/.\n\n## Starting file: input/priya-email.md\n\nFrom: Priya Raman <priya.raman@halefoundation.example>\nTo: Morgan Reyes <morgan.reyes@cedarcommons.example>\nDate: Monday 9 November 2026, 08:14\nSubject: Friday site visit\n\nHi Morgan,\n\nI'm sorry to do this on short notice, but our team retreat now overlaps with\nFriday's site visit. Could we move it to Tuesday the 17th or Wednesday the\n18th, at 10 either day? Same plan otherwise: an hour with you and Dana, then a\nwalk through the Elm Street site.\n\nAlso, a quick check while I have you: is the interim report still on track for\nNovember 30? We'd love to have it a few days early if you can manage it, since\nour renewal review starts on December 1.\n\nThanks,\nPriya\n\nPriya Raman\nProgram Officer, Hale Foundation\n\n## Left\n\nTo: Priya Raman\nSubject: Re: Friday site visit\n\nHi Priya,\n\nTuesday the 17th at 10 works for Dana and me. We can't send the interim report early because our finance close isn't done until the 25th. It will be in by the 30th.\n\nThanks,\nMorgan\n\n## Right\n\nTo: Priya Raman <priya.raman@halefoundation.example>\nSubject: Re: Friday site visit\n\nHi Priya,\n\nTuesday the 17th at 10 works for me and Dana. Same plan: an hour with us, then the walk through the Elm Street site.\n\nOn the interim report, we can't send it early. Our finance close isn't done until the 25th, and the report needs those final figures. It will be in your hands by November 30, ahead of your December 1 review start.\n\nIf it would help your review to see anything sooner, tell me and I'll see what we can share without the final numbers.\n\nThanks,\nMorgan\n",
+ "command": [
+  "claude",
+  "-p",
+  "--output-format",
+  "stream-json",
+  "--verbose",
+  "--model",
+  "claude-sonnet-5-5",
+  "--setting-sources",
+  "project",
+  "--strict-mcp-config",
+  "--settings",
+  "{\"autoMemoryEnabled\":false,\"disableClaudeAiConnectors\":true}",
+  "--tools",
+  "",
+  "--permission-mode",
+  "acceptEdits",
+  "--permission-prompts",
+  "none",
+  "--no-session-persistence",
+  "--max-budget-usd",
+  "0.5"
+ ],
+ "isolation": {
+  "claude_code_version": "2.1.311",
+  "model": "claude-sonnet-5-5",
+  "permission_mode": "acceptEdits",
+  "mcp_servers": 0,
+  "connector_tools": 0,
+  "tools": [],
+  "skills": [
+   "design",
+   "doctor",
+   "plugin-authoring"
+  ],
+  "plugins": [
+   "cc-plugin-agents-md",
+   "cc-plugin-telemetry",
+   "cc-plugin-plugin-authoring"
+  ],
+  "auto_memory": "off",
+  "verified": true
+ },
+ "claude_code_version": "2.1.311",
+ "tool": "skill-eval-lite 0.1.0"
+}

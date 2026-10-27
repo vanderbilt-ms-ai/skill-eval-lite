@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 254" width="400" height="254" role="img" aria-labelledby="steps-group-07-t steps-group-07-d"><title id="steps-group-07-t">The wizard: Load your experiment file into the wizard</title><desc id="steps-group-07-d">In step 1, under “Your experiment file”, click choose a file. You should see: A summary of your experiment, and “Nothing is missing.” in green.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
+.dg .inv{fill:#FFFFFF}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .pl{fill:#F8F8F4;stroke:#D9DAD2}
+.dg .wh{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .btn{fill:#16212B;stroke:#16212B}
+.dg .btn2{fill:#FFFFFF;stroke:#5F6A73}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .thick{stroke-width:2.2}
+.dg .dash{stroke-dasharray:5 4}
+.dg .h-rule{fill:#D9DAD2}
+.dg .h-rule2{fill:#E9EAE3}
+.dg .cur{fill:#FFFFFF;stroke:#16212B;stroke-width:1.3;stroke-linejoin:round}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
+.dg .inv{fill:#141C23}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .pl{fill:#18222A;stroke:#2A3640}
+.dg .wh{fill:#141C23;stroke:#2A3640}
+.dg .btn{fill:#E2E8EE;stroke:#E2E8EE}
+.dg .btn2{fill:#141C23;stroke:#8593A0}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .thick{stroke-width:2.2}
+.dg .dash{stroke-dasharray:5 4}
+.dg .h-rule{fill:#2A3640}
+.dg .h-rule2{fill:#1F2A33}
+.dg .cur{fill:#141C23;stroke:#E2E8EE;stroke-width:1.3;stroke-linejoin:round}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="399" height="253" rx="12"/><rect x="8" y="8" width="384" height="238" rx="10" class="wh"/><path d="M8 18 Q8 8 18 8 H382 Q392 8 392 18 V30 H8 Z" class="h-rule2"/><circle cx="21" cy="19" r="3.4" class="h-rule"/><circle cx="33" cy="19" r="3.4" class="h-rule"/><circle cx="45" cy="19" r="3.4" class="h-rule"/><rect x="64" y="12.5" width="272" height="13" rx="6.5" class="wh"/><text x="200" y="22.5" font-size="9.5" class="t3" text-anchor="middle">wizard.html</text><path d="M8 60 L392 60" class="ln s-rule thin"/><text x="20" y="49.5" font-size="11" class="b">Skill Eval Lite</text><rect x="120" y="36" width="70.8" height="19" rx="9.5" class="btn"/><text x="155.4" y="49.3" font-size="10.5" class="inv" text-anchor="middle">1  Intake</text><circle cx="205.3" cy="45.5" r="9" class="h-rule2"/><text x="205.3" y="49.3" font-size="10" class="t2" text-anchor="middle">2</text><circle cx="229.3" cy="45.5" r="9" class="h-rule2"/><text x="229.3" y="49.3" font-size="10" class="t2" text-anchor="middle">3</text><circle cx="253.3" cy="45.5" r="9" class="h-rule2"/><text x="253.3" y="49.3" font-size="10" class="t2" text-anchor="middle">4</text><circle cx="277.3" cy="45.5" r="9" class="h-rule2"/><text x="277.3" y="49.3" font-size="10" class="t2" text-anchor="middle">5</text><text x="22" y="82" font-size="12" class="b">Your experiment file</text><rect x="22" y="92" width="356" height="46" rx="8" class="f-web dash"/><text x="34" y="119" font-size="11.5" class="t2">Drop experiment.toml here, or</text><rect x="237.4" y="102" width="108.7" height="26" rx="6" class="btn2"/><text x="291.8" y="119.1" font-size="11.5" text-anchor="middle">choose a file</text><rect x="233.4" y="98" width="116.7" height="34" rx="9" class="ln s-web thick"/><path d="M341.14 119 L341.14 135 L345.14 131.3 L348.03999999999996 137.4 L350.74 136.2 L347.94 130.3 L353.14 130.1 Z" class="cur"/><text x="22" y="158" font-size="11.5" class="t2">In the window that opens, go to:</text><rect x="22" y="168" width="137" height="24" rx="6" class="pl"/><path transform="translate(28 173) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="48" y="184" font-size="11.5" class="m">skill-eval-lite</text><path d="M165 176 L170 180 L165 184" class="ln thin"/><rect x="177" y="168" width="108.4" height="24" rx="6" class="pl"/><path transform="translate(183 173) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="203" y="184" font-size="11.5" class="m">experiments</text><path d="M26 206 L31 210 L26 214" class="ln thin"/><rect x="40" y="198" width="72.8" height="24" rx="6" class="pl"/><path transform="translate(46 203) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="66" y="214" font-size="11.5" class="m">&lt;name&gt;</text><path d="M118.8 206 L123.8 210 L118.8 214" class="ln thin"/><rect x="130.8" y="198" width="137" height="24" rx="6" class="f-web"/><g transform="translate(136.8 202) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="156.8" y="214" font-size="11.5" class="m t-web b">experiment.toml</text></svg>

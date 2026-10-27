@@ -1,0 +1,9 @@
+{
+ "role": "fault",
+ "note": "The same steps, with the brief written first and the lookups after it.",
+ "expect": {
+  "search-before-write": "fail",
+  "steps-follow": "fail",
+  "sound-process": "fail"
+ }
+}

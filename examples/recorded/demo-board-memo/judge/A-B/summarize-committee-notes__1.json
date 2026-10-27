@@ -1,0 +1,62 @@
+{
+ "comparison": "A|B",
+ "prompt": "summarize-committee-notes",
+ "repeat": 1,
+ "shown_left": "B",
+ "decision": "RIGHT",
+ "winner": "A",
+ "note": "",
+ "response": "Right is more faithful to the notes. Left invents a deadline for Ellis's timing check (10 Nov \"with the corrected actuals\") and a question to Alicia about who drafts the explanation, and it carries a long inline \"[UNVERIFIED - ...]\" note that Morgan would have to cut. Right keeps the open items as the notes leave them (no date for Ellis's timing check, no owner for the one-pager). It does open with a stock thanks line, add an invented \"unpaid time\" remark, and end with \"Thanks,\". Left has a similar invented closing line, so the style problems roughly cancel and the factual fidelity decides it, though not by much.\n\nRIGHT",
+ "model": "claude-sonnet-5-5",
+ "when": "2026-10-26T21:33:59Z",
+ "seconds": 10.5,
+ "cost_usd": 0.0210348,
+ "status": "ok",
+ "requested_model": "claude-sonnet-5-5",
+ "input": "You are judging two drafts that an assistant wrote for Morgan Reyes. Morgan\nsends drafts under their own name. Read the request, the starting file if\nthere is one, and the two drafts.\n\nQuestion: Which draft would Morgan be more willing to send under their own\nname without changes?\n\nJudge what is on the page: whether it answers what was asked, whether its\nfacts match the request, and whether it reads as Morgan writes (plain, short,\nno stock openers or sign-offs). Do not prefer a draft because it is longer.\n\nGive two or three sentences of reasons. Then, on the last line, write only\nLEFT, RIGHT or TIE, or UNKNOWN if you can't tell.\n\n## The request\n\nHere are my notes from Thursday's Riverside finance committee meeting\n(input/committee-notes.md). Turn them into a short summary I can send to the\ncommittee: what we decided, who does what by when, and what is still open.\nSave it in drafts/.\n\n## Starting file: input/committee-notes.md\n\nRiverside finance cttee - Thu 5 Nov 2026, 6:30pm, video\n\nPresent: me (chair), Ellis, Tom Becker, Alicia Moreno\n\nQ1 actuals (Jul-Sep)\n- revenue roughly on plan\n- program supplies over by ~6,500. Camp supplies for next summer bought in Sept?\n  Ellis to confirm timing vs real overspend\n- 2 Sept lines miscoded. Ellis sends corrected Q1 actuals by Tue 10 Nov\n\nAudit\n- auditor wants fieldwork in Jan, not March\n- Ellis not happy about Jan (two staff out). Ellis to ask auditor about Feb\n- no decision\n\nReserve transfer\n- Tom suggested moving 5,000 from operating reserve to cover supplies\n- not ours to decide, goes to full board 19 Nov\n- Alicia wants a one-page explanation for the board first\n\nPacket\n- me: cover memo draft to Ellis by Wed 11 Nov\n- packet to board Thu 12 Nov (one week before mtg)\n\nNext cttee mtg Thu 3 Dec\n\n## Left\n\nSubject: Finance committee summary - Thursday 5 November\n\nHello all,\n\nThe committee made one decision on Thursday: the proposed 5,000 transfer from the operating reserve goes to the full board on Thursday 19 November, not to us. Nothing else was settled. Details below.\n\nWhat happened\n\n1. First quarter (July to September): revenue is roughly on plan. Program supplies are over budget by about 6,500 [UNVERIFIED - figure from meeting notes, before Ellis's corrected actuals]. Two September lines were miscoded, so that number may change.\n2. Audit: the auditor wants to start fieldwork in January instead of March. No decision was made.\n3. Reserve transfer: Tom suggested moving 5,000 from the operating reserve to cover the supplies overage. Because it is the board's call, we will pass it on with a one-page explanation.\n\nWho does what by when\n\n1. Ellis: send corrected first quarter actuals - Tuesday 10 November.\n2. Ellis: confirm whether the program supplies overage is real overspending or camp supplies for next summer bought in September - Tuesday 10 November, with the corrected actuals.\n3. Ellis: ask the auditor whether February fieldwork is possible - date to be set (see open items).\n4. Morgan: cover memo draft to Ellis - Wednesday 11 November.\n5. Morgan: board packet out - Thursday 12 November.\n\nWhat is still open\n\n1. Who writes the one-page reserve explanation Alicia asked for, and by when? It needs to be ready before the packet goes out on 12 November. Alicia, would you like to draft it, or should I?\n2. Audit fieldwork timing: January or February? Ellis is asking the auditor, and we need an answer date.\n3. The final size of the program supplies overage, pending the corrected actuals.\n\nOur next committee meeting is Thursday 3 December.\n\nI know this lands in a heavy stretch, and I appreciate the unpaid time you put in.\n\nMorgan\n\n## Right\n\nSubject: Finance committee summary - Thursday 5 Nov [DATE UNVERIFIED]\n\nHello all,\n\nThanks for making time Thursday evening. I know this is unpaid time on top of a full week. Here is where we landed.\n\nWhat we decided\n\n1. The reserve transfer is not ours to decide. Tom suggested moving 5,000 [UNVERIFIED] from the operating reserve to cover program supplies. That goes to the full board on 19 Nov.\n2. The packet goes to the board on Thu 12 Nov, one week before the meeting.\n\nWho does what by when\n\n1. Ellis: send corrected Q1 actuals (July to September) by Tue 10 Nov. Two September lines were coded to the wrong account.\n2. Ellis: confirm whether the program supplies overage is a timing issue or a real overspend.\n3. Ellis: ask the auditor whether fieldwork can happen in February instead of January.\n4. Morgan: send the cover memo draft to Ellis by Wed 11 Nov.\n\nWhat is still open\n\n1. Program supplies are over plan by about 6,500 [UNVERIFIED]. Camp supplies for next summer may have been bought in September, which would make this timing and not overspend. Ellis is checking.\n2. Audit fieldwork timing. The auditor wants January. Nothing is decided until Ellis hears back on February.\n3. One-page explanation of the reserve transfer for the board. Alicia asked for it ahead of the 19 Nov meeting. Who writes it is not settled.\n\nRevenue for Q1 was roughly on plan.\n\nNext committee meeting is Thu 3 Dec.\n\nThanks,\nMorgan\n",
+ "command": [
+  "claude",
+  "-p",
+  "--output-format",
+  "stream-json",
+  "--verbose",
+  "--model",
+  "claude-sonnet-5-5",
+  "--setting-sources",
+  "project",
+  "--strict-mcp-config",
+  "--settings",
+  "{\"autoMemoryEnabled\":false,\"disableClaudeAiConnectors\":true}",
+  "--tools",
+  "",
+  "--permission-mode",
+  "acceptEdits",
+  "--permission-prompts",
+  "none",
+  "--no-session-persistence",
+  "--max-budget-usd",
+  "0.5"
+ ],
+ "isolation": {
+  "claude_code_version": "2.1.310",
+  "model": "claude-sonnet-5-5",
+  "permission_mode": "acceptEdits",
+  "mcp_servers": 0,
+  "connector_tools": 0,
+  "tools": [],
+  "skills": [
+   "design",
+   "doctor",
+   "plugin-authoring"
+  ],
+  "plugins": [
+   "cc-plugin-agents-md",
+   "cc-plugin-telemetry",
+   "cc-plugin-plugin-authoring"
+  ],
+  "auto_memory": "off",
+  "verified": true
+ },
+ "claude_code_version": "2.1.310",
+ "tool": "skill-eval-lite 0.1.0"
+}

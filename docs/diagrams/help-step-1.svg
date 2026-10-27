@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 226" width="300" height="226" role="img" aria-labelledby="help-step-1-t help-step-1-d"><title id="help-step-1-t">Step 1: where the file is</title><desc id="help-step-1-d">experiments/&lt;name&gt;/experiment.toml, before the runs, or runs/&lt;name&gt;/bundle.json, after them, both inside skill-eval-lite: choose either one in step 1.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t3{fill:#5F6A73}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t3{fill:#8593A0}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="225" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Where the file is</text><path transform="translate(12 39) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="32" y="50.5" font-size="11.5" class="m">skill-eval-lite/</text><path d="M18 59 V72 H25" class="ln thin s-rule"/><path transform="translate(28 61) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="48" y="72.5" font-size="11.5" class="m">experiments/&lt;name&gt;/</text><path d="M34 81 V94 H41" class="ln thin s-rule"/><g transform="translate(44 82) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="64" y="94.5" font-size="11.5" class="m b t-web">experiment.toml</text><text x="288" y="94.5" font-size="10.5" class="t3 it" text-anchor="end">before the runs</text><path d="M18 103 V116 H25" class="ln thin s-rule"/><path transform="translate(28 105) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="48" y="116.5" font-size="11.5" class="m">runs/&lt;name&gt;/</text><path d="M34 125 V138 H41" class="ln thin s-rule"/><g transform="translate(44 126) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="64" y="138.5" font-size="11.5" class="m b t-web">bundle.json</text><text x="288" y="138.5" font-size="10.5" class="t3 it" text-anchor="end">after the runs</text><path d="M30 146 L30 161" class="ln s-web"/><path d="M30 168 L25.2 159 L34.8 159 Z" class="h-web"/><text x="42" y="161" font-size="10.5" class="t3 it">choose either one</text><rect x="12" y="174" width="276" height="40" rx="8" class="f-web dash"/><rect x="22" y="186" width="17" height="14" rx="3" class="f-web"/><path d="M22 190.5 L39 190.5" class="ln s-web thin"/><circle cx="25" cy="188.3" r="0.9" class="h-web"/><circle cx="27.6" cy="188.3" r="0.9" class="h-web"/><text x="46" y="198.5" font-size="12" class="b t-web">Step 1: choose it here</text></svg>

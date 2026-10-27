@@ -1,0 +1,9 @@
+{
+ "role": "fault",
+ "note": "Two dates changed from the notes (the actuals are due 10 November, not 17; the next meeting is 3 December, not 10). The facts test should fail it; the shorthand test can't see it.",
+ "expect": {
+  "no-shorthand": "pass",
+  "facts-match-the-source": "fail",
+  "sendable": "fail"
+ }
+}

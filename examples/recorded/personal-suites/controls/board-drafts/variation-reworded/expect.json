@@ -1,0 +1,5 @@
+{
+ "role": "variation",
+ "varies": "reference",
+ "note": "The reference's first paragraph reworded without changing what it says. Every test should give the same result as on the reference."
+}

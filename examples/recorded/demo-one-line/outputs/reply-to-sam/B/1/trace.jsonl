@@ -1,0 +1,3 @@
+{"tool": "Read", "detail": "input/sam-message.md", "error": false}
+{"tool": "Bash", "detail": "ls drafts", "error": true}
+{"tool": "Bash", "detail": "mkdir -p drafts && printf 'Yes, we are both going. You drive, and 10 works.\\n\\nThanks for letting the front desk know.\\n' > drafts/reply-to-sam-saturday.md && cat drafts/reply-to-sam-saturday.md", "error": false}

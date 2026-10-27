@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 245" width="300" height="245" role="img" aria-labelledby="sz-cases-t sz-cases-d"><title id="sz-cases-t">A folder for each case</title><desc id="sz-cases-d">Each case is a folder: product/&lt;item&gt;/ with context.md and output.md; process/&lt;item&gt;/ with context.md and its steps (trace.jsonl or transcript.jsonl).</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .pl{fill:#F8F8F4;stroke:#D9DAD2}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .pl{fill:#18222A;stroke:#2A3640}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="244" rx="12"/><text x="12" y="22" font-size="12.5" class="b">A folder for each case</text><rect x="12" y="32" width="276" height="166" rx="8" class="pl"/><path transform="translate(22 45) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="42" y="56.5" font-size="11.5" class="m">my-suites/</text><path d="M28 65 V78 H35" class="ln thin s-rule"/><path transform="translate(38 67) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="58" y="78.5" font-size="11.5" class="m">product/summary-1/</text><path d="M44 87 V100 H51" class="ln thin s-rule"/><g transform="translate(54 88) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="74" y="100.5" font-size="11.5" class="m b t-web">context.md</text><text x="288" y="100.5" font-size="10.5" class="t3 it" text-anchor="end">what for</text><path d="M44 109 V122 H51" class="ln thin s-rule"/><g transform="translate(54 110) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="74" y="122.5" font-size="11.5" class="m b t-web">output.md</text><text x="288" y="122.5" font-size="10.5" class="t3 it" text-anchor="end">tested</text><path d="M28 131 V144 H35" class="ln thin s-rule"/><path transform="translate(38 133) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="58" y="144.5" font-size="11.5" class="m">process/brief-1/</text><path d="M44 153 V166 H51" class="ln thin s-rule"/><g transform="translate(54 154) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="74" y="166.5" font-size="11.5" class="m b t-web">context.md</text><text x="288" y="166.5" font-size="10.5" class="t3 it" text-anchor="end">what for</text><path d="M44 175 V188 H51" class="ln thin s-rule"/><g transform="translate(54 176) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="74" y="188.5" font-size="11.5" class="m b t-web">trace.jsonl</text><text x="288" y="188.5" font-size="10.5" class="t3 it" text-anchor="end">its steps</text><text x="12" y="220" font-size="11" class="t2">Add the files from your computer, or paste</text><text x="12" y="235" font-size="11" class="t2">them in.</text></svg>

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 778" width="400" height="778" role="img" aria-labelledby="order-suites-t order-suites-d"><title id="order-suites-t">Personal I suites, in order</title><desc id="order-suites-d">Terminal: copy the worked example into a packet, check it, run the suites. Wizard, checks-only mode: load the bundle, judge the AI tests yourself, rate the cases, save the reports. Your files: keep them in the packet.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .b{font-weight:600}
+.dg .t2{fill:#45515B}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .pl{fill:#F8F8F4;stroke:#D9DAD2}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .f-term{fill:rgba(28,124,110,.14);stroke:#1C7C6E}
+.dg .s-term{stroke:#1C7C6E}
+.dg .h-term{fill:#1C7C6E}
+.dg .t-term{fill:#187062}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+.dg .s-n{stroke:#7A8791}
+.dg .h-n{fill:#7A8791}
+.dg .tw{fill:#1E2A33;stroke:#13202A}
+.dg .tw-arrow{stroke:#62D2C0}
+.dg .tw-cur{fill:#E6EDF3}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .b{font-weight:600}
+.dg .t2{fill:#A7B4BF}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .pl{fill:#18222A;stroke:#2A3640}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .f-term{fill:rgba(76,192,174,.16);stroke:#4CC0AE}
+.dg .s-term{stroke:#4CC0AE}
+.dg .h-term{fill:#4CC0AE}
+.dg .t-term{fill:#4CC0AE}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+.dg .s-n{stroke:#8E9BA5}
+.dg .h-n{fill:#8E9BA5}
+.dg .tw{fill:#0A0F13;stroke:#2A3640}
+.dg .tw-arrow{stroke:#62D2C0}
+.dg .tw-cur{fill:#E6EDF3}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="399" height="777" rx="12"/><text x="16" y="28" font-size="15" class="b">Personal I suites, in order</text><rect x="12" y="43" width="17" height="14" rx="3" class="tw"/><path d="M15.5 47 L19 50 L15.5 53" class="ln thin tw-arrow"/><rect x="20.5" y="52.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="34" y="55" font-size="12" class="b t-term">Terminal</text><rect x="371" y="43" width="17" height="14" rx="3" class="f-web"/><path d="M371 47.5 L388 47.5" class="ln s-web thin"/><circle cx="374" cy="45.3" r="0.9" class="h-web"/><circle cx="376.6" cy="45.3" r="0.9" class="h-web"/><text x="364" y="55" font-size="12" class="b t-web" text-anchor="end">The wizard (browser)</text><path d="M22 66 V678" class="ln thin dash s-term"/><path d="M378 66 V678" class="ln thin dash s-web"/><rect x="44" y="78" width="280" height="54" rx="9" class="f-term"/><rect x="54" y="89" width="17" height="14" rx="3" class="tw"/><path d="M57.5 93 L61 96 L57.5 99" class="ln thin tw-arrow"/><rect x="62.5" y="98.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="80" y="100.5" font-size="13" class="b">Make your packet</text><text x="80" y="119" font-size="12" class="t2">copy examples/personal-suites</text><rect x="44" y="156" width="280" height="54" rx="9" class="f-term"/><rect x="54" y="167" width="17" height="14" rx="3" class="tw"/><path d="M57.5 171 L61 174 L57.5 177" class="ln thin tw-arrow"/><rect x="62.5" y="176.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="80" y="178.5" font-size="13" class="b">Check it</text><text x="80" y="197" font-size="12" class="t2">suite … --check</text><rect x="44" y="234" width="280" height="54" rx="9" class="f-term"/><rect x="54" y="245" width="17" height="14" rx="3" class="tw"/><path d="M57.5 249 L61 252 L57.5 255" class="ln thin tw-arrow"/><rect x="62.5" y="254.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="80" y="256.5" font-size="13" class="b">Run the tests</text><text x="80" y="275" font-size="12" class="t2">suite: the program and AI tests</text><rect x="76" y="312" width="280" height="54" rx="9" class="f-web"/><rect x="86" y="323" width="17" height="14" rx="3" class="f-web"/><path d="M86 327.5 L103 327.5" class="ln s-web thin"/><circle cx="89" cy="325.3" r="0.9" class="h-web"/><circle cx="91.6" cy="325.3" r="0.9" class="h-web"/><text x="112" y="334.5" font-size="13" class="b">Load the bundle</text><text x="112" y="353" font-size="12" class="t2">Step 1: my-suites/bundle.json</text><rect x="76" y="390" width="280" height="54" rx="9" class="f-web"/><rect x="86" y="401" width="17" height="14" rx="3" class="f-web"/><path d="M86 405.5 L103 405.5" class="ln s-web thin"/><circle cx="89" cy="403.3" r="0.9" class="h-web"/><circle cx="91.6" cy="403.3" r="0.9" class="h-web"/><text x="112" y="412.5" font-size="13" class="b">Judge the AI tests yourself</text><text x="112" y="431" font-size="12" class="t2">Step 2, Reference</text><rect x="76" y="468" width="280" height="54" rx="9" class="f-web"/><rect x="86" y="479" width="17" height="14" rx="3" class="f-web"/><path d="M86 483.5 L103 483.5" class="ln s-web thin"/><circle cx="89" cy="481.3" r="0.9" class="h-web"/><circle cx="91.6" cy="481.3" r="0.9" class="h-web"/><text x="112" y="490.5" font-size="13" class="b">Rate the cases</text><text x="112" y="509" font-size="12" class="t2">Step 3, Human tests</text><rect x="76" y="546" width="280" height="54" rx="9" class="f-web"/><rect x="86" y="557" width="17" height="14" rx="3" class="f-web"/><path d="M86 561.5 L103 561.5" class="ln s-web thin"/><circle cx="89" cy="559.3" r="0.9" class="h-web"/><circle cx="91.6" cy="559.3" r="0.9" class="h-web"/><text x="112" y="568.5" font-size="13" class="b">Save the reports</text><text x="112" y="587" font-size="12" class="t2">Step 4, Report</text><rect x="60" y="624" width="280" height="54" rx="9" class="f-file dash"/><path transform="translate(70 634) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="96" y="646.5" font-size="13" class="b">Keep them in your packet</text><text x="96" y="665" font-size="12" class="t2">judgments.csv and reports/</text><path d="M22 96 L44 96" class="ln s-term thin"/><circle cx="22" cy="96" r="4" class="h-term"/><path d="M22 174 L44 174" class="ln s-term thin"/><circle cx="22" cy="174" r="4" class="h-term"/><path d="M184 132 C184 142 184 139 184 149" class="ln s-n"/><path d="M184 156 L179.2 147 L188.8 147 Z" class="h-n"/><path d="M22 252 L44 252" class="ln s-term thin"/><circle cx="22" cy="252" r="4" class="h-term"/><path d="M184 210 C184 220 184 217 184 227" class="ln s-n"/><path d="M184 234 L179.2 225 L188.8 225 Z" class="h-n"/><path d="M356 330 L378 330" class="ln s-web thin"/><circle cx="378" cy="330" r="4" class="h-web"/><path d="M184 288 C184 298 216 295 216 305" class="ln s-n"/><path d="M216 312 L211.2 303 L220.8 303 Z" class="h-n"/><path d="M356 408 L378 408" class="ln s-web thin"/><circle cx="378" cy="408" r="4" class="h-web"/><path d="M216 366 C216 376 216 373 216 383" class="ln s-n"/><path d="M216 390 L211.2 381 L220.8 381 Z" class="h-n"/><path d="M356 486 L378 486" class="ln s-web thin"/><circle cx="378" cy="486" r="4" class="h-web"/><path d="M216 444 C216 454 216 451 216 461" class="ln s-n"/><path d="M216 468 L211.2 459 L220.8 459 Z" class="h-n"/><path d="M356 564 L378 564" class="ln s-web thin"/><circle cx="378" cy="564" r="4" class="h-web"/><path d="M216 522 C216 532 216 529 216 539" class="ln s-n"/><path d="M216 546 L211.2 537 L220.8 537 Z" class="h-n"/><path d="M216 600 C216 610 200 607 200 617" class="ln s-n"/><path d="M200 624 L195.2 615 L204.8 615 Z" class="h-n"/><rect x="16" y="696" width="368" height="66" rx="8" class="pl"/><text x="26" y="714" font-size="12" class="t2">The packet is the folder for Personal I. A</text><text x="26" y="730" font-size="12" class="t2">recorded one, ready to load:</text><text x="26" y="746" font-size="12" class="t2">examples/recorded/personal-suites/bundle.json.</text></svg>

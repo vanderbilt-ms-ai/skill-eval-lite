@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 242" width="300" height="242" role="img" aria-labelledby="help-suite-4-t help-suite-4-d"><title id="help-suite-4-t">Checks-only step 4: save the reports</title><desc id="help-suite-4-d">Export judgments.csv and each report. Move judgments.csv into my-suites/ and the reports into my-suites/reports/.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
+.dg .inv{fill:#FFFFFF}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .btn{fill:#16212B;stroke:#16212B}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
+.dg .inv{fill:#141C23}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .btn{fill:#E2E8EE;stroke:#E2E8EE}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="241" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Save the reports in your packet</text><rect x="12" y="42" width="155.4" height="26" rx="6" class="btn"/><text x="89.7" y="59.1" font-size="11.5" class="inv" text-anchor="middle">Export judgments.csv</text><rect x="12" y="74" width="202.1" height="26" rx="6" class="btn"/><text x="113" y="91.1" font-size="11.5" class="inv" text-anchor="middle">Export &lt;suite&gt;-&lt;version&gt;.md</text><path d="M30 104 L30 119" class="ln s-web"/><path d="M30 126 L25.2 117 L34.8 117 Z" class="h-web"/><text x="42" y="119" font-size="10.5" class="t3 it">from Downloads, move them</text><path transform="translate(12 129) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="32" y="140.5" font-size="11.5" class="m">my-suites/</text><path d="M18 149 V162 H25" class="ln thin s-rule"/><g transform="translate(28 150) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="48" y="162.5" font-size="11.5" class="m b t-web">judgments.csv</text><text x="288" y="162.5" font-size="10.5" class="t3 it" text-anchor="end">every row</text><path d="M18 171 V184 H25" class="ln thin s-rule"/><path transform="translate(28 173) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="48" y="184.5" font-size="11.5" class="m">reports/</text><path d="M34 193 V206 H41" class="ln thin s-rule"/><g transform="translate(44 194) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="64" y="206.5" font-size="11.5" class="m b t-web">&lt;suite&gt;-&lt;version&gt;.md</text><text x="288" y="206.5" font-size="10.5" class="t3 it" text-anchor="end">each report</text><text x="12" y="230" font-size="11.5" class="t2">A classmate’s judgments.csv: import it here.</text></svg>

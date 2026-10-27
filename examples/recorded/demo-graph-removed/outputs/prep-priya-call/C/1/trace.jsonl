@@ -1,0 +1,6 @@
+{"tool": "Bash", "detail": "ls; ls kb Grants/current notes 2>&1 | head -50; kb/kb search Hale 2>&1 | head -30", "error": false}
+{"tool": "Bash", "detail": "ls -la; ls ~/Documents/work 2>&1 | head; find / -ipath '*grants*' -maxdepth 5 2>/dev/null | head", "error": true}
+{"tool": "Glob", "detail": "**/* in .", "error": false}
+{"tool": "Glob", "detail": "**/* in /root/Documents/work", "error": true}
+{"tool": "Grep", "detail": "Hale in .", "error": false}
+{"tool": "Write", "detail": "notes/briefs/2026-10-27-hale-priya-call.md", "error": false}

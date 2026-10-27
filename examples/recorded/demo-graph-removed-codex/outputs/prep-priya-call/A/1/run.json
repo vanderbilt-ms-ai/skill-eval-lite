@@ -1,0 +1,106 @@
+{
+ "prompt": "prep-priya-call",
+ "round": "A",
+ "repeat": 1,
+ "status": "ok",
+ "reason": "",
+ "model": "gpt-6.1-sol",
+ "models_used": [
+  "gpt-6.1-sol"
+ ],
+ "runner": "codex",
+ "codex_version": "0.164.0",
+ "started": "2026-10-27T01:16:30Z",
+ "seconds": 40.4,
+ "cost_usd": null,
+ "num_turns": null,
+ "permission_denials": 0,
+ "output_from": "files: notes/hale-call-brief-2026-10-27.md",
+ "written": [
+  "notes/hale-call-brief-2026-10-27.md"
+ ],
+ "parts_changed_by_the_run": [],
+ "round_change": [],
+ "starting_files": [],
+ "command": [
+  "codex",
+  "exec",
+  "--json",
+  "--ephemeral",
+  "--skip-git-repo-check",
+  "-m",
+  "gpt-6.1-sol",
+  "-"
+ ],
+ "stdin": "the prompt's text (prompts/prep-priya-call/prompt.md)",
+ "cwd": ".",
+ "transcript": "transcripts/prep-priya-call__A__1.jsonl",
+ "isolation": {
+  "mcp_servers": 0,
+  "connector_tools": 0,
+  "tools": [
+   "apply_patch",
+   "clock__curr_time",
+   "exec",
+   "exec_command",
+   "followup_task",
+   "interrupt_agent",
+   "list_agents",
+   "list_mcp_resource_templates",
+   "list_mcp_resources",
+   "read_mcp_resource",
+   "request_user_input",
+   "request_user_input_async",
+   "send_message",
+   "sleep",
+   "spawn_agent",
+   "wait",
+   "wait_agent",
+   "write_stdin"
+  ],
+  "skills": [
+   "knowledge-graph",
+   "knowledge-graph-maintain"
+  ],
+  "codex_builtin_skills": [],
+  "plugins": [],
+  "instructions": [
+   "AGENTS.md in the run's folder"
+  ],
+  "auto_memory": "off",
+  "network": "off",
+  "files": "read: Codex's minimal system paths, the run's folder, Codex and Python; write: the run's folder",
+  "verified": true,
+  "codex_version": "0.164.0",
+  "model": "gpt-6.1-sol"
+ },
+ "tool": "skill-eval-lite 0.1.0",
+ "usage": {
+  "input_tokens": 144165,
+  "cached_input_tokens": 118400,
+  "cache_write_input_tokens": 0,
+  "output_tokens": 1217,
+  "reasoning_output_tokens": 68
+ },
+ "reasoning_effort": "the model's default",
+ "codex_mapping": {
+  "agents_md": "AGENTS.md written from CLAUDE.md with 5 @ imports inlined (25625 bytes)",
+  "imports": [
+   ".claude/identity/soul.md",
+   ".claude/identity/persona.md",
+   ".claude/identity/operating.md",
+   ".claude/identity/user.md",
+   ".claude/identity/voice.md"
+  ],
+  "unresolved": [],
+  "skills": [
+   "knowledge-graph",
+   "knowledge-graph-maintain"
+  ],
+  "not_mapped": [
+   ".claude/settings.json: project settings (permissions, hooks, environment): Codex's sandbox and settings apply instead",
+   ".claude/commands: slash commands (Codex has no project commands; a run doesn't type them)"
+  ],
+  "note": "A Codex run evaluates the assistant's instructions as Codex reads them: AGENTS.md is written from CLAUDE.md with its @ imports inlined, and .claude/skills/ is copied to .agents/skills/. Codex and Claude Code results are not interchangeable: compare rounds run with the same runner."
+ }
+}

@@ -1,0 +1,62 @@
+{
+ "comparison": "A|C",
+ "prompt": "prep-priya-call",
+ "repeat": 1,
+ "shown_left": "C",
+ "decision": "RIGHT",
+ "winner": "A",
+ "note": "",
+ "response": "Right is the one Morgan could send without changes. It answers the request with a table of open items (site visit 11/13, interim report 11/30, renewal proposal 12/01) and flags clearly that the amounts are unverified and the dates should be checked against `calendar.md`. Left gives no dates or amounts at all, only a list of what it couldn't access and a fill-in-yourself table, so Morgan would still have to do the brief's work. Right's sourcing is a small risk, since Left says `kb/` doesn't exist and I can't confirm the graph pages. Even so, Right is more useful and just as plain in tone.\n\nRIGHT",
+ "model": "claude-sonnet-5-5",
+ "when": "2026-10-26T21:32:50Z",
+ "seconds": 6.7,
+ "cost_usd": 0.0175989,
+ "status": "ok",
+ "requested_model": "claude-sonnet-5-5",
+ "input": "You are judging two drafts that an assistant wrote for Morgan Reyes. Morgan\nsends drafts under their own name. Read the request, the starting file if\nthere is one, and the two drafts.\n\nQuestion: Which draft would Morgan be more willing to send under their own\nname without changes?\n\nJudge what is on the page: whether it answers what was asked, whether its\nfacts match the request, and whether it reads as Morgan writes (plain, short,\nno stock openers or sign-offs). Do not prefer a draft because it is longer.\n\nGive two or three sentences of reasons. Then, on the last line, write only\nLEFT, RIGHT or TIE, or UNKNOWN if you can't tell.\n\n## The request\n\nPriya Raman is calling me tomorrow at 2. Give me a short brief to read first:\nwhat's open with the Hale Foundation, with the dates and amounts. Save it in\nnotes/.\n\n## Left\n\n# Hale Foundation - brief for call with Priya Raman\n\nCall: Tuesday 2026-10-27, 2:00pm (time as you gave it; not checked against the calendar).\n\n## Status of this brief\n\nNo open items, dates, or amounts are listed here. I could not source any of them.\n\n- `Grants/current/` (budget workbook, signed agreement, pipeline.xlsx, calendar.md) is not in this repo or reachable from this session.\n- `kb/` does not exist, so there are no graph pages on Hale.\n- Google Drive, Gmail, and Calendar tools are not available in this session, so I could not check the thread history or the grant calendar.\n- Local `~/Documents/work` was blocked by permissions.\n\nPer the rules, I am not filling in figures from memory or from older copies.\n\n## What I know\n\n- Priya Raman is program officer at the Hale Foundation, Cedar Commons' largest funder. Warm relationship, formal paperwork (user.md).\n- Dana Whitfield reviews anything going to a funder above 50,000.\n\n## To fill in before 2pm\n\n| Item | Source to check | Value |\n|---|---|---|\n| Current award amount and term | Signed agreement, Grants/current/ | [UNVERIFIED] |\n| Next report due date and amount reported | Grants/current/calendar.md | [UNVERIFIED] |\n| Payments received / outstanding | Budget workbook | [UNVERIFIED] |\n| Renewal stage and ask | Grants/current/pipeline.xlsx | [UNVERIFIED] |\n| Open threads or asks from Priya | Cedar Commons email | [UNVERIFIED] |\n\n## Questions to settle\n\n- Is the call a renewal conversation, a report check-in, or something she raised?\n- Is anything promised to Hale that is not yet delivered?\n\n## Right\n\n# Hale Foundation - brief for call with Priya Raman\n\nCall: Tuesday 2026-10-27, 2:00pm. Priya Raman is the program officer at the Hale\nFoundation, Cedar Commons' largest funder.\n\nSource note: dates below come from the knowledge graph pages \"Hale Foundation\" and\n\"Hale Foundation renewal\", which cite the grant calendar. `Grants/current/` is not\nin this repo, so I could not open `calendar.md` or `pipeline.xlsx` to confirm them.\nCheck against `Grants/current/calendar.md` before quoting any date to Priya.\n\n## What is open\n\n| Item | Date | Amount | Status |\n|---|---|---|---|\n| Site visit | 2026-11-13, 10:00 | n/a | Set per graph. Confirm attendees and agenda. |\n| Interim report | Due 2026-11-30 | [UNVERIFIED] | Open. |\n| Renewal proposal | Due 2026-12-01 | [UNVERIFIED] | In preparation. Request is above 50,000, so Dana Whitfield reviews the narrative before it goes. |\n\n## Gaps\n\n- No amounts for the current grant, the interim report, or the renewal request are\n  in the graph. They live in `Grants/current/pipeline.xlsx` (Hale row) and the signed\n  agreement. Pull them before the call if you expect to talk numbers.\n- The interim report and the renewal proposal are due one day apart (11/30 and\n  12/01). Worth deciding before the call whether to ask Priya about sequencing.\n- Dana's review comes before the renewal goes out, so her review window has to fit\n  between the 11/13 site visit and 12/01.\n\n## Questions to put to Priya\n\n1. Is the 11/13 site visit at 10:00 still good on her side, and who from Hale is coming?\n2. Does she want anything in the interim report beyond what the agreement requires?\n3. Is there anything she needs from us for the renewal ahead of 12/01?\n\nNothing here has been sent to Hale.\n",
+ "command": [
+  "claude",
+  "-p",
+  "--output-format",
+  "stream-json",
+  "--verbose",
+  "--model",
+  "claude-sonnet-5-5",
+  "--setting-sources",
+  "project",
+  "--strict-mcp-config",
+  "--settings",
+  "{\"autoMemoryEnabled\":false,\"disableClaudeAiConnectors\":true}",
+  "--tools",
+  "",
+  "--permission-mode",
+  "acceptEdits",
+  "--permission-prompts",
+  "none",
+  "--no-session-persistence",
+  "--max-budget-usd",
+  "0.5"
+ ],
+ "isolation": {
+  "claude_code_version": "2.1.310",
+  "model": "claude-sonnet-5-5",
+  "permission_mode": "acceptEdits",
+  "mcp_servers": 0,
+  "connector_tools": 0,
+  "tools": [],
+  "skills": [
+   "design",
+   "doctor",
+   "plugin-authoring"
+  ],
+  "plugins": [
+   "cc-plugin-agents-md",
+   "cc-plugin-telemetry",
+   "cc-plugin-plugin-authoring"
+  ],
+  "auto_memory": "off",
+  "verified": true
+ },
+ "claude_code_version": "2.1.310",
+ "tool": "skill-eval-lite 0.1.0"
+}

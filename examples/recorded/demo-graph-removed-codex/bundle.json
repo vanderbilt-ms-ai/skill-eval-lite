@@ -1,0 +1,348 @@
+{
+ "schema": "skill-eval-lite/bundle@1",
+ "tool": "skill-eval-lite 0.1.0",
+ "made_up": false,
+ "outputs": [
+  {
+   "prompt": "prep-dana-checkin",
+   "round": "A",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "# Dana check-in\n\nWednesday at 11, per your message.\n\nAim: leave with a review plan for the Hale renewal and a decision on the quiet corporate partners.\n\n## What's open, and what you need from Dana\n\n| Open item | What you need from her |\n| --- | --- |\n| Hale renewal narrative. The graph records it as not yet drafted and requiring Dana's review before it goes to Hale. | Ask: \"What needs to be in the narrative, and when should I get you a draft so there's time for your review?\" |\n| Quiet corporate partners. The graph records an unresolved decision about moving them to inactive in the pipeline. | Ask: \"Should we mark them inactive or make another outreach attempt? If we keep them active, who owns the next step, and by when?\" |\n\n## Source limits\n\nThese are the open items recorded in `kb/wiki/Dana Whitfield.md`, `kb/wiki/Hale Foundation renewal.md` (Explanation), and `kb/wiki/Quiet corporate partners.md` (Explanation). They are leads to confirm, not a verified current task list: the status notes cite an October 28, 2026 session, which is later than today's October 26 date.\n\nThe cited originals, `Grants/current/pipeline.xlsx`, `Grants/current/calendar.md`, and the session transcripts, are unavailable here. No email, Drive, or calendar connector is available in this session. Partner names, amounts, deadlines, and any newer exchanges remain unverified and are omitted.\n",
+   "message": "Saved [the brief](notes/dana-check-in-brief.md): Hale narrative review and the quiet-partner decision, with specific asks for Dana.\n\nThe source notes are future-dated and originals aren't available, so the brief flags both items as needing confirmation.",
+   "output_from": "files: notes/dana-check-in-brief.md",
+   "trace": [
+    [
+     "Skill",
+     "knowledge-graph"
+    ],
+    [
+     "Bash",
+     "kb/kb search Dana"
+    ],
+    [
+     "Glob",
+     "rg --files -g '!kb/build/**' -g '!node_modules/**' -g '!\\.git/**'"
+    ],
+    [
+     "Bash",
+     "kb/kb node \"Dana Whitfield\""
+    ],
+    [
+     "Bash",
+     "kb/kb node \"Hale Foundation renewal\""
+    ],
+    [
+     "Bash",
+     "kb/kb node \"Quiet corporate partners\""
+    ],
+    [
+     "Bash",
+     "ls -la kb; cat kb/map.json; cat README.md"
+    ],
+    [
+     "Bash",
+     "cat \"kb/wiki/Hale Foundation renewal.md\" \"kb/wiki/Quiet corporate partners.md\" \"kb/wiki/Funder pipeline.md\" \"kb/wiki/Grant calendar.md\" \"kb/wiki/Session transcripts.md\" \"kb/wiki/Calendars.md\"; rg --files --hidden -g \"!\\.git/**\" -g \"!kb/tools/**\" -g \"!kb/build/**\""
+    ],
+    [
+     "Bash",
+     "cat .agents/skills/knowledge-graph-maintain/SKILL.md; ls -ld Grants/current ~/.claude/projects; kb/kb search Hale"
+    ],
+    [
+     "Bash",
+     "mkdir -p notes"
+    ],
+    [
+     "Write",
+     "notes/dana-check-in-brief.md"
+    ],
+    [
+     "Read",
+     "cat notes/dana-check-in-brief.md"
+    ]
+   ],
+   "model": "gpt-6.1-sol",
+   "seconds": 42.4,
+   "cost_usd": null,
+   "when": "2026-10-27T01:16:30Z",
+   "runner": "codex",
+   "usage": {
+    "input_tokens": 146713,
+    "cached_input_tokens": 128512,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 985,
+    "reasoning_output_tokens": 64
+   }
+  },
+  {
+   "prompt": "prep-dana-checkin",
+   "round": "C",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "# Dana check-in - Wednesday, October 28, at 11\n\nCedar Commons. Meeting time supplied by Morgan; calendar not verified.\n\n## What's open between you\n\nNot verified. This workspace has no meeting notes, correspondence, grant files, or knowledge graph, and no email, Drive, or calendar connector is available in this session. I can't establish outstanding requests, decisions, or commitments from either of you.\n\n## What you need from her\n\nSuggested prompts, pending the actual thread history:\n\n1. What needs your decision or review before our next check-in?\n2. Which partnership or funder item should take priority, and what can wait?\n3. Are there outstanding requests between us? Confirm the next action, owner, and due date for each.\n\nSource context: .claude/identity/user.md, \"Who else shows up\", identifies Dana Whitfield as Cedar Commons' executive director and Morgan's manager. It does not establish any current open items.\n",
+   "message": "Saved [the brief](notes/dana-check-in-2026-10-28.md). I couldn't verify open items: no correspondence or meeting notes are available, and no connectors are live. The file flags that gap and includes three suggested prompts for Dana.",
+   "output_from": "files: notes/dana-check-in-2026-10-28.md",
+   "trace": [
+    [
+     "Bash",
+     "pwd; rg --files -g '!*build*' -g '!*.xlsx' -g '!*.pdf' | head -80"
+    ],
+    [
+     "Bash",
+     "ls -la; find . -maxdepth 4 -type f | head -100"
+    ],
+    [
+     "ListMcpResources",
+     "{}"
+    ],
+    [
+     "ListMcpResourceTemplates",
+     "{}"
+    ],
+    [
+     "Bash",
+     "rg -n -i 'dana|hale|open|pending|check-in' .claude/identity CLAUDE.md README.md; test -e kb/kb && kb/kb search Dana",
+     "error"
+    ],
+    [
+     "Read",
+     "cat .claude/identity/user.md"
+    ],
+    [
+     "Bash",
+     "mkdir -p notes\ncat > notes/dana-check-in-2026-10-28.md <<'EOF'\n# Dana check-in - Wednesday, October 28, at 11\n\nCedar Commons. Meeting time supplied by Morgan; calendar not verified.\n\n## What's open between you\n\nNot verified. This workspace has no meeting notes, correspondence, grant files, or knowledge graph, and no email, Drive, or calendar connector is available in this session. I can't establish outstanding requests, decisions, or commitments from either of you.\n\n## What you need from her\n\nSuggested prompts, pending the actual thread history:\n\n1. What needs your decision or review before our next check-in?\n2. Which partnership or funder item should take priority, and what can wait?\n3. Are there outstanding requests between us? Confirm the next action, owner, and due date for each.\n\nSource context: .claude/identity/user.md, \"Who else shows up\", identifies Dana Whitfield as Cedar Commons' executive director and Morgan's manager. It does not establish any current open items.\nEOF\ncat notes/dana-check-in-2026-10-28.md"
+    ]
+   ],
+   "model": "gpt-6.1-sol",
+   "seconds": 27.4,
+   "cost_usd": null,
+   "when": "2026-10-27T01:16:30Z",
+   "runner": "codex",
+   "usage": {
+    "input_tokens": 85057,
+    "cached_input_tokens": 58368,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 612,
+    "reasoning_output_tokens": 20
+   }
+  },
+  {
+   "prompt": "prep-priya-call",
+   "round": "A",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "# Hale Foundation - call brief\n\nCall with Priya Raman: October 27, 2026, at 2, per Morgan's message. Time zone and a.m./p.m. were not specified.\n\nThe graph lists three open items below. The current source documents are unavailable here, and no Drive, email, or calendar connector is connected. Dates and amounts remain unverified; this is not a complete check of recent correspondence.\n\n| Open item | Date and amount | Source and next step |\n| --- | --- | --- |\n| Site visit | [UNVERIFIED] November 13, 2026, at 10:00; time zone unspecified | Graph: Hale Foundation, Explanation, citing Grants/current/calendar.md, Hale entries. Confirm timing and preparation with Priya. |\n| Current grant interim report | [UNVERIFIED] Due November 30, 2026. Current award amount not available. | Graph: Hale Foundation, Explanation, citing Grants/current/calendar.md, Hale entries. Confirm reporting requirements and work remaining. |\n| Renewal proposal | [UNVERIFIED] Due December 1, 2026; request of $120,000 over two years | Graph: Hale Foundation renewal, Explanation, citing Grants/current/calendar.md, Hale entries, and Grants/current/pipeline.xlsx, Hale row (tab unspecified). Verify amount and term against the current workbook or signed agreement before using them externally. Dana reviews the narrative before it goes. |\n\nAsk Priya whether the report and renewal deadlines still stand, what Hale needs for the site visit, and whether anything else is outstanding. The listed deadlines are consecutive, so set Dana's review date early enough to finish both.\n\nDraft status is unknown. The graph says the renewal narrative was not drafted as of October 28, 2026, citing a session after today's date of October 26. That entry cannot establish the current status.\n",
+   "message": "Saved the [Hale call brief](notes/hale-call-brief-2026-10-27.md) with the site visit, interim report, and renewal.\n\nDates and amounts are marked [UNVERIFIED]: the graph has them, but the current source files and connectors aren't available here.",
+   "output_from": "files: notes/hale-call-brief-2026-10-27.md",
+   "trace": [
+    [
+     "Skill",
+     "knowledge-graph"
+    ],
+    [
+     "Bash",
+     "pwd; rg --files -g 'AGENTS.md' -g '*Hale*' -g '*hale*' -g '*calendar*' -g '*pipeline*' -g '*Raman*' -g '*operating*'"
+    ],
+    [
+     "Bash",
+     "kb/kb search Hale"
+    ],
+    [
+     "Glob",
+     "rg --files"
+    ],
+    [
+     "Bash",
+     "kb/kb node \"Hale Foundation renewal\""
+    ],
+    [
+     "Bash",
+     "kb/kb node \"Priya Raman\""
+    ],
+    [
+     "Bash",
+     "ls -la; ls -la kb/wiki; cat kb/map.json"
+    ],
+    [
+     "ListMcpResourceTemplates",
+     "{}"
+    ],
+    [
+     "ListMcpResources",
+     "{}"
+    ],
+    [
+     "Bash",
+     "cat \"kb/wiki/Hale Foundation renewal.md\" \"kb/wiki/Funder pipeline.md\" \"kb/wiki/Grant calendar.md\" \"kb/wiki/Session transcripts.md\" \"kb/wiki/Grants current folder.md\"; ls -la .claude; rg --files --hidden .claude"
+    ],
+    [
+     "Bash",
+     "cat .agents/skills/knowledge-graph-maintain/SKILL.md; cat \"kb/wiki/Hale Foundation.md\""
+    ],
+    [
+     "Write",
+     "notes/hale-call-brief-2026-10-27.md"
+    ],
+    [
+     "Bash",
+     "cat notes/hale-call-brief-2026-10-27.md; python -c \"from pathlib import Path; p=Path('notes/hale-call-brief-2026-10-27.md'); assert p.read_text().isascii(); print('ASCII check: PASS')\""
+    ]
+   ],
+   "model": "gpt-6.1-sol",
+   "seconds": 40.4,
+   "cost_usd": null,
+   "when": "2026-10-27T01:16:30Z",
+   "runner": "codex",
+   "usage": {
+    "input_tokens": 144165,
+    "cached_input_tokens": 118400,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1217,
+    "reasoning_output_tokens": 68
+   }
+  },
+  {
+   "prompt": "prep-priya-call",
+   "round": "C",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "# Hale Foundation call brief\n\nCall: October 27, 2026, at 2:00 with Priya Raman. Source: Morgan's request on October 26; AM/PM and timezone not specified.\n\nCurrent status: Open items, deadlines, and amounts could not be verified. This workspace has no kb/ or Grants/current/ records, and no connected mail, calendar, or Drive tools or resources were available to check. This is an incomplete brief.\n\n| Item to confirm | Date | Amount | Source needed |\n| --- | --- | --- | --- |\n| Active grant obligations, reports, and unpaid installments | [UNVERIFIED] | [UNVERIFIED] | Current signed Hale agreement and amendments in Grants/current/ |\n| Renewal or pending request | [UNVERIFIED] | [UNVERIFIED] | Grants/current/pipeline.xlsx and current budget workbook |\n| Next reporting deadline | [UNVERIFIED] | Not established | Grants/current/calendar.md, checked against the signed agreement |\n\nBefore the call: Obtain the current Hale agreement, pipeline entry, reporting calendar, and latest Priya correspondence to establish what remains open. No open commitment or amount is confirmed here.\n",
+   "message": "Saved an [incomplete brief](notes/hale-call-2026-10-27.md). The Hale records aren't in this workspace, and no mail or Drive connection is available, so dates and amounts remain unverified.\n\nPlease provide the current Hale agreement, pipeline entry, and latest Priya correspondence so I can finish it.",
+   "output_from": "files: notes/hale-call-2026-10-27.md",
+   "trace": [
+    [
+     "Bash",
+     "pwd; rg --files -g '!*.xlsx' -g '!*.pdf' -g '!*.docx'"
+    ],
+    [
+     "Bash",
+     "ls -la; rg --files --hidden"
+    ],
+    [
+     "ListMcpResources",
+     "{}"
+    ],
+    [
+     "ListMcpResourceTemplates",
+     "{}"
+    ],
+    [
+     "Bash",
+     "ls -la .claude; cat .claude/settings.json; test ! -e kb/kb || kb/kb search Hale"
+    ],
+    [
+     "Write",
+     "notes/hale-call-2026-10-27.md"
+    ],
+    [
+     "Read",
+     "cat notes/hale-call-2026-10-27.md"
+    ]
+   ],
+   "model": "gpt-6.1-sol",
+   "seconds": 25.9,
+   "cost_usd": null,
+   "when": "2026-10-27T01:16:30Z",
+   "runner": "codex",
+   "usage": {
+    "input_tokens": 85976,
+    "cached_input_tokens": 67328,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 655,
+    "reasoning_output_tokens": 23
+   }
+  }
+ ],
+ "judge": [
+  {
+   "comparison": "A|C",
+   "prompt": "prep-dana-checkin",
+   "repeat": 1,
+   "shown_left": "A",
+   "decision": "LEFT",
+   "winner": "A",
+   "note": "",
+   "response": "Left gives Morgan two concrete open items and clear asks for Dana, while acknowledging that the source notes may not reflect current status. Right offers only generic prompts and doesn't establish what's open between them; Left's lengthy source caveats are cumbersome, but it better answers the request.\n\nLEFT",
+   "model": "gpt-6.1-sol",
+   "when": "2026-10-27T01:17:35Z",
+   "seconds": 8.3,
+   "cost_usd": null,
+   "status": "ok",
+   "requested_model": "gpt-6.1-sol",
+   "runner": "codex",
+   "usage": {
+    "input_tokens": 9686,
+    "cached_input_tokens": 7680,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 126,
+    "reasoning_output_tokens": 65
+   }
+  },
+  {
+   "comparison": "A|C",
+   "prompt": "prep-priya-call",
+   "repeat": 1,
+   "shown_left": "C",
+   "decision": "RIGHT",
+   "winner": "A",
+   "note": "",
+   "response": "Right gives Morgan concrete open items, dates, and a renewal amount to review before the call; Left offers only a checklist of missing information. Right is more useful despite its technical source language and extra caveats, though the supplied material does not establish whether its specific facts are correct.\n\nRIGHT",
+   "model": "gpt-6.1-sol",
+   "when": "2026-10-27T01:17:35Z",
+   "seconds": 10.6,
+   "cost_usd": null,
+   "status": "ok",
+   "requested_model": "gpt-6.1-sol",
+   "runner": "codex",
+   "usage": {
+    "input_tokens": 9810,
+    "cached_input_tokens": 7680,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 146,
+    "reasoning_output_tokens": 83
+   }
+  }
+ ],
+ "files": {},
+ "experiment": {
+  "name": "demo-graph-removed.toml",
+  "text": "# Demonstration 1 of 3: round C removes the knowledge graph. Things should get worse.\n# A demonstration for the live session: two prompts, two rounds, one repeat\n# (4 runs; about 3 minutes with --jobs 4). It is not a full experiment: a\n# full one has both controls, at least four development prompts and two\n# repeats (see class-assistant/experiment.toml, whose prompts, round files and\n# starting files this file uses). Wren and Morgan Reyes are fictional.\nschema = \"skill-eval-lite/experiment@1\"\ndemo = true\nfiles_from = \"class-assistant\"\ntitle = \"Can the evaluation see the knowledge graph? (demonstration: the graph removed)\"\npurpose = \"\"\"\nWren drafts replies, summaries and briefs for Morgan Reyes, who sends them\nunder Morgan's own name. The outputs are for Morgan to send or read with as\nfew changes as possible.\"\"\"\ncriterion = \"\"\"\nA good output could go out under Morgan's name without changes: it answers\nwhat was asked, gets the facts from the request and the knowledge graph right,\nand reads as Morgan writes (plain, short, no stock openers or sign-offs).\"\"\"\njudging_question = \"Which draft would Morgan be more willing to send under their own name without changes?\"\nrepeats = 1\nseed = 5502\n\n[system]\nname = \"Wren, Morgan Reyes's assistant (the class assistant; fictional)\"\nkind = \"assistant\"\nfolder = \"the class assistant: python3 run_ab.py setup ../class-assistant\"\n\n[[system.parts]]\nid = \"knowledge-graph\"\npath = \"kb/ and .claude/skills/knowledge-graph*/\"\npaths = [\"kb/\", \".claude/skills/knowledge-graph/\", \".claude/skills/knowledge-graph-maintain/\"]\nreaches_model = \"the skills load when the agent chooses; pages are searched with kb/kb\"\n\n[[rounds]]\nid = \"A\"\nlabel = \"As it is\"\nrole = \"baseline\"\nchange = { how = \"as-is\" }\n\n[[rounds]]\nid = \"C\"\nlabel = \"Knowledge graph removed\"\nrole = \"control-should-change\"\nchange = { part = \"knowledge-graph\", how = \"removed\" }\nexpected = { direction = \"worse\", tags = [\"in-graph\"], sources = [\"people\", \"judge\", \"searched-the-graph\", \"names-the-renewal-amount\"] }\nwhy = \"Without kb/ the assistant can't know who Dana and Priya are or what is open with them. If nothing in the evaluation moves, the evaluation can't see the graph.\"\n\n[[comparisons]]\nbaseline = \"A\"\nnew = \"C\"\n\n[controls]\ntolerance = 0.10\n\n[[behaviors]]\nid = \"uses-the-graph\"\ndescription = \"Searches the knowledge graph before writing about someone in it; doesn't need to when the request holds everything.\"\n\n[prompts]\ndevelopment = [\"prep-dana-checkin\", \"prep-priya-call\"]\nheld_out = [\"reply-to-school\"]\nsealed = true\n\n[[prompt]]\nid = \"prep-dana-checkin\"\ntitle = \"A brief for the check-in with Dana\"\ntags = [\"briefing\", \"in-graph\"]\nshould = [\"uses-the-graph\"]\nshould_not = [\"uses-the-board-register\"]\ntext = \"\"\"\nMy check-in with Dana is Wednesday at 11. Give me a short brief to read\nbeforehand: what's open between us, and what I need from her. Save it in\nnotes/.\"\"\"\nreference = \"\"\"\nCheck-in with Dana, Wednesday at 11\n\nOpen between us\n1. The Hale Foundation renewal narrative. The request is 120,000 over two years, above the 50,000 that Dana reviews, and it is due to Hale on 1 December. I need her review dates.\n2. The two quiet corporate partners. We haven't decided whether to mark them inactive. I need her decision.\n\nFrom the graph pages for Dana Whitfield and the Hale Foundation.\"\"\"\n\n[[prompt]]\nid = \"prep-priya-call\"\ntitle = \"A brief for a call with Priya at the Hale Foundation\"\ntags = [\"briefing\", \"funder\", \"in-graph\"]\nshould = [\"uses-the-graph\"]\ntext = \"\"\"\nPriya Raman is calling me tomorrow at 2. Give me a short brief to read first:\nwhat's open with the Hale Foundation, with the dates and amounts. Save it in\nnotes/.\"\"\"\nreference = \"\"\"\nCall with Priya Raman, Hale Foundation, tomorrow at 2\n\nOpen with Hale\n1. The interim report on the current grant, due Monday 30 November.\n2. The renewal proposal: 120,000 over two years, due Tuesday 1 December. The narrative isn't drafted yet, and Dana reviews it before it goes, because the request is above 50,000.\n\nFrom the graph pages for the Hale Foundation renewal and the grant calendar.\"\"\"\n\n[[prompt]]\nid = \"reply-to-school\"\ntitle = \"Answer Ms. Okafor about the trip\"\ntags = [\"voice\", \"reply\", \"household\", \"not-in-graph\"]\nshould_not = [\"uses-the-graph\", \"uses-the-board-register\"]\nfiles = [\"input/school-email.md\"]\ntext = \"\"\"\nCan you answer Ms. Okafor for me? Her email is in input/school-email.md. Yes to\nthe trip, and I've signed the form and will send it in with the fee tomorrow.\nI can't chaperone that day, sorry.\"\"\"\nreference = \"\"\"\nMs. Okafor,\n\nYes to the trip. I've signed the form, and it'll come in with the fee tomorrow. I can't chaperone that day, sorry.\n\nMorgan\"\"\"\n\n[model]\nrunner = \"claude-code\"\nmodel = \"claude-sonnet-5-5\"\nallowed_tools = [\"Read\", \"Write\", \"Edit\", \"Glob\", \"Grep\", \"Skill\", \"Bash kb/kb *\"]\ntimeout_seconds = 300\nmax_budget_usd = 1.00\nnote = \"The same model and settings for every round. Personal settings, memory and connectors are left out of every run.\"\n\n# Checks run by the wizard on every output. contains: every text must appear;\n# not-contains: none may appear. A failed or timed-out run fails every check.\n\n[[checks]]\nid = \"searched-the-graph\"\nkind = \"trace-ran-command\"\nobject = \"process\"\npattern = \"kb/kb search*\"\ntags = [\"in-graph\"]\nshows = \"The run searched the knowledge graph, as CLAUDE.md asks before answering anything about a person.\"\ndoes_not_show = \"That it used what it found, or searched for the right person.\"\n\n[[checks]]\nid = \"names-the-renewal-amount\"\nkind = \"matches\"\nobject = \"product\"\npattern = \"120,?000|120 ?[kK]\"\nprompts = [\"prep-dana-checkin\", \"prep-priya-call\"]\nshows = \"The brief gives the Hale renewal's amount, which only the knowledge graph holds.\"\ndoes_not_show = \"That the rest of the brief is right.\"\n\n[[checks]]\nid = \"stayed-in-bounds\"\nkind = \"trace-no-tool-outside\"\nobject = \"process\"\nallowed = [\"Read\", \"Write\", \"Edit\", \"Glob\", \"Grep\", \"Skill\", \"Bash kb/kb *\"]\nshows = \"Every step used a tool on the allowed list.\"\ndoes_not_show = \"That each step was a good one.\"\n\n[[checks]]\nid = \"no-forbidden-characters\"\nkind = \"not-contains\"\nobject = \"product\"\ntext = [\"—\", \"–\", \"“\", \"”\", \"‘\", \"’\", \"…\"]\nshows = \"The voice file's character rule held: no em or en dashes, curly quotes or ellipsis characters.\"\ndoes_not_show = \"That the draft sounds like Morgan, or that it is right.\"\n\n[judge]\nmodel = \"claude-sonnet-5-5\"\ndecision = \"The last line of the response is LEFT, RIGHT, TIE or UNKNOWN.\"\nprompt = \"\"\"\nYou are judging two drafts that an assistant wrote for Morgan Reyes. Morgan\nsends drafts under their own name. Read the request, the starting file if\nthere is one, and the two drafts.\n\nQuestion: Which draft would Morgan be more willing to send under their own\nname without changes?\n\nJudge what is on the page: whether it answers what was asked, whether its\nfacts match the request, and whether it reads as Morgan writes (plain, short,\nno stock openers or sign-offs). Do not prefer a draft because it is longer.\n\nGive two or three sentences of reasons. Then, on the last line, write only\nLEFT, RIGHT or TIE, or UNKNOWN if you can't tell.\"\"\"\n\n[frozen]\ndate = \"\"\nhash = \"\"\n\n[provenance]\nwritten_by = \"Claude (claude-opus-5-5), by hand, from the class intake\"\ndate = \"2026-10-26\"\nskill = \"experiment-intake 1\"\n",
+  "sha256": "sha256:9b9c9f1f3a5670f55b1851770110a8330b6d7fc3996e9b883b1d90076a5f5fda"
+ },
+ "assistant": {
+  "name": "class-assistant",
+  "git": {
+   "commit": "63a3f5f",
+   "uncommitted_changes": false
+  }
+ },
+ "runner": {
+  "name": "codex",
+  "codex_version": "0.164.0",
+  "flags": [
+   "exec",
+   "--json",
+   "--ephemeral",
+   "--skip-git-repo-check",
+   "-m",
+   "gpt-6.1-sol",
+   "-"
+  ],
+  "codex_home": "a temporary folder holding only config.toml (below) and a link to the login",
+  "config_toml": "# Written by Skill Eval Lite (run_ab.py) for isolated Codex runs; deleted when the command ends.\napproval_policy = \"never\"\ndefault_permissions = \"skill-eval-lite\"\nallow_login_shell = false\nweb_search = \"disabled\"\ncheck_for_update_on_startup = false\nproject_doc_max_bytes = 1048576\nproject_root_markers = []\n\n[history]\npersistence = \"none\"\n\n[memories]\nuse_memories = false\ngenerate_memories = false\n\n[analytics]\nenabled = false\n\n[shell_environment_policy]\ninherit = \"core\"\n\n[features]\napps = false\nplugins = false\nremote_plugin = false\nrecommended_plugins = false\ntool_suggest = false\nhooks = false\nmemories = false\nshell_snapshot = false\nmulti_agent = false\nimage_generation = false\nbrowser_use = false\nbrowser_use_external = false\ncomputer_use = false\nin_app_browser = false\nview_image = false\ngoals = false\nskill_mcp_dependency_install = false\ndaemon_auto_start = false\n\n[permissions.skill-eval-lite.filesystem]\n\":minimal\" = \"read\"\n\":workspace_roots\" = \"write\"\n\"~/.codex/packages/standalone/releases/0.164.0-x86_64-unknown-linux-musl\" = \"read\"\n\"<the temporary CODEX_HOME>/tmp\" = \"read\"\n\"/usr\" = \"read\"\n\n[permissions.skill-eval-lite.network]\nenabled = false\n\n# Also switched off by path: 5 of Codex's own skills.\n",
+  "env_left_out": [
+   "OPENAI_API_KEY",
+   "OPENAI_BASE_URL",
+   "OPENAI_FEDERATION_RULE_ID",
+   "OPENAI_IDENTITY_TOKEN_FILE",
+   "CODEX_* (every variable)"
+  ],
+  "login": "the ChatGPT plan's login",
+  "note": "A Codex run evaluates the assistant's instructions as Codex reads them: AGENTS.md is written from CLAUDE.md with its @ imports inlined, and .claude/skills/ is copied to .agents/skills/. Codex and Claude Code results are not interchangeable: compare rounds run with the same runner."
+ },
+ "updated": "2026-10-27T01:17:13Z"
+}

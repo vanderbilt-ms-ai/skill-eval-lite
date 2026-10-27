@@ -1,0 +1,3 @@
+{"tool": "Read", "detail": "input/priya-email.md", "error": false}
+{"tool": "Bash", "detail": "kb/kb search Priya Raman; ls Grants/current 2>&1 | head", "error": false}
+{"tool": "Write", "detail": "notes/drafts/2026-11-priya-site-visit-reply.md", "error": false}

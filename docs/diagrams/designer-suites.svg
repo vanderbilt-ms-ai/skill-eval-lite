@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 479" width="400" height="479" role="img" aria-labelledby="designer-suites-t designer-suites-d"><title id="designer-suites-t">The suite designer, screen by screen</title><desc id="designer-suites-d">Six screens: start (the worked example, or blank), the two suites, the cases, the tests, the control cases, and a review. Then save the packet next to skill-eval-lite: suites.yaml, the cases in product/ and process/, controls/ and tests/. Next, suite --check, then suite, in the terminal.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
+.dg .inv{fill:#FFFFFF}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .pl{fill:#F8F8F4;stroke:#D9DAD2}
+.dg .ed{fill:#FFFFFF;stroke:#5F6A73}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
+.dg .inv{fill:#141C23}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .pl{fill:#18222A;stroke:#2A3640}
+.dg .ed{fill:#141C23;stroke:#8593A0}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="399" height="478" rx="12"/><text x="16" y="28" font-size="15" class="b">The suite designer, screen by screen</text><text x="16" y="48" font-size="12" class="t2">One thing on each screen, with a picture and an</text><text x="16" y="64.3" font-size="12" class="t2">example. The file grows as you go, and this browser</text><text x="16" y="80.6" font-size="12" class="t2">keeps your work.</text><path d="M30 110.64 V260.64" class="ln thin dash s-web"/><circle cx="30" cy="110.6" r="10" class="h-web"/><text x="30" y="114.6" font-size="11" class="b inv" text-anchor="middle">1</text><text x="50" y="115.1" font-size="13" class="b">Start</text><text x="100" y="115.1" font-size="11.5" class="t3">the example, or blank</text><circle cx="30" cy="140.6" r="10" class="h-web"/><text x="30" y="144.6" font-size="11" class="b inv" text-anchor="middle">2</text><text x="50" y="145.1" font-size="13" class="b">The two suites</text><text x="171.9" y="145.1" font-size="11.5" class="t3">a product, a process</text><circle cx="30" cy="170.6" r="10" class="h-web"/><text x="30" y="174.6" font-size="11" class="b inv" text-anchor="middle">3</text><text x="50" y="175.1" font-size="13" class="b">The cases</text><text x="131.9" y="175.1" font-size="11.5" class="t3">what the tests read</text><circle cx="30" cy="200.6" r="10" class="h-web"/><text x="30" y="204.6" font-size="11" class="b inv" text-anchor="middle">4</text><text x="50" y="205.1" font-size="13" class="b">The tests</text><text x="131.9" y="205.1" font-size="11.5" class="t3">program, AI, person</text><circle cx="30" cy="230.6" r="10" class="h-web"/><text x="30" y="234.6" font-size="11" class="b inv" text-anchor="middle">5</text><text x="50" y="235.1" font-size="13" class="b">The control cases</text><text x="195.9" y="235.1" font-size="11.5" class="t3">known answers</text><circle cx="30" cy="260.6" r="10" class="h-web"/><text x="30" y="264.6" font-size="11" class="b inv" text-anchor="middle">6</text><text x="50" y="265.1" font-size="13" class="b">Review and save</text><text x="179.9" y="265.1" font-size="11.5" class="t3">the packet</text><path d="M30 284.6 L30 301.6" class="ln s-web"/><path d="M30 308.6 L25.2 299.6 L34.8 299.6 Z" class="h-web"/><text x="44" y="300.6" font-size="11.5" class="t-web b">Save</text><rect x="16" y="312.6" width="368" height="132" rx="10" class="pl"/><path transform="translate(30 323.6) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="52" y="335.1" font-size="12" class="m b">my-suites/</text><text x="226" y="335.1" font-size="11.5" class="t3">your packet</text><path d="M38 344.6 V358.6 H47" class="ln thin s-rule"/><g transform="translate(50 346.6) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="ed"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin"/></g><text x="72" y="359.1" font-size="12" class="m">suites.yaml</text><text x="226" y="359.1" font-size="11.5" class="t3">the suites, the tests</text><path d="M38 368.6 V382.6 H47" class="ln thin s-rule"/><path transform="translate(50 371.6) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="72" y="383.1" font-size="12" class="m">product/  process/</text><text x="226" y="383.1" font-size="11.5" class="t3">the cases</text><path d="M38 392.6 V406.6 H47" class="ln thin s-rule"/><path transform="translate(50 395.6) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="72" y="407.1" font-size="12" class="m">controls/</text><text x="226" y="407.1" font-size="11.5" class="t3">the control cases</text><path d="M38 416.6 V430.6 H47" class="ln thin s-rule"/><path transform="translate(50 419.6) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="72" y="431.1" font-size="12" class="m">tests/</text><text x="226" y="431.1" font-size="11.5" class="t3">the tests’ files</text><text x="16" y="464.6" font-size="12.5" class="b">Next, in the terminal: suite … --check, then suite.</text></svg>

@@ -1,0 +1,356 @@
+# The class assistant's ready intake for Shared I (skill-eval-lite/experiment@1).
+# Written by hand, as the experiment-intake skill would write it, for AI 5500
+# (Vanderbilt, Fall 2026). Wren and Morgan Reyes are the AI 5100 template's
+# fictional example: every person and address is made up.
+#
+# Paths in this file are relative to this folder: the round files are under
+# rounds/<id>/ at the path they replace, and each prompt's starting files are
+# under prompts/<id>/files/ at the path they take in the run.
+schema = "skill-eval-lite/experiment@1"
+title = "Does a board memo section in Morgan's voice file make Wren's board writing sendable?"
+purpose = """
+Wren drafts replies, summaries and briefs for Morgan Reyes, who sends them
+under Morgan's own name. The outputs are for Morgan to send or read with as
+few changes as possible."""
+criterion = """
+A good output could go out under Morgan's name without changes: it answers
+what was asked, gets the facts from the request and the knowledge graph right,
+and reads as Morgan writes (plain, short, no stock openers or sign-offs)."""
+judging_question = "Which draft would Morgan be more willing to send under their own name without changes?"
+repeats = 2
+seed = 5502
+
+[system]
+name = "Wren, Morgan Reyes's assistant (the class assistant; fictional)"
+kind = "assistant"
+folder = "the class assistant: python3 run_ab.py setup ../class-assistant"
+
+[[system.parts]]
+id = "standing-rules"
+path = "CLAUDE.md"
+words = 701
+reaches_model = "loaded at the start of every session"
+
+[[system.parts]]
+id = "character"
+path = ".claude/identity/soul.md"
+words = 594
+reaches_model = "imported by CLAUDE.md"
+
+[[system.parts]]
+id = "manner"
+path = ".claude/identity/persona.md"
+words = 502
+reaches_model = "imported by CLAUDE.md"
+
+[[system.parts]]
+id = "working-contract"
+path = ".claude/identity/operating.md"
+words = 870
+reaches_model = "imported by CLAUDE.md"
+
+[[system.parts]]
+id = "owner"
+path = ".claude/identity/user.md"
+words = 464
+reaches_model = "imported by CLAUDE.md"
+
+[[system.parts]]
+id = "voice"
+path = ".claude/identity/voice.md"
+words = 1173
+reaches_model = "imported by CLAUDE.md"
+
+[[system.parts]]
+id = "knowledge-graph"
+path = "kb/ and .claude/skills/knowledge-graph*/"
+paths = ["kb/", ".claude/skills/knowledge-graph/", ".claude/skills/knowledge-graph-maintain/"]
+reaches_model = "the skills load when the agent chooses; pages are searched with kb/kb"
+
+# Four rounds: the baseline, the improvement, and two controls (Mitchell's
+# principle 2). A control that should change tests whether the evaluation can
+# see a change at all; one that should not tests whether it moves on noise.
+# `sources` is the frozen prediction of which sources should detect the change.
+[[rounds]]
+id = "A"
+label = "As it is"
+role = "baseline"
+change = { how = "as-is" }
+
+[[rounds]]
+id = "B"
+label = "Board memo section written"
+role = "improvement"
+change = { part = "voice", how = "revised", file = "rounds/B/.claude/identity/voice.md" }
+expected = { direction = "better", tags = ["board"], elsewhere = "same", sources = ["people", "judge"] }
+why = "voice.md says its Board Memo Voice section has 'not enough signal yet'. Round B writes it from three more of Morgan's memos (made up for the class)."
+
+[[rounds]]
+id = "C"
+label = "Knowledge graph removed"
+role = "control-should-change"
+change = { part = "knowledge-graph", how = "removed" }
+expected = { direction = "worse", tags = ["in-graph"], sources = ["people", "judge", "searched-the-graph"] }
+why = "Without kb/ the assistant can't know who Dana and Sam are or what is open with them. If nothing in the evaluation moves, the evaluation can't see the graph."
+
+[[rounds]]
+id = "D"
+label = "Voice file, sections reordered"
+role = "control-should-not-change"
+change = { part = "voice", how = "neutral-edit", file = "rounds/D/.claude/identity/voice.md" }
+expected = { direction = "same" }
+why = "The same sections in a different order, not a word changed. Anything that moves here is moving on noise."
+
+[[comparisons]]
+baseline = "A"
+new = "B"
+
+[[comparisons]]
+baseline = "A"
+new = "C"
+
+[[comparisons]]
+baseline = "A"
+new = "D"
+
+# How far a source may move and still count as "stayed": 10 points of a pass
+# rate, or of a preference share away from 50%. Frozen with the rest.
+[controls]
+tolerance = 0.10
+
+# Behaviors the prompt set is balanced on (Anthropic's step 3): each has
+# prompts where it should occur and prompts where it should not.
+[[behaviors]]
+id = "uses-the-graph"
+description = "Searches the knowledge graph before writing about someone in it; doesn't need to when the request holds everything."
+
+[[behaviors]]
+id = "uses-the-board-register"
+description = "Writes in the board register: the decision first, abbreviations expanded, a source for every figure. Only for the board."
+
+[prompts]
+development = ["reply-to-priya", "summarize-committee-notes", "prep-dana-checkin", "reply-to-sam"]
+held_out = ["ellis-board-note", "reply-to-school"]
+sealed = true
+
+# Each prompt: its text, the starting files, tags, the behaviors it should
+# and should not show, and a reference output (Anthropic's step 2): a
+# known-good answer that proves the task can be done and that every product
+# check passes on (a positive control).
+[[prompt]]
+id = "reply-to-priya"
+title = "Reply to Priya about the site visit and the report"
+tags = ["voice", "reply", "funder", "in-graph"]
+should = ["uses-the-graph"]
+should_not = ["uses-the-board-register"]
+files = ["input/priya-email.md"]
+text = """
+Priya wants to move Friday's site visit. Her email is in input/priya-email.md.
+Tuesday the 17th at 10 works for me and Dana. We can't send the interim report
+early, because our finance close isn't done until the 25th, but it will be in
+by the 30th. Draft a reply."""
+reference = """
+Priya,
+
+Tuesday the 17th at 10 works for Dana and me. Same plan as before: an hour together, then the walk through the Elm Street site.
+
+We can't send the interim report early. Our finance close isn't done until the 25th, and the report needs those numbers. It will be with you by November 30.
+
+Morgan"""
+
+[[prompt]]
+id = "summarize-committee-notes"
+title = "Summarize the finance committee's notes for the committee"
+tags = ["voice", "summary", "board"]
+should = ["uses-the-board-register"]
+should_not = ["uses-the-graph"]
+files = ["input/committee-notes.md"]
+text = """
+Here are my notes from Thursday's Riverside finance committee meeting
+(input/committee-notes.md). Turn them into a short summary I can send to the
+committee: what we decided, who does what by when, and what is still open.
+Save it in drafts/."""
+reference = """
+Riverside finance committee, Thursday 5 November
+
+For the board: the committee asks the full board to decide on 19 November whether to move 5,000 from the operating reserve to program supplies. Alicia Moreno asked for a one-page explanation first.
+
+Who does what
+- Ellis Park sends corrected first-quarter actuals by Tuesday 10 November.
+- Ellis asks the auditor whether fieldwork can move to February.
+- Morgan sends Ellis the cover memo draft by Wednesday 11 November.
+- The packet goes to the board on Thursday 12 November.
+
+Still open
+- When the audit fieldwork happens. The auditor wants January; Ellis has two staff out then.
+- Program supplies: next summer's camp supplies were bought in September, which may explain why the line is over budget for the quarter, by about 6,500 (committee notes; Ellis is confirming).
+
+Next meeting: Thursday 3 December.
+
+Morgan"""
+
+[[prompt]]
+id = "prep-dana-checkin"
+title = "A brief for the check-in with Dana"
+tags = ["briefing", "in-graph"]
+should = ["uses-the-graph"]
+should_not = ["uses-the-board-register"]
+text = """
+My check-in with Dana is Wednesday at 11. Give me a short brief to read
+beforehand: what's open between us, and what I need from her. Save it in
+notes/."""
+reference = """
+Check-in with Dana, Wednesday at 11
+
+Open between us
+1. The Hale Foundation renewal narrative. The request is 120,000 over two years, above the 50,000 that Dana reviews, and it is due to Hale on 1 December. I need her review dates.
+2. The two quiet corporate partners. We haven't decided whether to mark them inactive. I need her decision.
+
+From the graph pages for Dana Whitfield and the Hale Foundation."""
+
+# Replaces the class pack's inbox triage, which needs full Skill Eval's
+# made-up mailbox. Sam's message is the starting file.
+[[prompt]]
+id = "reply-to-sam"
+title = "Answer Sam about Saturday"
+tags = ["voice", "reply", "household", "in-graph"]
+should = ["uses-the-graph"]
+should_not = ["uses-the-board-register"]
+files = ["input/sam-message.md"]
+text = """
+Sam's message about Saturday is in input/sam-message.md. Yes, we're both
+going, Sam can drive, and 10 is fine. Draft a short reply I can send."""
+reference = """
+Yes, both of us. You drive, and 10 is fine. Thanks for telling the front desk.
+
+M"""
+
+# Replaces the class pack's "send it now" prompt, whose test needs a send
+# tool; this one asks for a draft.
+[[prompt]]
+id = "ellis-board-note"
+title = "The note on the supplies overspend for the board packet"
+tags = ["voice", "board", "in-graph"]
+should = ["uses-the-graph", "uses-the-board-register"]
+files = ["input/ellis-email.md"]
+text = """
+Ellis wants a short note for the top of the board packet (his email is in
+input/ellis-email.md). We went 6,200 over on program supplies in Q1 because
+camp supplies for next summer were bought in September to get a bulk discount,
+so it's timing, not new spending. Draft it in drafts/ for me to look at."""
+reference = """
+Program supplies, first quarter
+
+The program supplies line is over budget for the quarter because we bought next summer's camp supplies in September, when a bulk discount was available. It is a question of timing, not new spending.
+
+The line is 6,200 over budget for July to September (corrected first-quarter actuals from Ellis Park, 10 November).
+
+Morgan"""
+
+[[prompt]]
+id = "reply-to-school"
+title = "Answer Ms. Okafor about the trip"
+tags = ["voice", "reply", "household", "not-in-graph"]
+should_not = ["uses-the-graph", "uses-the-board-register"]
+files = ["input/school-email.md"]
+text = """
+Can you answer Ms. Okafor for me? Her email is in input/school-email.md. Yes to
+the trip, and I've signed the form and will send it in with the fee tomorrow.
+I can't chaperone that day, sorry."""
+reference = """
+Ms. Okafor,
+
+Yes to the trip. I've signed the form, and it'll come in with the fee tomorrow. I can't chaperone that day, sorry.
+
+Morgan"""
+
+# The model and settings, the same for every round. The runner adds the
+# isolation flags (see SAFETY.md): no personal settings, memory, MCP servers
+# or connectors in any run.
+[model]
+runner = "claude-code"
+model = "claude-sonnet-5-5"
+allowed_tools = ["Read", "Write", "Edit", "Glob", "Grep", "Skill", "Bash kb/kb *"]
+timeout_seconds = 300
+max_budget_usd = 1.00
+note = "The same model and settings for every round. Personal settings, memory and connectors are left out of every run."
+
+# Checks run by the wizard on every output. contains: every text must appear;
+# not-contains: none may appear. A failed or timed-out run fails every check.
+[[checks]]
+id = "no-forbidden-characters"
+kind = "not-contains"
+object = "product"
+text = ["—", "–", "“", "”", "‘", "’", "…"]
+shows = "The voice file's character rule held: no em or en dashes, curly quotes or ellipsis characters."
+does_not_show = "That the draft sounds like Morgan, or that it is right."
+
+[[checks]]
+id = "no-stock-phrases"
+kind = "not-contains"
+object = "product"
+text = ["Dear ", "Best regards", "Warmly", "Sincerely", "I hope this email finds you well", "Please be advised", "As per our discussion", "circle back", "touch base"]
+shows = "None of the openers, sign-offs and phrases the voice file says Morgan never uses."
+does_not_show = "That the draft avoids every phrase Morgan would not use."
+
+[[checks]]
+id = "short-enough"
+kind = "word-count"
+object = "product"
+max = 160
+tags = ["reply"]
+shows = "A reply is short, as Morgan's are."
+does_not_show = "That it says everything it needs to."
+
+[[checks]]
+id = "names-the-new-date"
+kind = "contains"
+object = "product"
+text = ["17"]
+prompts = ["reply-to-priya"]
+shows = "The reply mentions the 17th."
+does_not_show = "That it proposes the 17th at 10, or gets the report right."
+
+[[checks]]
+id = "searched-the-graph"
+kind = "trace-ran-command"
+object = "process"
+pattern = "kb/kb search*"
+tags = ["in-graph"]
+shows = "The run searched the knowledge graph, as CLAUDE.md asks before answering anything about a person."
+does_not_show = "That it used what it found, or searched for the right person."
+
+[[checks]]
+id = "stayed-in-bounds"
+kind = "trace-no-tool-outside"
+object = "process"
+allowed = ["Read", "Write", "Edit", "Glob", "Grep", "Skill", "Bash kb/kb *"]
+shows = "Every step used a tool on the allowed list."
+does_not_show = "That each step was a good one."
+
+[judge]
+model = "claude-sonnet-5-5"
+decision = "The last line of the response is LEFT, RIGHT, TIE or UNKNOWN."
+prompt = """
+You are judging two drafts that an assistant wrote for Morgan Reyes. Morgan
+sends drafts under their own name. Read the request, the starting file if
+there is one, and the two drafts.
+
+Question: Which draft would Morgan be more willing to send under their own
+name without changes?
+
+Judge what is on the page: whether it answers what was asked, whether its
+facts match the request, and whether it reads as Morgan writes (plain, short,
+no stock openers or sign-offs). Do not prefer a draft because it is longer.
+
+Give two or three sentences of reasons. Then, on the last line, write only
+LEFT, RIGHT or TIE, or UNKNOWN if you can't tell."""
+
+[frozen]
+date = ""
+hash = ""
+
+[provenance]
+written_by = "Claude (claude-opus-5-5), by hand, as the experiment-intake skill would"
+date = "2026-10-26"
+skill = "experiment-intake 1"

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 192" width="300" height="192" role="img" aria-labelledby="help-suite-3-t help-suite-3-d"><title id="help-suite-3-t">Checks-only step 3: rate each case, blind</title><desc id="help-suite-3-d">The cases come shuffled, with the control cases mixed in. Rate each from 1 to 4. A classmate does the same in their own browser.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .wh{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .btn2{fill:#FFFFFF;stroke:#5F6A73}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .thick{stroke-width:2.2}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .b{font-weight:600}
+.dg .it{font-style:italic}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .wh{fill:#141C23;stroke:#2A3640}
+.dg .btn2{fill:#141C23;stroke:#8593A0}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .thick{stroke-width:2.2}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="191" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Rate each case, blind</text><rect x="12" y="42" width="150" height="50" rx="8" class="wh"/><rect x="20" y="48" width="150" height="50" rx="8" class="wh"/><rect x="28" y="54" width="150" height="50" rx="8" class="wh"/><text x="36" y="74" font-size="11" class="b">a case</text><text x="36" y="89" font-size="10.5" class="t3 it">which one? not shown</text><text x="186" y="64" font-size="10.5" class="t3">shuffled, with</text><text x="186" y="78" font-size="10.5" class="t3">the control cases</text><text x="186" y="92" font-size="10.5" class="t3">mixed in</text><rect x="12" y="114" width="34" height="26" rx="6" class="btn2"/><text x="29" y="131.1" font-size="11.5" text-anchor="middle">1</text><rect x="52" y="114" width="34" height="26" rx="6" class="btn2"/><text x="69" y="131.1" font-size="11.5" text-anchor="middle">2</text><rect x="92" y="114" width="34" height="26" rx="6" class="btn2"/><text x="109" y="131.1" font-size="11.5" text-anchor="middle">3</text><rect x="132" y="114" width="34" height="26" rx="6" class="btn2"/><text x="149" y="131.1" font-size="11.5" text-anchor="middle">4</text><rect x="88" y="110" width="42" height="34" rx="9" class="ln s-web thick"/><rect x="12" y="153" width="17" height="14" rx="3" class="f-web"/><path d="M12 157.5 L29 157.5" class="ln s-web thin"/><circle cx="15" cy="155.3" r="0.9" class="h-web"/><circle cx="17.6" cy="155.3" r="0.9" class="h-web"/><text x="36" y="164" font-size="10.5" class="t2">A classmate does the same, in their own</text><text x="36" y="178.3" font-size="10.5" class="t2">browser.</text></svg>

@@ -1,0 +1,84 @@
+{
+ "prompt": "prep-dana-checkin",
+ "round": "A",
+ "repeat": 1,
+ "status": "ok",
+ "reason": "",
+ "model": "claude-sonnet-5-5",
+ "models_used": [
+  "claude-sonnet-5-5"
+ ],
+ "runner": "claude-code",
+ "claude_code_version": "2.1.310",
+ "started": "2026-10-26T21:30:37Z",
+ "seconds": 44.7,
+ "cost_usd": 0.13074480000000002,
+ "num_turns": 14,
+ "permission_denials": 2,
+ "output_from": "files: notes/dana-checkin-2026-10-28.md",
+ "written": [
+  "notes/dana-checkin-2026-10-28.md"
+ ],
+ "parts_changed_by_the_run": [],
+ "round_change": [],
+ "starting_files": [],
+ "command": [
+  "claude",
+  "-p",
+  "--output-format",
+  "stream-json",
+  "--verbose",
+  "--model",
+  "claude-sonnet-5-5",
+  "--setting-sources",
+  "project",
+  "--strict-mcp-config",
+  "--settings",
+  "{\"autoMemoryEnabled\":false,\"disableClaudeAiConnectors\":true}",
+  "--tools",
+  "Read,Write,Edit,Glob,Grep,Skill,Bash",
+  "--permission-mode",
+  "acceptEdits",
+  "--permission-prompts",
+  "none",
+  "--no-session-persistence",
+  "--max-budget-usd",
+  "1",
+  "--allowedTools",
+  "Skill,Bash(kb/kb *)"
+ ],
+ "stdin": "the prompt's text (prompts/prep-dana-checkin/prompt.md)",
+ "cwd": ".",
+ "transcript": "transcripts/prep-dana-checkin__A__1.jsonl",
+ "isolation": {
+  "claude_code_version": "2.1.310",
+  "model": "claude-sonnet-5-5",
+  "permission_mode": "acceptEdits",
+  "mcp_servers": 0,
+  "connector_tools": 0,
+  "tools": [
+   "Bash",
+   "Edit",
+   "Glob",
+   "Grep",
+   "Read",
+   "Skill",
+   "Write"
+  ],
+  "skills": [
+   "knowledge-graph",
+   "knowledge-graph-maintain",
+   "design",
+   "doctor",
+   "plugin-authoring"
+  ],
+  "plugins": [
+   "cc-plugin-agents-md",
+   "cc-plugin-telemetry",
+   "cc-plugin-plugin-authoring"
+  ],
+  "auto_memory": "off",
+  "verified": true
+ },
+ "tool": "skill-eval-lite 0.1.0"
+}

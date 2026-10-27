@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 440 448" width="440" height="448" role="img" aria-labelledby="class-assistant-t class-assistant-d"><title id="class-assistant-t">The class assistant: Wren</title><desc id="class-assistant-d">Morgan Reyes asks Wren for a draft; Wren writes it; Morgan sends it under Morgan’s own name. Both are made up. Wren is a folder: CLAUDE.md, read every time; five identity files read through it (soul, persona, operating, user, voice); the knowledge graph in kb/, searched when needed; and skills.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
+.dg .halo{paint-order:stroke;stroke:#FFFFFF;stroke-width:5px;stroke-linejoin:round}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .wh{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .ed{fill:#FFFFFF;stroke:#5F6A73}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .s-term{stroke:#1C7C6E}
+.dg .t-term{fill:#187062}
+.dg .s-web{stroke:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-agent{fill:rgba(122,79,168,.12);stroke:#7A4FA8}
+.dg .s-agent{stroke:#7A4FA8}
+.dg .h-agent{fill:#7A4FA8}
+.dg .t-agent{fill:#7A4FA8}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+.dg .s-file{stroke:#9A6A0C}
+.dg .t-file{fill:#85590A}
+.dg .f-n{fill:rgba(122,135,145,.16);stroke:#7A8791}
+.dg .s-n{stroke:#7A8791}
+.dg .h-n{fill:#7A8791}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
+.dg .halo{paint-order:stroke;stroke:#141C23;stroke-width:5px;stroke-linejoin:round}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .wh{fill:#141C23;stroke:#2A3640}
+.dg .ed{fill:#141C23;stroke:#8593A0}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .dash{stroke-dasharray:5 4}
+.dg .s-term{stroke:#4CC0AE}
+.dg .t-term{fill:#4CC0AE}
+.dg .s-web{stroke:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-agent{fill:rgba(180,148,222,.15);stroke:#B494DE}
+.dg .s-agent{stroke:#B494DE}
+.dg .h-agent{fill:#B494DE}
+.dg .t-agent{fill:#B494DE}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+.dg .s-file{stroke:#E2AE4A}
+.dg .t-file{fill:#E2AE4A}
+.dg .f-n{fill:rgba(142,155,165,.18);stroke:#8E9BA5}
+.dg .s-n{stroke:#8E9BA5}
+.dg .h-n{fill:#8E9BA5}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="439" height="447" rx="12"/><text x="16" y="28" font-size="15" class="b">The class assistant: Wren</text><text x="16" y="47" font-size="12" class="t2">Wren and Morgan Reyes are made up (fictional).</text><rect x="16" y="66" width="124" height="54" rx="10" class="wh"/><circle cx="34" cy="81" r="4.5" class="f-n"/><path d="M27 93 Q27 86.5 34 86.5 Q41 86.5 41 93 Z" class="f-n"/><text x="48" y="88" font-size="12.5" class="b">Morgan Reyes</text><text x="48" y="105" font-size="11.5" class="t3">the owner</text><rect x="182" y="66" width="112" height="54" rx="10" class="f-agent"/><path d="M194 77.5 H205 Q208 77.5 208 80.5 V85.5 Q208 88.5 205 88.5 H199 L195.5 91.5 V88.5 H194 Q191 88.5 191 85.5 V80.5 Q191 77.5 194 77.5 Z" class="f-agent"/><circle cx="196.2" cy="83" r="1.1" class="h-agent"/><circle cx="199.5" cy="83" r="1.1" class="h-agent"/><circle cx="202.8" cy="83" r="1.1" class="h-agent"/><text x="214" y="88" font-size="12.5" class="b t-agent">Wren</text><text x="214" y="105" font-size="11.5" class="t-agent">the assistant</text><rect x="336" y="66" width="88" height="54" rx="10" class="wh"/><g transform="translate(345 75) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="ed"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin"/></g><text x="365" y="88" font-size="12.5" class="b">a draft</text><text x="365" y="105" font-size="11.5" class="t3">a reply…</text><path d="M143 98 L172 98" class="ln s-n"/><path d="M179 98 L170 102.8 L170 93.2 Z" class="h-n"/><text x="161" y="88" font-size="11" class="t2" text-anchor="middle">asks</text><path d="M297 98 L326 98" class="ln s-agent"/><path d="M333 98 L324 102.8 L324 93.2 Z" class="h-agent"/><text x="315" y="88" font-size="11" class="t2" text-anchor="middle">writes</text><path d="M380 120 C380 150 78 157 78 127" class="ln s-n dash"/><path d="M78 120 L82.8 129 L73.2 129 Z" class="h-n"/><text x="228" y="158" font-size="11.5" class="t2 halo" text-anchor="middle">Morgan sends it, under Morgan’s own name</text><text x="16" y="188" font-size="12.5" class="b">Wren is a folder of files. Each file is a part:</text><path transform="translate(20 207) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="41" y="218.5" font-size="12" class="m b">class-assistant/</text><path d="M27 227 V241 H35" class="ln thin s-rule"/><g transform="translate(38 229) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="ed"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin"/></g><text x="59" y="241.5" font-size="12" class="m">CLAUDE.md</text><text x="180" y="241.5" font-size="11.5" class="t2">the standing rules</text><path d="M27 250 V264 H35" class="ln thin s-rule"/><path transform="translate(38 253) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="59" y="264.5" font-size="12" class="m">.claude/identity/</text><path d="M45 273 V287 H53" class="ln thin s-rule"/><g transform="translate(56 275) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="ed"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin"/></g><text x="77" y="287.5" font-size="12" class="m">soul.md</text><text x="180" y="287.5" font-size="11.5" class="t2">character</text><path d="M45 296 V310 H53" class="ln thin s-rule"/><g transform="translate(56 298) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="ed"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin"/></g><text x="77" y="310.5" font-size="12" class="m">persona.md</text><text x="180" y="310.5" font-size="11.5" class="t2">manner</text><path d="M45 319 V333 H53" class="ln thin s-rule"/><g transform="translate(56 321) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="ed"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin"/></g><text x="77" y="333.5" font-size="12" class="m">operating.md</text><text x="180" y="333.5" font-size="11.5" class="t2">how Wren works</text><path d="M45 342 V356 H53" class="ln thin s-rule"/><g transform="translate(56 344) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="ed"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin"/></g><text x="77" y="356.5" font-size="12" class="m">user.md</text><text x="180" y="356.5" font-size="11.5" class="t2">about Morgan</text><path d="M45 365 V379 H53" class="ln thin s-rule"/><g transform="translate(56 367) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="ed"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin"/></g><text x="77" y="379.5" font-size="12" class="m">voice.md</text><text x="180" y="379.5" font-size="11.5" class="t2">how Morgan writes</text><path d="M27 388 V402 H35" class="ln thin s-rule"/><path transform="translate(38 391) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="59" y="402.5" font-size="12" class="m">kb/</text><text x="180" y="402.5" font-size="11.5" class="t2">the knowledge graph</text><path d="M27 411 V425 H35" class="ln thin s-rule"/><path transform="translate(38 414) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="59" y="425.5" font-size="12" class="m">.claude/skills/</text><text x="180" y="425.5" font-size="11.5" class="t2">skills, to use it</text><path d="M308 229 H314 V245 H308" class="ln thin s-term"/><text x="322" y="241" font-size="11" class="t-term b">read every time</text><path d="M308 275 H314 V383 H308" class="ln thin s-web"/><text x="322" y="327" font-size="11" class="t-web b">read through</text><text x="322" y="341" font-size="11" class="t-web b">CLAUDE.md</text><path d="M308 390 H314 V429 H308" class="ln thin s-file"/><text x="322" y="407.5" font-size="11" class="t-file b">searched or used</text><text x="322" y="421.5" font-size="11" class="t-file b">when needed</text></svg>

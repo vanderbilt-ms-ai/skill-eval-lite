@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 228" width="300" height="228" role="img" aria-labelledby="sz-controls-t sz-controls-d"><title id="sz-controls-t">Cases whose answers you know</title><desc id="sz-controls-d">A reference every test should pass; planted faults, each broken in one way, that some tests should fail; harmless variations that should get the same results as the reference. A test that misses one is a finding.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .b{font-weight:600}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .f-agent{fill:rgba(122,79,168,.12);stroke:#7A4FA8}
+.dg .t-agent{fill:#7A4FA8}
+.dg .f-ok{fill:rgba(31,125,85,.12);stroke:#1F7D55}
+.dg .t-ok{fill:#1A6E4A}
+.dg .f-bad{fill:rgba(201,86,27,.12);stroke:#C9561B}
+.dg .t-bad{fill:#B24A12}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .b{font-weight:600}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .f-agent{fill:rgba(180,148,222,.15);stroke:#B494DE}
+.dg .t-agent{fill:#B494DE}
+.dg .f-ok{fill:rgba(76,192,139,.14);stroke:#4CC08B}
+.dg .t-ok{fill:#4CC08B}
+.dg .f-bad{fill:rgba(240,132,75,.15);stroke:#F0844B}
+.dg .t-bad{fill:#F0844B}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="227" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Cases whose answers you know</text><text x="200" y="44" font-size="9.5" class="t3" text-anchor="middle">test 1</text><text x="234" y="44" font-size="9.5" class="t3" text-anchor="middle">test 2</text><text x="268" y="44" font-size="9.5" class="t3" text-anchor="middle">test 3</text><rect x="12" y="52" width="164" height="28" rx="6" class="f-ok"/><text x="20" y="64" font-size="11" class="b t-ok">reference</text><text x="20" y="75.5" font-size="10" class="t-ok">a good case</text><text x="200" y="70" font-size="13" class="b t-ok" text-anchor="middle">✓</text><text x="234" y="70" font-size="13" class="b t-ok" text-anchor="middle">✓</text><text x="268" y="70" font-size="13" class="b t-ok" text-anchor="middle">✓</text><rect x="12" y="86" width="164" height="28" rx="6" class="f-bad"/><text x="20" y="98" font-size="11" class="b t-bad">planted fault</text><text x="20" y="109.5" font-size="10" class="t-bad">one thing broken</text><text x="200" y="104" font-size="13" class="b t-bad" text-anchor="middle">✗</text><text x="234" y="104" font-size="13" class="b t-ok" text-anchor="middle">✓</text><text x="268" y="104" font-size="13" class="b t-bad" text-anchor="middle">✗</text><rect x="12" y="120" width="164" height="28" rx="6" class="f-bad"/><text x="20" y="132" font-size="11" class="b t-bad">planted fault</text><text x="20" y="143.5" font-size="10" class="t-bad">another</text><text x="200" y="138" font-size="13" class="b t-ok" text-anchor="middle">✓</text><text x="234" y="138" font-size="13" class="b t-bad" text-anchor="middle">✗</text><text x="268" y="138" font-size="13" class="b t-bad" text-anchor="middle">✗</text><rect x="12" y="154" width="164" height="28" rx="6" class="f-agent"/><text x="20" y="166" font-size="11" class="b t-agent">harmless variation</text><text x="20" y="177.5" font-size="10" class="t-agent">same as the reference</text><text x="200" y="172" font-size="13" class="b t-agent" text-anchor="middle">=</text><text x="234" y="172" font-size="13" class="b t-agent" text-anchor="middle">=</text><text x="268" y="172" font-size="13" class="b t-agent" text-anchor="middle">=</text><text x="12" y="202" font-size="11" class="t2">A test that misses one of these is a</text><text x="12" y="217" font-size="11" class="t2">finding: look at why before you trust it.</text></svg>

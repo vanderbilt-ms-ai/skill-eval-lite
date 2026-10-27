@@ -1,0 +1,215 @@
+# Demonstration 2 of 3: round D reorders the voice file's sections, not a word changed. Nothing should move.
+# A demonstration for the live session: two prompts, two rounds, one repeat
+# (4 runs; about 3 minutes with --jobs 4). It is not a full experiment: a
+# full one has both controls, at least four development prompts and two
+# repeats (see class-assistant/experiment.toml, whose prompts, round files and
+# starting files this file uses). Wren and Morgan Reyes are fictional.
+schema = "skill-eval-lite/experiment@1"
+demo = true
+files_from = "class-assistant"
+title = "Does reordering the voice file change anything? (demonstration: a control that should not)"
+purpose = """
+Wren drafts replies, summaries and briefs for Morgan Reyes, who sends them
+under Morgan's own name. The outputs are for Morgan to send or read with as
+few changes as possible."""
+criterion = """
+A good output could go out under Morgan's name without changes: it answers
+what was asked, gets the facts from the request and the knowledge graph right,
+and reads as Morgan writes (plain, short, no stock openers or sign-offs)."""
+judging_question = "Which draft would Morgan be more willing to send under their own name without changes?"
+repeats = 1
+seed = 5502
+
+[system]
+name = "Wren, Morgan Reyes's assistant (the class assistant; fictional)"
+kind = "assistant"
+folder = "the class assistant: python3 run_ab.py setup ../class-assistant"
+
+[[system.parts]]
+id = "voice"
+path = ".claude/identity/voice.md"
+words = 1173
+reaches_model = "imported by CLAUDE.md"
+
+[[rounds]]
+id = "A"
+label = "As it is"
+role = "baseline"
+change = { how = "as-is" }
+
+[[rounds]]
+id = "D"
+label = "Voice file, sections reordered"
+role = "control-should-not-change"
+change = { part = "voice", how = "neutral-edit", file = "rounds/D/.claude/identity/voice.md" }
+expected = { direction = "same" }
+why = "The same sections in a different order, not a word changed. Anything that moves here is moving on noise."
+
+[[comparisons]]
+baseline = "A"
+new = "D"
+
+[controls]
+tolerance = 0.10
+
+[[behaviors]]
+id = "uses-the-board-register"
+description = "Writes in the board register: the decision first, abbreviations expanded, a source for every figure. Only for the board."
+
+[prompts]
+development = ["reply-to-priya", "summarize-committee-notes"]
+held_out = ["reply-to-school"]
+sealed = true
+
+# Each prompt: its text, the starting files, tags, the behaviors it should
+# and should not show, and a reference output (Anthropic's step 2): a
+# known-good answer that proves the task can be done and that every product
+# check passes on (a positive control).
+[[prompt]]
+id = "reply-to-priya"
+title = "Reply to Priya about the site visit and the report"
+tags = ["voice", "reply", "funder", "in-graph"]
+should = ["uses-the-graph"]
+should_not = ["uses-the-board-register"]
+files = ["input/priya-email.md"]
+text = """
+Priya wants to move Friday's site visit. Her email is in input/priya-email.md.
+Tuesday the 17th at 10 works for me and Dana. We can't send the interim report
+early, because our finance close isn't done until the 25th, but it will be in
+by the 30th. Draft a reply."""
+reference = """
+Priya,
+
+Tuesday the 17th at 10 works for Dana and me. Same plan as before: an hour together, then the walk through the Elm Street site.
+
+We can't send the interim report early. Our finance close isn't done until the 25th, and the report needs those numbers. It will be with you by November 30.
+
+Morgan"""
+
+[[prompt]]
+id = "summarize-committee-notes"
+title = "Summarize the finance committee's notes for the committee"
+tags = ["voice", "summary", "board"]
+should = ["uses-the-board-register"]
+should_not = ["uses-the-graph"]
+files = ["input/committee-notes.md"]
+text = """
+Here are my notes from Thursday's Riverside finance committee meeting
+(input/committee-notes.md). Turn them into a short summary I can send to the
+committee: what we decided, who does what by when, and what is still open.
+Save it in drafts/."""
+reference = """
+Riverside finance committee, Thursday 5 November
+
+For the board: the committee asks the full board to decide on 19 November whether to move 5,000 from the operating reserve to program supplies. Alicia Moreno asked for a one-page explanation first.
+
+Who does what
+- Ellis Park sends corrected first-quarter actuals by Tuesday 10 November.
+- Ellis asks the auditor whether fieldwork can move to February.
+- Morgan sends Ellis the cover memo draft by Wednesday 11 November.
+- The packet goes to the board on Thursday 12 November.
+
+Still open
+- When the audit fieldwork happens. The auditor wants January; Ellis has two staff out then.
+- Program supplies: next summer's camp supplies were bought in September, which may explain why the line is over budget for the quarter, by about 6,500 (committee notes; Ellis is confirming).
+
+Next meeting: Thursday 3 December.
+
+Morgan"""
+
+[[prompt]]
+id = "reply-to-school"
+title = "Answer Ms. Okafor about the trip"
+tags = ["voice", "reply", "household", "not-in-graph"]
+should_not = ["uses-the-graph", "uses-the-board-register"]
+files = ["input/school-email.md"]
+text = """
+Can you answer Ms. Okafor for me? Her email is in input/school-email.md. Yes to
+the trip, and I've signed the form and will send it in with the fee tomorrow.
+I can't chaperone that day, sorry."""
+reference = """
+Ms. Okafor,
+
+Yes to the trip. I've signed the form, and it'll come in with the fee tomorrow. I can't chaperone that day, sorry.
+
+Morgan"""
+
+[model]
+runner = "claude-code"
+model = "claude-sonnet-5-5"
+allowed_tools = ["Read", "Write", "Edit", "Glob", "Grep", "Skill", "Bash kb/kb *"]
+timeout_seconds = 300
+max_budget_usd = 1.00
+note = "The same model and settings for every round. Personal settings, memory and connectors are left out of every run."
+
+# Checks run by the wizard on every output. contains: every text must appear;
+# not-contains: none may appear. A failed or timed-out run fails every check.
+
+[[checks]]
+id = "no-forbidden-characters"
+kind = "not-contains"
+object = "product"
+text = ["—", "–", "“", "”", "‘", "’", "…"]
+shows = "The voice file's character rule held: no em or en dashes, curly quotes or ellipsis characters."
+does_not_show = "That the draft sounds like Morgan, or that it is right."
+
+[[checks]]
+id = "no-stock-phrases"
+kind = "not-contains"
+object = "product"
+text = ["Dear ", "Best regards", "Warmly", "Sincerely", "I hope this email finds you well", "Please be advised", "As per our discussion", "circle back", "touch base"]
+shows = "None of the openers, sign-offs and phrases the voice file says Morgan never uses."
+does_not_show = "That the draft avoids every phrase Morgan would not use."
+
+[[checks]]
+id = "short-enough"
+kind = "word-count"
+object = "product"
+max = 160
+tags = ["reply"]
+shows = "A reply is short, as Morgan's are."
+does_not_show = "That it says everything it needs to."
+
+[[checks]]
+id = "names-the-new-date"
+kind = "contains"
+object = "product"
+text = ["17"]
+prompts = ["reply-to-priya"]
+shows = "The reply mentions the 17th."
+does_not_show = "That it proposes the 17th at 10, or gets the report right."
+
+[[checks]]
+id = "stayed-in-bounds"
+kind = "trace-no-tool-outside"
+object = "process"
+allowed = ["Read", "Write", "Edit", "Glob", "Grep", "Skill", "Bash kb/kb *"]
+shows = "Every step used a tool on the allowed list."
+does_not_show = "That each step was a good one."
+
+[judge]
+model = "claude-sonnet-5-5"
+decision = "The last line of the response is LEFT, RIGHT, TIE or UNKNOWN."
+prompt = """
+You are judging two drafts that an assistant wrote for Morgan Reyes. Morgan
+sends drafts under their own name. Read the request, the starting file if
+there is one, and the two drafts.
+
+Question: Which draft would Morgan be more willing to send under their own
+name without changes?
+
+Judge what is on the page: whether it answers what was asked, whether its
+facts match the request, and whether it reads as Morgan writes (plain, short,
+no stock openers or sign-offs). Do not prefer a draft because it is longer.
+
+Give two or three sentences of reasons. Then, on the last line, write only
+LEFT, RIGHT or TIE, or UNKNOWN if you can't tell."""
+
+[frozen]
+date = ""
+hash = ""
+
+[provenance]
+written_by = "Claude (claude-opus-5-5), by hand, from the class intake"
+date = "2026-10-26"
+skill = "experiment-intake 1"

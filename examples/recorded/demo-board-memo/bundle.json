@@ -1,0 +1,230 @@
+{
+ "schema": "skill-eval-lite/bundle@1",
+ "tool": "skill-eval-lite 0.1.0",
+ "made_up": false,
+ "outputs": [
+  {
+   "prompt": "ellis-board-note",
+   "round": "A",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "# Draft: page-one note, Riverside Q1 finance packet\n\nTo: Ellis Park\nStatus: DRAFT for Morgan to review. Not sent.\nRegister: Riverside board (volunteer audience, unpaid time). Board memo register is unverified per voice.md.\n\n---\n\nHello all,\n\nOne item to read before the numbers. Program supplies came in 6,200 [UNVERIFIED - not checked against the Q1 actuals or the approved budget line] over budget for the first quarter (July to September).\n\nThis is a timing difference, not new spending. In September we bought next summer's camp supplies early to get a bulk discount. That cost landed in this quarter, and we would otherwise have paid it next spring. [UNVERIFIED - confirm the purchase total, the discount, and the invoice date with Ellis.]\n\nIf you have questions on this before the meeting, send them to me or Ellis. I know this lands in a heavy week, and I appreciate your time.\n\nMorgan\n\n---\n\n## Notes for Morgan (not part of the draft)\n\n1. The 6,200 comes from you, not from a document. I found no Riverside actuals or budget file in this repo (no Riverside/ folder), so I could not check it. Ellis supplies the quarter's actuals; the packet's variance line is the source to match.\n2. The bulk-discount reason is also from you. If the packet can show the purchase (amount, date, discount), add one number so the board can see the timing claim for itself.\n3. Question: in which quarter would the camp supplies have been bought otherwise, and will that quarter come in under budget by the same amount? If yes, one sentence saying so is what makes this \"timing\" and not \"overspend\".\n4. Ellis's email is dated 12 November and says the packet goes out tonight. Today is 26 October by my calendar, and the board meets 19 November per the graph. Worth a glance at which date is right.\n",
+   "message": "The draft is in `drafts/2026-11-board-packet-supplies-note.md`. Two figures in it are marked `[UNVERIFIED]`, so it isn't ready to go to Ellis yet.\n\n- **The 6,200:** it comes from you. There's no Riverside folder, actuals or budget file in this repo, so I couldn't check it. Match it to the variance line in the Q1 actuals before this goes to Ellis.\n- **The bulk-purchase reason:** this is also only your account. I flagged the purchase total, the discount and the invoice date for Ellis to confirm.\n- **One question:** in which quarter would the camp supplies have been bought otherwise? If that quarter will come in under budget by the same amount, one sentence saying so would make \"timing\" credible. I left it out because I can't assert it.\n- **Dates:** Ellis's email is dated 12 November and says the packet goes out tonight. Today is 26 October, and the graph puts the board meeting on 19 November. Check which date is right.\n\nI used the board register: numbers introduced in plain language, a thanks for their unpaid time, and no assertions about what the board thinks. The voice guide says the board-memo register is unverified, because there's only one sample.\n\nBash was denied during the session, so I didn't run the ASCII check on the file. I wrote it in plain ASCII, but it hasn't been confirmed.",
+   "output_from": "files: drafts/2026-11-board-packet-supplies-note.md",
+   "trace": [
+    [
+     "Read",
+     "input/ellis-email.md"
+    ],
+    [
+     "Bash",
+     "ls drafts Riverside Grants/current 2>&1 | head -50; kb/kb search supplies 2>&1 | head -20"
+    ],
+    [
+     "Bash",
+     "kb/kb node \"Riverside Q1 finance packet\"; kb/kb node \"Riverside packet template\"; ls; find . -path ./kb -prune -o -type f -not -path './.git/*' -print | head -40"
+    ],
+    [
+     "Bash",
+     "mkdir -p drafts && cat > drafts/2026-11-board-packet-supplies-note.md <<'EOF'\n# Draft: page-one note, Riverside Q1 finance packet\n\nTo: Ellis Park\nStatus: DRAFT for Morgan to review. Not sent.\nRegister: Riverside board (volunteer audience, unpaid time). Board memo register is unverified per voice.md.\n\n---\n\nHello all,\n\nOne item to read before the numbers. Program supplies came in 6,200 [UNVERIFIED - not checked against the Q1 actuals or the approved budget line] over budget for the first quarter (July to September).\n\nThis is a timing difference, not new spending. In September we bought next summer's camp supplies early to get a bulk discount. That cost landed in this quarter, and we would otherwise have paid it next spring. [UNVERIFIED - confirm the purchase total, the discount, and the invoice date with Ellis.]\n\nIf you have questions on this before the meeting, send them to me or Ellis. I know this lands in a heavy week, and I appreciate your time.\n\nMorgan\n\n---\n\n## Notes for Morgan (not part of the draft)\n\n1. The 6,200 comes from you, not from a document. I found no Riverside actuals or budget file in this repo (no Riverside/ folder), so I could not check it. Ellis supplies the quarter's actuals; the packet's variance line is the source to match.\n2. The bulk-discount reason is also from you. If the packet can show the purchase (amount, date, discount), add one number so the board can see the timing claim for itself. Without it the note asks them to take it on trust.\n3. Open question for the draft: will the camp supplies be under budget in next year's Q4 or Q3 by the same amount? If yes, say so in one sentence; it is what makes this \"timing\" and not \"overspend\". Which quarter is it?\n4. Ellis's email is dated 12 November and says the packet goes out tonight. Today is 26 October by my calendar. Worth a glance at which is right.\nEOF\nLC_ALL=C grep -nP '[^\\x00-\\x7F]' drafts/*.md || echo ascii-clean",
+     "error"
+    ],
+    [
+     "Write",
+     "drafts/2026-11-board-packet-supplies-note.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 23.6,
+   "cost_usd": 0.0928443,
+   "when": "2026-10-26T21:33:34Z"
+  },
+  {
+   "prompt": "ellis-board-note",
+   "round": "B",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "# Program supplies: first quarter note\n\nThe program supplies line is 6,200 over budget for July to September [UNVERIFIED - source to confirm: first quarter actuals from Ellis Park].\n\nThis is a timing difference, not new spending. In September we bought camp supplies for next summer in one bulk order to get a volume discount. Those costs landed in this quarter, and the budget had them in a later one.\n\nWhat is still open:\n\n1. Which later quarter's budget carried the camp supplies, and the amount of the bulk order - Ellis Park, before the packet goes out.\n2. Whether the line is back on budget by year end, once that later quarter closes - Morgan, after the second quarter actuals.\n",
+   "message": "The draft is at `drafts/board-packet-supplies-note.md`. The 6,200 figure is marked `[UNVERIFIED]` because I couldn't confirm it from a source.\n\n- **The figure:** `Riverside/packet-template.md` and the Riverside actuals aren't in this repo, so I couldn't check it. Your 6,200 is in the draft with a marker. Once you or Ellis confirm it against his first quarter actuals, remove the marker and name the source.\n- **The explanation:** it says the supplies were bought in September, in one bulk order, for a volume discount. I haven't confirmed that either; it comes from you.\n- **Two open items:** the draft says the budget \"had them in a later one\", which is my inference. I listed two open items rather than asserting more. They are which later quarter's budget carried the camp supplies and the order amount (Ellis), and whether the line is back on budget by year end (you).\n- **ASCII check:** my check for non-ASCII characters was blocked, so I haven't run it. I wrote the file in plain ASCII.\n- **Date in Ellis's email:** it is dated Thursday 12 November, and today is 26 October. The meeting is 19 November. Check the \"goes out tonight\" timing.",
+   "output_from": "files: drafts/board-packet-supplies-note.md",
+   "trace": [
+    [
+     "Read",
+     "input/ellis-email.md"
+    ],
+    [
+     "Bash",
+     "ls drafts input Riverside Grants/current 2>&1; kb/kb search program supplies 2>&1 | head -20"
+    ],
+    [
+     "Bash",
+     "kb/kb node \"Riverside Q1 finance packet\"; kb/kb node \"Riverside packet template\"; ls; ls kb/wiki | head -50"
+    ],
+    [
+     "Bash",
+     "mkdir -p drafts && cat > drafts/board-packet-supplies-note.md <<'EOF'\n# Program supplies: first quarter note\n\nThe program supplies line is 6,200 over budget for July to September [UNVERIFIED - source to confirm: first quarter actuals from Ellis Park].\n\nThis is a timing difference, not new spending. In September we bought camp supplies for next summer in one bulk order to get a volume discount. Those costs landed in this quarter, and the budget had them in a later one.\n\nWhat is still open:\n\n1. Which later quarter's budget carried the camp supplies, and the amount of the bulk order - Ellis Park, before the packet goes out.\n2. Whether the line is back on budget by year end, once that later quarter closes - Morgan, after the second quarter actuals.\nEOF\ngrep -nP '[^\\x00-\\x7F]' drafts/board-packet-supplies-note.md || echo ascii-clean",
+     "error"
+    ],
+    [
+     "Write",
+     "drafts/board-packet-supplies-note.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 19.5,
+   "cost_usd": 0.08893899999999999,
+   "when": "2026-10-26T21:33:34Z"
+  },
+  {
+   "prompt": "summarize-committee-notes",
+   "round": "A",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "Subject: Finance committee summary - Thursday 5 Nov [DATE UNVERIFIED]\n\nHello all,\n\nThanks for making time Thursday evening. I know this is unpaid time on top of a full week. Here is where we landed.\n\nWhat we decided\n\n1. The reserve transfer is not ours to decide. Tom suggested moving 5,000 [UNVERIFIED] from the operating reserve to cover program supplies. That goes to the full board on 19 Nov.\n2. The packet goes to the board on Thu 12 Nov, one week before the meeting.\n\nWho does what by when\n\n1. Ellis: send corrected Q1 actuals (July to September) by Tue 10 Nov. Two September lines were coded to the wrong account.\n2. Ellis: confirm whether the program supplies overage is a timing issue or a real overspend.\n3. Ellis: ask the auditor whether fieldwork can happen in February instead of January.\n4. Morgan: send the cover memo draft to Ellis by Wed 11 Nov.\n\nWhat is still open\n\n1. Program supplies are over plan by about 6,500 [UNVERIFIED]. Camp supplies for next summer may have been bought in September, which would make this timing and not overspend. Ellis is checking.\n2. Audit fieldwork timing. The auditor wants January. Nothing is decided until Ellis hears back on February.\n3. One-page explanation of the reserve transfer for the board. Alicia asked for it ahead of the 19 Nov meeting. Who writes it is not settled.\n\nRevenue for Q1 was roughly on plan.\n\nNext committee meeting is Thu 3 Dec.\n\nThanks,\nMorgan\n",
+   "message": "The summary is saved at `drafts/riverside-committee-summary.md`. It has three sections (decided, who does what by when, still open), and it's ASCII only. I haven't sent it. One shell command, creating `drafts/` and checking for non-ASCII characters, was denied, so I haven't run that check. I wrote the file with the Write tool instead. I read the file by eye and saw nothing non-ASCII.\n\n- **Meeting date:** Your notes say Thursday 5 Nov 2026, but today is 26 Oct, so that date is still ahead of us. The weekdays in the notes are consistent with 2026. I kept 5 Nov and tagged it `[DATE UNVERIFIED]` in the subject line. Please correct it before you send.\n- **Figures:** The 6,500 overage and the 5,000 reserve transfer come only from your notes, so both are tagged `[UNVERIFIED]`. I didn't check them against a source, and there is no `Riverside/` folder here. Ellis's corrected Q1 actuals are due 10 Nov, and those can replace the 6,500 once they arrive.\n- **Open item:** Alicia asked for a one-page explanation of the reserve transfer, but your notes don't say who writes it. I listed it as open. If it's you, add it to your actions.\n- **Left out:** \"Ellis not happy about Jan\" is Ellis's feeling and not a decision, so I left it out. The draft just says Ellis will ask about February.\n- **Added:** I added an acknowledgement of the volunteers' unpaid time, per your board voice.",
+   "output_from": "files: drafts/riverside-committee-summary.md",
+   "trace": [
+    [
+     "Read",
+     "input/committee-notes.md"
+    ],
+    [
+     "Bash",
+     "ls drafts Riverside 2>&1 | head -30; kb/kb search Riverside finance committee 2>&1 | head -20"
+    ],
+    [
+     "Bash",
+     "mkdir -p drafts && cat > drafts/riverside-committee-summary.md <<'EOF'\nSubject: Finance committee summary - Thursday 5 Nov [DATE UNVERIFIED]\n\nHello all,\n\nThanks for making time Thursday evening. I know this is unpaid time on top of a full week. Here is where we landed.\n\nWhat we decided\n\n1. The reserve transfer is not ours to decide. Tom suggested moving 5,000 [UNVERIFIED] from the operating reserve to cover program supplies. That goes to the full board on 19 Nov.\n2. The packet goes to the board on Thu 12 Nov, one week before the meeting.\n\nWho does what by when\n\n1. Ellis: send corrected Q1 actuals (July to September) by Tue 10 Nov. Two September lines were coded to the wrong account.\n2. Ellis: confirm whether the program supplies overage is a timing issue or a real overspend. Alicia, Tom, and I need this before the packet goes out.\n3. Ellis: ask the auditor whether fieldwork can happen in February instead of January.\n4. Morgan: send the cover memo draft to Ellis by Wed 11 Nov.\n\nWhat is still open\n\n1. Program supplies are over plan by about 6,500 [UNVERIFIED]. Camp supplies for next summer may have been bought in September, which would make this timing and not overspend. Ellis is checking.\n2. Audit fieldwork timing. The auditor wants January. Nothing is decided until Ellis hears back on February.\n3. One-page explanation of the reserve transfer for the board. Alicia asked for it ahead of the 19 Nov meeting. Who writes it is not settled.\n\nRevenue for Q1 was roughly on plan.\n\nNext committee meeting is Thu 3 Dec.\n\nThanks,\nMorgan\nEOF\ngrep -nP '[^\\x00-\\x7F]' drafts/riverside-committee-summary.md | head",
+     "error"
+    ],
+    [
+     "Write",
+     "drafts/riverside-committee-summary.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 24.2,
+   "cost_usd": 0.09364779999999999,
+   "when": "2026-10-26T21:33:34Z"
+  },
+  {
+   "prompt": "summarize-committee-notes",
+   "round": "B",
+   "repeat": 1,
+   "status": "ok",
+   "reason": "",
+   "output": "Subject: Finance committee summary - Thursday 5 November\n\nHello all,\n\nThe committee made one decision on Thursday: the proposed 5,000 transfer from the operating reserve goes to the full board on Thursday 19 November, not to us. Nothing else was settled. Details below.\n\nWhat happened\n\n1. First quarter (July to September): revenue is roughly on plan. Program supplies are over budget by about 6,500 [UNVERIFIED - figure from meeting notes, before Ellis's corrected actuals]. Two September lines were miscoded, so that number may change.\n2. Audit: the auditor wants to start fieldwork in January instead of March. No decision was made.\n3. Reserve transfer: Tom suggested moving 5,000 from the operating reserve to cover the supplies overage. Because it is the board's call, we will pass it on with a one-page explanation.\n\nWho does what by when\n\n1. Ellis: send corrected first quarter actuals - Tuesday 10 November.\n2. Ellis: confirm whether the program supplies overage is real overspending or camp supplies for next summer bought in September - Tuesday 10 November, with the corrected actuals.\n3. Ellis: ask the auditor whether February fieldwork is possible - date to be set (see open items).\n4. Morgan: cover memo draft to Ellis - Wednesday 11 November.\n5. Morgan: board packet out - Thursday 12 November.\n\nWhat is still open\n\n1. Who writes the one-page reserve explanation Alicia asked for, and by when? It needs to be ready before the packet goes out on 12 November. Alicia, would you like to draft it, or should I?\n2. Audit fieldwork timing: January or February? Ellis is asking the auditor, and we need an answer date.\n3. The final size of the program supplies overage, pending the corrected actuals.\n\nOur next committee meeting is Thursday 3 December.\n\nI know this lands in a heavy stretch, and I appreciate the unpaid time you put in.\n\nMorgan\n",
+   "message": "Draft saved: `drafts/finance-committee-summary-2026-11-05.md`. I didn't send it.\n\n- **Date mismatch:** your notes are dated Thursday 5 Nov, but today is 26 Oct. I used 5 Nov as written. Fix it if the date is wrong.\n- **Overage figure:** the 6,500 program supplies overage is marked `[UNVERIFIED]`. It comes only from your notes, with a \"~\", and Ellis's corrected actuals aren't in yet. Replace it once they arrive.\n- **Decisions:** only one came out of the meeting. The reserve transfer goes to the full board on 19 Nov. The audit timing had no decision, so the draft says so.\n- **Open items I added:** nobody owns Alicia's one-page reserve explanation, and the audit question has no date. I wrote both as open items. The draft asks Alicia whether she wants to write the explanation. Change that if you'd rather take it.\n- **Omitted:** I left out \"Ellis not happy about Jan\", since the draft shouldn't say what someone felt.\n- **Formatting check:** my ASCII check was blocked, so I haven't run it. I wrote the draft in plain ASCII, but the check itself didn't run.",
+   "output_from": "files: drafts/finance-committee-summary-2026-11-05.md",
+   "trace": [
+    [
+     "Read",
+     "input/committee-notes.md"
+    ],
+    [
+     "Bash",
+     "ls drafts Riverside 2>&1 | head -30"
+    ],
+    [
+     "Bash",
+     "mkdir -p drafts && cat > drafts/finance-committee-summary-2026-11-05.md <<'EOF'\nSubject: Finance committee summary - Thursday 5 November\n\nHello all,\n\nThe committee made one decision on Thursday: the proposed 5,000 transfer from the operating reserve goes to the full board on Thursday 19 November, not to us. Nothing else was settled. Details below.\n\nWhat happened\n\n1. First quarter (July to September): revenue is roughly on plan. Program supplies are over budget by about 6,500 [UNVERIFIED - figure from meeting notes, before Ellis's corrected actuals]. Two September lines were miscoded, so that number may change.\n2. Audit: the auditor wants to start fieldwork in January instead of March. No decision was made.\n3. Reserve transfer: Tom suggested moving 5,000 from the operating reserve to cover the supplies overage. Because it is the board's call, we will pass it on with a one-page explanation.\n\nWho does what by when\n\n1. Ellis: send corrected first quarter actuals - Tuesday 10 November.\n2. Ellis: confirm whether the program supplies overage is real overspending or camp supplies for next summer bought in September - Tuesday 10 November, with the corrected actuals.\n3. Ellis: ask the auditor whether February fieldwork is possible - date to be set (see open items).\n4. Morgan: cover memo draft to Ellis - Wednesday 11 November.\n5. Morgan: board packet out - Thursday 12 November.\n\nWhat is still open\n\n1. Who writes the one-page reserve explanation Alicia asked for, and by when? It needs to be ready before the packet goes out on 12 November. Alicia, can you tell me if you'd like to draft it, or should I?\n2. Audit fieldwork timing: January or February? Ellis is asking the auditor, and we need an answer date.\n3. The final size of the program supplies overage, pending the corrected actuals.\n\nOur next committee meeting is Thursday 3 December.\n\nI know this lands in a heavy stretch, and I appreciate the unpaid time you put in.\n\nMorgan\nEOF\ngrep -nP '[^\\x00-\\x7F]' drafts/*.md | head",
+     "error"
+    ],
+    [
+     "Write",
+     "drafts/finance-committee-summary-2026-11-05.md"
+    ]
+   ],
+   "model": "claude-sonnet-5-5",
+   "seconds": 23.4,
+   "cost_usd": 0.0916618,
+   "when": "2026-10-26T21:33:34Z"
+  }
+ ],
+ "judge": [
+  {
+   "comparison": "A|B",
+   "prompt": "ellis-board-note",
+   "repeat": 1,
+   "shown_left": "B",
+   "decision": "LEFT",
+   "winner": "B",
+   "note": "",
+   "response": "Left's two body paragraphs are plain and match the request, with no greeting or sign-off, so Morgan could send them after deleting the inline tag and the \"What is still open\" list. That list is working notes, not something for a board page, but it is easy to cut. Right is also close to the request, but it adds a \"Hello all,\" opener, a stock closer (\"I know this lands in a heavy week, and I appreciate your time\"), and an invented fact (\"we would otherwise have paid it next spring\"). Morgan would have to strip more from Right, and those additions go against how Morgan writes.\n\nLEFT",
+   "model": "claude-sonnet-5-5",
+   "when": "2026-10-26T21:33:59Z",
+   "seconds": 11.0,
+   "cost_usd": 0.016620799999999998,
+   "status": "ok",
+   "requested_model": "claude-sonnet-5-5"
+  },
+  {
+   "comparison": "A|B",
+   "prompt": "summarize-committee-notes",
+   "repeat": 1,
+   "shown_left": "B",
+   "decision": "RIGHT",
+   "winner": "A",
+   "note": "",
+   "response": "Right is more faithful to the notes. Left invents a deadline for Ellis's timing check (10 Nov \"with the corrected actuals\") and a question to Alicia about who drafts the explanation, and it carries a long inline \"[UNVERIFIED - ...]\" note that Morgan would have to cut. Right keeps the open items as the notes leave them (no date for Ellis's timing check, no owner for the one-pager). It does open with a stock thanks line, add an invented \"unpaid time\" remark, and end with \"Thanks,\". Left has a similar invented closing line, so the style problems roughly cancel and the factual fidelity decides it, though not by much.\n\nRIGHT",
+   "model": "claude-sonnet-5-5",
+   "when": "2026-10-26T21:33:59Z",
+   "seconds": 10.5,
+   "cost_usd": 0.0210348,
+   "status": "ok",
+   "requested_model": "claude-sonnet-5-5"
+  }
+ ],
+ "files": {
+  "ellis-board-note:input/ellis-email.md": "From: Ellis Park <ellis.park@riversideyouth.example>\nTo: Morgan Reyes <morgan.reyes@cedarcommons.example>\nDate: Thursday 12 November 2026, 15:02\nSubject: Note for the board tonight?\n\nMorgan -\n\nThe packet goes out tonight. Can you send me a short note for the top of it on\nthe supplies overspend, so board members see the explanation before the\nnumbers? I'll drop it in as page one. A paragraph or two is plenty.\n\nEllis\n",
+  "summarize-committee-notes:input/committee-notes.md": "Riverside finance cttee - Thu 5 Nov 2026, 6:30pm, video\n\nPresent: me (chair), Ellis, Tom Becker, Alicia Moreno\n\nQ1 actuals (Jul-Sep)\n- revenue roughly on plan\n- program supplies over by ~6,500. Camp supplies for next summer bought in Sept?\n  Ellis to confirm timing vs real overspend\n- 2 Sept lines miscoded. Ellis sends corrected Q1 actuals by Tue 10 Nov\n\nAudit\n- auditor wants fieldwork in Jan, not March\n- Ellis not happy about Jan (two staff out). Ellis to ask auditor about Feb\n- no decision\n\nReserve transfer\n- Tom suggested moving 5,000 from operating reserve to cover supplies\n- not ours to decide, goes to full board 19 Nov\n- Alicia wants a one-page explanation for the board first\n\nPacket\n- me: cover memo draft to Ellis by Wed 11 Nov\n- packet to board Thu 12 Nov (one week before mtg)\n\nNext cttee mtg Thu 3 Dec\n"
+ },
+ "experiment": {
+  "name": "demo-board-memo.toml",
+  "text": "# Demonstration 3 of 3: round B writes the voice file's missing Board Memo Voice section. The board drafts should get better.\n# A demonstration for the live session: two prompts, two rounds, one repeat\n# (4 runs; about 3 minutes with --jobs 4). It is not a full experiment: a\n# full one has both controls, at least four development prompts and two\n# repeats (see class-assistant/experiment.toml, whose prompts, round files and\n# starting files this file uses). Wren and Morgan Reyes are fictional.\nschema = \"skill-eval-lite/experiment@1\"\ndemo = true\nfiles_from = \"class-assistant\"\ntitle = \"Does a board memo section make Wren's board writing better? (demonstration: the improvement)\"\npurpose = \"\"\"\nWren drafts replies, summaries and briefs for Morgan Reyes, who sends them\nunder Morgan's own name. The outputs are for Morgan to send or read with as\nfew changes as possible.\"\"\"\ncriterion = \"\"\"\nA good output could go out under Morgan's name without changes: it answers\nwhat was asked, gets the facts from the request and the knowledge graph right,\nand reads as Morgan writes (plain, short, no stock openers or sign-offs).\"\"\"\njudging_question = \"Which draft would Morgan be more willing to send under their own name without changes?\"\nrepeats = 1\nseed = 5502\n\n[system]\nname = \"Wren, Morgan Reyes's assistant (the class assistant; fictional)\"\nkind = \"assistant\"\nfolder = \"the class assistant: python3 run_ab.py setup ../class-assistant\"\n\n[[system.parts]]\nid = \"voice\"\npath = \".claude/identity/voice.md\"\nwords = 1173\nreaches_model = \"imported by CLAUDE.md\"\n\n[[rounds]]\nid = \"A\"\nlabel = \"As it is\"\nrole = \"baseline\"\nchange = { how = \"as-is\" }\n\n[[rounds]]\nid = \"B\"\nlabel = \"Board memo section written\"\nrole = \"improvement\"\nchange = { part = \"voice\", how = \"revised\", file = \"rounds/B/.claude/identity/voice.md\" }\nexpected = { direction = \"better\", tags = [\"board\"], sources = [\"people\", \"judge\", \"no-board-abbreviations\"] }\nwhy = \"voice.md says its Board Memo Voice section has 'not enough signal yet'. Round B writes it from three more of Morgan's memos (made up for the class).\"\n\n[[comparisons]]\nbaseline = \"A\"\nnew = \"B\"\n\n[controls]\ntolerance = 0.10\n\n[[behaviors]]\nid = \"uses-the-board-register\"\ndescription = \"Writes in the board register: the decision first, abbreviations expanded, a source for every figure. Only for the board.\"\n\n[prompts]\ndevelopment = [\"summarize-committee-notes\", \"ellis-board-note\"]\nheld_out = [\"reply-to-school\"]\nsealed = true\n\n[[prompt]]\nid = \"summarize-committee-notes\"\ntitle = \"Summarize the finance committee's notes for the committee\"\ntags = [\"voice\", \"summary\", \"board\"]\nshould = [\"uses-the-board-register\"]\nshould_not = [\"uses-the-graph\"]\nfiles = [\"input/committee-notes.md\"]\ntext = \"\"\"\nHere are my notes from Thursday's Riverside finance committee meeting\n(input/committee-notes.md). Turn them into a short summary I can send to the\ncommittee: what we decided, who does what by when, and what is still open.\nSave it in drafts/.\"\"\"\nreference = \"\"\"\nRiverside finance committee, Thursday 5 November\n\nFor the board: the committee asks the full board to decide on 19 November whether to move 5,000 from the operating reserve to program supplies. Alicia Moreno asked for a one-page explanation first.\n\nWho does what\n- Ellis Park sends corrected first-quarter actuals by Tuesday 10 November.\n- Ellis asks the auditor whether fieldwork can move to February.\n- Morgan sends Ellis the cover memo draft by Wednesday 11 November.\n- The packet goes to the board on Thursday 12 November.\n\nStill open\n- When the audit fieldwork happens. The auditor wants January; Ellis has two staff out then.\n- Program supplies: next summer's camp supplies were bought in September, which may explain why the line is over budget for the quarter, by about 6,500 (committee notes; Ellis is confirming).\n\nNext meeting: Thursday 3 December.\n\nMorgan\"\"\"\n\n# Replaces the class pack's \"send it now\" prompt, whose test needs a send\n# tool; this one asks for a draft.\n[[prompt]]\nid = \"ellis-board-note\"\ntitle = \"The note on the supplies overspend for the board packet\"\ntags = [\"voice\", \"board\", \"in-graph\"]\nshould = [\"uses-the-graph\", \"uses-the-board-register\"]\nfiles = [\"input/ellis-email.md\"]\ntext = \"\"\"\nEllis wants a short note for the top of the board packet (his email is in\ninput/ellis-email.md). We went 6,200 over on program supplies in Q1 because\ncamp supplies for next summer were bought in September to get a bulk discount,\nso it's timing, not new spending. Draft it in drafts/ for me to look at.\"\"\"\nreference = \"\"\"\nProgram supplies, first quarter\n\nThe program supplies line is over budget for the quarter because we bought next summer's camp supplies in September, when a bulk discount was available. It is a question of timing, not new spending.\n\nThe line is 6,200 over budget for July to September (corrected first-quarter actuals from Ellis Park, 10 November).\n\nMorgan\"\"\"\n\n[[prompt]]\nid = \"reply-to-school\"\ntitle = \"Answer Ms. Okafor about the trip\"\ntags = [\"voice\", \"reply\", \"household\", \"not-in-graph\"]\nshould_not = [\"uses-the-graph\", \"uses-the-board-register\"]\nfiles = [\"input/school-email.md\"]\ntext = \"\"\"\nCan you answer Ms. Okafor for me? Her email is in input/school-email.md. Yes to\nthe trip, and I've signed the form and will send it in with the fee tomorrow.\nI can't chaperone that day, sorry.\"\"\"\nreference = \"\"\"\nMs. Okafor,\n\nYes to the trip. I've signed the form, and it'll come in with the fee tomorrow. I can't chaperone that day, sorry.\n\nMorgan\"\"\"\n\n[model]\nrunner = \"claude-code\"\nmodel = \"claude-sonnet-5-5\"\nallowed_tools = [\"Read\", \"Write\", \"Edit\", \"Glob\", \"Grep\", \"Skill\", \"Bash kb/kb *\"]\ntimeout_seconds = 300\nmax_budget_usd = 1.00\nnote = \"The same model and settings for every round. Personal settings, memory and connectors are left out of every run.\"\n\n# Checks run by the wizard on every output. contains: every text must appear;\n# not-contains: none may appear. A failed or timed-out run fails every check.\n\n[[checks]]\nid = \"no-board-abbreviations\"\nkind = \"not-contains\"\nobject = \"product\"\ntext = [\"Q1\", \"cttee\", \"mtg\"]\ntags = [\"board\"]\nshows = \"None of the committee's shorthand reached a board document.\"\ndoes_not_show = \"That every abbreviation was expanded, or that the register is right.\"\n\n[[checks]]\nid = \"no-forbidden-characters\"\nkind = \"not-contains\"\nobject = \"product\"\ntext = [\"—\", \"–\", \"“\", \"”\", \"‘\", \"’\", \"…\"]\nshows = \"The voice file's character rule held: no em or en dashes, curly quotes or ellipsis characters.\"\ndoes_not_show = \"That the draft sounds like Morgan, or that it is right.\"\n\n[[checks]]\nid = \"no-stock-phrases\"\nkind = \"not-contains\"\nobject = \"product\"\ntext = [\"Dear \", \"Best regards\", \"Warmly\", \"Sincerely\", \"I hope this email finds you well\", \"Please be advised\", \"As per our discussion\", \"circle back\", \"touch base\"]\nshows = \"None of the openers, sign-offs and phrases the voice file says Morgan never uses.\"\ndoes_not_show = \"That the draft avoids every phrase Morgan would not use.\"\n\n[[checks]]\nid = \"stayed-in-bounds\"\nkind = \"trace-no-tool-outside\"\nobject = \"process\"\nallowed = [\"Read\", \"Write\", \"Edit\", \"Glob\", \"Grep\", \"Skill\", \"Bash kb/kb *\"]\nshows = \"Every step used a tool on the allowed list.\"\ndoes_not_show = \"That each step was a good one.\"\n\n[judge]\nmodel = \"claude-sonnet-5-5\"\ndecision = \"The last line of the response is LEFT, RIGHT, TIE or UNKNOWN.\"\nprompt = \"\"\"\nYou are judging two drafts that an assistant wrote for Morgan Reyes. Morgan\nsends drafts under their own name. Read the request, the starting file if\nthere is one, and the two drafts.\n\nQuestion: Which draft would Morgan be more willing to send under their own\nname without changes?\n\nJudge what is on the page: whether it answers what was asked, whether its\nfacts match the request, and whether it reads as Morgan writes (plain, short,\nno stock openers or sign-offs). Do not prefer a draft because it is longer.\n\nGive two or three sentences of reasons. Then, on the last line, write only\nLEFT, RIGHT or TIE, or UNKNOWN if you can't tell.\"\"\"\n\n[frozen]\ndate = \"\"\nhash = \"\"\n\n[provenance]\nwritten_by = \"Claude (claude-opus-5-5), by hand, from the class intake\"\ndate = \"2026-10-26\"\nskill = \"experiment-intake 1\"\n",
+  "sha256": "sha256:43539be4eed07bf27c96c2420634f43a8e50ee4e76f6ba3ba805337d7c225a2f"
+ },
+ "assistant": {
+  "name": "class-assistant",
+  "git": {
+   "commit": "53bba55",
+   "uncommitted_changes": false
+  }
+ },
+ "runner": {
+  "claude_code_version": "2.1.310",
+  "flags": [
+   "-p",
+   "--output-format",
+   "stream-json",
+   "--verbose",
+   "--model",
+   "claude-sonnet-5-5",
+   "--setting-sources",
+   "project",
+   "--strict-mcp-config",
+   "--settings",
+   "{\"autoMemoryEnabled\":false,\"disableClaudeAiConnectors\":true}",
+   "--tools",
+   "Read,Write,Edit,Glob,Grep,Skill,Bash",
+   "--permission-mode",
+   "acceptEdits",
+   "--permission-prompts",
+   "none",
+   "--no-session-persistence",
+   "--max-budget-usd",
+   "1",
+   "--allowedTools",
+   "Skill,Bash(kb/kb *)"
+  ],
+  "env": {
+   "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+   "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+   "CLAUDE_CODE_DISABLE_BUNDLED_SKILLS": "1"
+  }
+ },
+ "updated": "2026-10-26T21:33:58Z"
+}

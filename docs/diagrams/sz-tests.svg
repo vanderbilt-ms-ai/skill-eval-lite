@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 186" width="300" height="186" role="img" aria-labelledby="sz-tests-t sz-tests-d"><title id="sz-tests-t">Three kinds of test</title><desc id="sz-tests-d">Mechanical: a program or a built-in check says pass or fail. LLM: an AI model, with your prompt, says PASS, FAIL or UNKNOWN. Human: a person rates each case on your scale, 1 to 4.</desc><style>
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-term{fill:rgba(28,124,110,.14);stroke:#1C7C6E}
+.dg .t-term{fill:#187062}
+.dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
+.dg .s-web{stroke:#1D6CB0}
+.dg .h-web{fill:#1D6CB0}
+.dg .t-web{fill:#1D6CB0}
+.dg .f-agent{fill:rgba(122,79,168,.12);stroke:#7A4FA8}
+.dg .h-agent{fill:#7A4FA8}
+.dg .t-agent{fill:#7A4FA8}
+.dg .tw{fill:#1E2A33;stroke:#13202A}
+.dg .tw-arrow{stroke:#62D2C0}
+.dg .tw-cur{fill:#E6EDF3}
+@media (prefers-color-scheme: dark) {
+.dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
+.dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
+.dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .f-term{fill:rgba(76,192,174,.16);stroke:#4CC0AE}
+.dg .t-term{fill:#4CC0AE}
+.dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
+.dg .s-web{stroke:#5BA6E8}
+.dg .h-web{fill:#5BA6E8}
+.dg .t-web{fill:#5BA6E8}
+.dg .f-agent{fill:rgba(180,148,222,.15);stroke:#B494DE}
+.dg .h-agent{fill:#B494DE}
+.dg .t-agent{fill:#B494DE}
+.dg .tw{fill:#0A0F13;stroke:#2A3640}
+.dg .tw-arrow{stroke:#62D2C0}
+.dg .tw-cur{fill:#E6EDF3}
+}
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="185" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Three kinds of test</text><rect x="12" y="34" width="276" height="42" rx="8" class="f-term"/><rect x="20" y="48" width="17" height="14" rx="3" class="tw"/><path d="M23.5 52 L27 55 L23.5 58" class="ln thin tw-arrow"/><rect x="28.5" y="57.2" width="5" height="1.6" rx="0.5" class="tw-cur"/><text x="46" y="52" font-size="12" class="b t-term">Mechanical</text><text x="46" y="67" font-size="10.5" class="t-term">a program, or a built-in check</text><text x="278" y="60" font-size="10.5" class="m t-term b" text-anchor="end">pass</text><rect x="12" y="84" width="276" height="42" rx="8" class="f-web"/><rect x="20" y="98" width="17" height="14" rx="3" class="f-web"/><path d="M20 102.5 L37 102.5" class="ln s-web thin"/><circle cx="23" cy="100.3" r="0.9" class="h-web"/><circle cx="25.6" cy="100.3" r="0.9" class="h-web"/><text x="46" y="102" font-size="12" class="b t-web">LLM</text><text x="46" y="117" font-size="10.5" class="t-web">an AI model, with your prompt</text><text x="278" y="110" font-size="10.5" class="m t-web b" text-anchor="end">PASS</text><rect x="12" y="134" width="276" height="42" rx="8" class="f-agent"/><path d="M23 148.5 H34 Q37 148.5 37 151.5 V156.5 Q37 159.5 34 159.5 H28 L24.5 162.5 V159.5 H23 Q20 159.5 20 156.5 V151.5 Q20 148.5 23 148.5 Z" class="f-agent"/><circle cx="25.2" cy="154" r="1.1" class="h-agent"/><circle cx="28.5" cy="154" r="1.1" class="h-agent"/><circle cx="31.8" cy="154" r="1.1" class="h-agent"/><text x="46" y="152" font-size="12" class="b t-agent">Human</text><text x="46" y="167" font-size="10.5" class="t-agent">a person, on your scale</text><text x="278" y="160" font-size="10.5" class="m t-agent b" text-anchor="end">1–4</text></svg>

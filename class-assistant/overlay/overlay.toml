@@ -1,0 +1,60 @@
+# The class assistant: the AI 5100 assistant template with its fictional
+# example in place (Morgan Reyes, whose assistant is Wren) and knowledge-graph
+# pages for the example's people and organizations.
+#
+#     python3 run_ab.py setup ../class-assistant
+#
+# clones the template from GitHub at the commit below, makes the copies listed
+# here, lays every file under files/ over the result at the same path, and
+# commits the result on a branch named class-assistant. This folder holds only
+# what differs from the template. Nothing in it is real: every person,
+# organization, address and figure is made up.
+
+schema = "skill-eval-lite/class-overlay@1"
+template = "https://github.com/vanderbilt-ms-ai/assistant-template.git"
+commit = "3ed9049a72673e4970cbc5976c852f6df8a3ae5b"
+branch = "class-assistant"
+
+# The example's six files take the place of the template's blanks, as the
+# template's /setup would leave them. Each example opens with an HTML comment
+# addressed to the template's reader ("FICTIONAL. A worked example of ...");
+# strip_comments removes it, so the assistant is not told in every session
+# that its principal is made up.
+
+[[copy]]
+from = ".claude/identity/examples/CLAUDE.example.md"
+to = "CLAUDE.md"
+strip_comments = true
+
+[[copy]]
+from = ".claude/identity/examples/soul.example.md"
+to = ".claude/identity/soul.md"
+strip_comments = true
+
+[[copy]]
+from = ".claude/identity/examples/persona.example.md"
+to = ".claude/identity/persona.md"
+strip_comments = true
+
+[[copy]]
+from = ".claude/identity/examples/operating.example.md"
+to = ".claude/identity/operating.md"
+strip_comments = true
+
+[[copy]]
+from = ".claude/identity/examples/user.example.md"
+to = ".claude/identity/user.md"
+strip_comments = true
+
+[[copy]]
+from = ".claude/identity/examples/voice.example.md"
+to = ".claude/identity/voice.md"
+strip_comments = true
+
+# The graph starts as the seed pages, as the first `kb/kb` run would make it;
+# files/kb/wiki/ then adds the pages the template's /setup would write for
+# Morgan (people, organizations, lanes, systems of record, hard rules) and an
+# index that lists them.
+[[copy]]
+from = "kb/seed/"
+to = "kb/wiki/"

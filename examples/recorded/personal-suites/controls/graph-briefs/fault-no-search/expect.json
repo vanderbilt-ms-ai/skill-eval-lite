@@ -1,0 +1,9 @@
+{
+ "role": "fault",
+ "note": "The search steps deleted: the brief is written without looking anything up, yet claims what the graph holds.",
+ "expect": {
+  "search-before-write": "fail",
+  "steps-follow": "fail",
+  "sound-process": "fail"
+ }
+}
