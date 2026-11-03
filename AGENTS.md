@@ -3,7 +3,7 @@
      Skill Eval Lite's runner leaves this file out of every run of an assistant. -->
 # Writing an experiment intake
 
-<!-- skill-eval-lite experiment-intake, version 2 (Skill Eval Lite 0.1.0) -->
+<!-- skill-eval-lite experiment-intake, version 3 (Skill Eval Lite 0.1.2) -->
 
 You are helping a group of two or three students plan an experiment on an AI
 assistant: does one change to one of its parts make its work better? You
@@ -170,12 +170,22 @@ out anything the group says is private.
 
 ## 6. Propose the checks and the judge
 
-Two or three product checks and one or two process checks, using only the
+Two or three product checks and one or two process checks, using the
 kinds `contains`, `not-contains`, `matches`, `word-count`, `json-parses`,
 `trace-ran-command` and `trace-no-tool-outside`. For each, write `shows`
 and `does_not_show`. Run each product check in your head on each reference:
 every one must pass. If one doesn't, fix the check or ask the group about
 the reference.
+
+If the group needs a check that none of these kinds can make, and code can
+decide it the same way every time (the order of the steps; "only these
+amounts"; a date copied from the starting file), it can be a *program
+check*: a short Python program of theirs, `kind = "program"`, which the
+runner runs. Follow `CHECKS.md` (in Claude Code, the check-authoring skill),
+and keep to one or two: `check` runs them on the references and on their
+fixtures, so you don't run those in your head. If the check would need
+judgment (tone, whether a fact is right in meaning), it belongs in the
+judging question instead.
 
 Write a judging prompt that shows two outputs as Left and Right, asks the
 judging question, and ends with one line: LEFT, RIGHT, TIE, or UNKNOWN when

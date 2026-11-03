@@ -26,7 +26,7 @@ It was made for AI 5500 (Vanderbilt, Fall 2026), for Shared I and Personal I. Th
 assistant is Wren, the AI 5100 assistant template's fictional example: Wren
 works for Morgan Reyes, and nobody in it is real.
 
-Version 0.1.1 (the version is in `VERSION`). On 0.1.0? In this folder, type `git pull`:
+Version 0.1.2 (the version is in `VERSION`). On an earlier version? In this folder, type `git pull`:
 [RELEASE.md](RELEASE.md) says what changed. `doctor` and `status` say when a newer
 version is out.
 
@@ -640,6 +640,32 @@ Then:
 The held-out prompts stay sealed: `run` and `judge` leave them out unless you
 add `--held-out`.
 
+### A check of your own: program checks
+
+A check that none of the built-in kinds can make, but that code can decide
+the same way every time (the order of a run's steps; "only these amounts"; a
+date copied from the starting file), can be a *program check*: a short
+Python program of your group's own, `kind = "program"`, in
+`experiments/<name>/checks/<id>/`. [CHECKS.md](CHECKS.md) says how to write
+one, with its *fixtures* (small made-up cases with the answer it should
+give). In Claude Code, the check-authoring skill writes one with you:
+
+    /check-authoring
+
+With Codex, ask it to follow `CHECKS.md`. `check` runs each program on the
+references and on its fixtures, and prints the `sha256` line to put in the
+check, which brings the program under the freeze. `run` runs the programs on
+every output at the end, and the wizard shows their results beside the
+built-in checks'. To run a program check on runs already made (one added
+after them, say), with no new runs and no model:
+
+    python3 run_ab.py score experiments/<name>/experiment.toml
+
+A check added after the runs is marked *added after the runs* in the
+wizard: its results are exploratory, not part of the test you froze.
+`examples/demo-program-check.toml` is a demonstration with two program
+checks, in `examples/class-assistant/checks/`.
+
 ## Make the file on screen: the designers
 
 The wizard has two designers. Open the wizard, and on Getting started press
@@ -660,7 +686,8 @@ from the file's own text. It suggests the two controls (remove the knowledge
 graph; reorder a file's sections, which it does for you) and asks for each
 round's prediction; then the prompts (the class prompts, or your own with
 their starting files), development or held out, with a balance meter; the
-checks, from a menu of the kinds the runner supports, and the AI judge's
+checks, from a menu of the built-in kinds (a program check it is given, from
+a demonstration, it keeps as it is, with its folder), and the AI judge's
 prompt from a template; and the repeats, the tool, the model and a budget.
 The last screen tells the experiment back in sentences, lists every check,
 and saves `experiments/<name>/` (`experiment.toml`, `rounds/`, `prompts/`):
@@ -790,8 +817,9 @@ experiment's seed, the runner:
 
 1. copies the assistant's folder into a new temporary folder, leaving out
    `.git`, `.claude/settings.local.json`, `CLAUDE.local.md`,
-   `writing-samples/`, `.claude/setup/answers.md`, the intake skill, and
-   earlier work in `drafts/`, `notes/` and `research/`;
+   `writing-samples/`, `.claude/setup/answers.md`, Skill Eval Lite's own
+   skills and guides (the intake, the helper, check-authoring), the program
+   checks' folders, and earlier work in `drafts/`, `notes/` and `research/`;
 2. applies the round's change to that copy: `as-is` (none), `removed` (the
    part's paths deleted), `blank` (the part's file emptied, or replaced by
    `change.file`), or `revised`, `neutral-edit` and `someone-else's` (the
@@ -810,6 +838,17 @@ experiment's seed, the runner:
 
 A run that fails or passes its time limit is kept as a failure, never as
 missing, and fails every check.
+
+Before the first run, the runner tests each program check as `check` does
+(on the references and its fixtures), and doesn't start if one fails. After
+the runs, it runs each program check on every output it applies to that has
+no result for the check as it is now (its version is its program's `sha256`
+and its `params`). Each time, the program gets a fresh folder holding the
+output, the reference, the trace, the transcript, the files the run wrote,
+the starting files and a `context.json`, but never the round, the repeat or
+the run's folder. It runs with Python's isolated mode, in that folder, with
+no API keys and a time limit ([CHECKS.md](CHECKS.md), [SAFETY.md](SAFETY.md)).
+A failed or timed-out run isn't given to it.
 
 ## The run folder
 
@@ -831,6 +870,14 @@ missing, and fails every check.
     transcripts/<prompt>__<round>__<repeat>.jsonl   the session's events
     judge/prompt.md                the judging prompt
     judge/<A-B>/<prompt>__<repeat>.json   each judgment: the input, the response, the side shown left
+    checks/<id>/                   each program check's program and fixtures, as they were run
+    outputs/<prompt>/<round>/<repeat>/checks/<id>.json   a program check's result on that output
+
+`bundle.json` carries the program checks' results too: `program_results`
+(one for each output and check, with its version, and `added_after_run` when
+the runs were made without that version of the check) and
+`program_reference_results`. Each output says which versions of the program
+checks it was made with (`program_checks`).
 
 Paths in these files are relative to the run's folder; your home folder,
 user and host names, session IDs, account usage and real e-mail addresses
@@ -852,7 +899,7 @@ JSON). `examples/class-assistant/experiment.toml` uses every field.
 | `title`, `purpose`, `criterion`, `judging_question` | The question; what the outputs are for; what makes one good enough to use; the question every blind pair answers |
 | `repeats`, `seed` | Runs per prompt per round; the seed for the run order, the judge's sides and the bootstrap |
 | `demo` | `true` for a demonstration that is not a full experiment |
-| `files_from` | Where `rounds/` and `prompts/` are, relative to this file (default: its folder) |
+| `files_from` | Where `rounds/`, `prompts/` and `checks/` are, relative to this file (default: its folder) |
 | `[system]`, `[[system.parts]]` | The assistant, and one entry per part: `id`, `path` (or `paths`), `words`, `reaches_model` |
 | `[[rounds]]` | `id`, `label`, `role` (`baseline`, `improvement`, `control-should-change`, `control-should-not-change`), `change = { part, how, file }`, `expected = { direction, tags, elsewhere, sources }`, `why` |
 | `[[comparisons]]` | `baseline` and `new`: the pairs that are judged; the first whose new round is an improvement is the headline |
@@ -861,7 +908,7 @@ JSON). `examples/class-assistant/experiment.toml` uses every field.
 | `[prompts]` | `development`, `held_out`, `sealed` |
 | `[[prompt]]` | `id`, `title`, `tags`, `should`, `should_not`, `files` (paths in the run), `text`, `reference` |
 | `[model]` | `runner` (`"claude-code"` or `"codex"`), `model`, `allowed_tools`, `timeout_seconds`, `max_budget_usd`, `note`; for Codex also `codex_model`, `reasoning_effort` |
-| `[[checks]]` | `id`, `kind`, `object` (`product` or `process`), the kind's arguments, `prompts` or `tags`, `shows`, `does_not_show` |
+| `[[checks]]` | `id`, `kind`, `object` (`product` or `process`), the kind's arguments, `prompts` or `tags`, `shows`, `does_not_show`; for a program check, `program` (`checks/<folder>/<name>.py`), `sha256` (the program's, which `check` prints), and optionally `params` (a table the program reads) and `timeout_seconds` (1 to 600; 60) |
 | `[judge]` | `model`, `prompt` (ending in one line: LEFT, RIGHT, TIE or UNKNOWN), `decision` |
 | `[frozen]` | `date`, `hash`: written by the wizard. The hash is `sha256c:` and the SHA-256 of the file without its `[frozen]` table (for JSON, without `frozen`, keys sorted), so `check`, `status`, `run` and the wizard can each check that the file hasn't changed since. A 0.1.0 freeze (`sha256:`) is read as frozen, with a note that it can't be checked |
 | `[provenance]` | Who wrote the file, when, with which skill |
@@ -872,7 +919,10 @@ does), `matches` (the regular expression `pattern` matches), `word-count`
 trace matches the glob `pattern`, in a step that didn't fail) and
 `trace-no-tool-outside` (every step matches the `allowed` list, each command
 of a shell step included). The wizard runs them on Shared I's runs, and
-`suite` on Personal I's cases.
+`suite` on Personal I's cases. And `program`: a program of your own, which
+the runner runs (see "A check of your own: program checks" above, and
+[CHECKS.md](CHECKS.md)). It prints `pass`, `fail` or `n/a` and a reason on
+its first line; anything else counts as `n/a`.
 
 How the two trace checks read a shell step:
 - A step is split into its commands at `;`, `&&`, `||`, `|`, `&` and new
@@ -947,6 +997,7 @@ in Claude Code). A helper session and each answer use a little of your plan.
     python3 run_ab.py run EXPERIMENT --assistant FOLDER [--runner R] [--model M] [--rounds A,C] [--prompts ID,ID]
                           [--repeats N] [--held-out] [--jobs N] [--out FOLDER] [--again] [--keep-work] [--unfrozen]
     python3 run_ab.py judge RUN_FOLDER [--runner R] [--comparisons A-B,A-C] [--model M] [--jobs N] [--again]
+    python3 run_ab.py score EXPERIMENT [--out RUN_FOLDER] [--checks ID,ID] [--again] [--jobs N]
     python3 run_ab.py suite SUITES_FILE [--runner R] [--suite ID] [--tests ID,ID] [--cases ID,ID] [--out FOLDER]
                             [--again] [--no-llm] [--check] [--jobs N]
 
@@ -958,6 +1009,11 @@ demonstration, `demo = true`, runs unfrozen). `--unfrozen` runs it anyway:
 each run, its `run.json` and the bundle then say `"frozen": false`, and the
 wizard's steps 3 to 5 say the runs were made before the experiment was
 frozen.
+
+`score` runs an experiment's program checks on the outputs in its run folder
+(by default `runs/<name>`), where they have no result for the check as it
+is now; `--again` runs them on every output. It calls no model. Results for
+a check the runs weren't made with are marked as added after the runs.
 
 `doctor` and `status` ask GitHub for the latest version (one small request,
 with nothing of yours in it) and say when a newer one is out; offline, they
@@ -1064,6 +1120,23 @@ and the freeze's fingerprint. `tests/test_freeze.py` checks that `check`,
 `status`, `run` and the wizard act on the fingerprint, that `--unfrozen`
 marks its runs, and the version check.
 
+The program checks' tests (`tests/test_programs.py`, new in 0.1.2) check
+what `check` says about a program check, and the `sha256` line it prints;
+its tests of each program on the references and on its fixtures, and a
+program that prints something else, crashes, takes too long, or would
+import a module from `PYTHONPATH`. With the fake `claude`, they check that
+`run` runs the programs at the end and keeps their results; that a program
+sees only its case, in isolated mode, with no API keys, and can't change an
+output; that a failed run isn't given to it; that `score` runs a check
+added after the runs and marks it; that a run made again is scored again;
+that the assistant never sees the checks' folders, even with the
+experiment inside it; that `new` copies them and `status` says when to
+`score`. In Chrome, the wizard shows the bundle's results with the runner's
+version of each check, and the designer keeps a program check and its
+folder, and its copy of `check` says what `run_ab.py` says, word for word,
+on ten versions of the demonstration. `demo-program-check` has not been run
+with a real model.
+
 The Codex tests (`tests/test_codex.py`) use a stand-in for `codex`
 (`tests/fake_codex.py`) that answers from the `CODEX_HOME` it is given, as
 Codex does: runs, the judge, a suite's LLM tests and `doctor`; that only the
@@ -1072,7 +1145,7 @@ asked; that a global `AGENTS.md`, a personal skill, an MCP tool or an MCP
 call stops the run; that runners are not mixed; and the import inlining,
 the trace names and the check before each run on their own.
 
-## Limits in 0.1.1
+## Limits in 0.1.2
 
 - The runner runs Claude Code or Codex. A Codex run reads the assistant
   through a generated `AGENTS.md` (see "With Codex"), so its results are not
@@ -1089,6 +1162,15 @@ the trace names and the check before each run on their own.
 - The wizard doesn't unseal the held-out prompts, or read another group's
   packet for the exchange; it reads ZIP files not at all (load
   `bundle.json`).
+- A program check is Python, standard library only, one file. It runs on
+  your computer with your permissions, in Python's isolated mode and with a
+  time limit, but not in a sandbox: read a program before you run one that
+  someone else wrote ([SAFETY.md](SAFETY.md)). The experiment designer keeps
+  a program check but doesn't write or edit one; the wizard shows their
+  results but can't run them.
+- The freeze's fingerprint covers the experiment file and, through each
+  program check's `sha256`, its program. It doesn't cover a program's
+  fixtures, the round files or the starting files.
 - The designers save straight into a folder only in browsers with the File
   System Access API (Chrome, Edge); elsewhere they download a ZIP. A
   program test that isn't Python, saved that way, needs `chmod +x`. They

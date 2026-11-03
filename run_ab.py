@@ -4,7 +4,8 @@
 Runs an assistant (a folder of Claude Code instructions, such as the AI 5100
 assistant template) on the prompts of an experiment, once per round and
 repeat, in a fresh copy each time, with Claude Code in print mode; keeps every
-output, run record and trace; writes a bundle that the wizard (wizard.html)
+output, run record and trace; runs the experiment's program checks
+(CHECKS.md) on the outputs; writes a bundle that the wizard (wizard.html)
 loads; and runs an LLM judge on blind pairs.
 
     python3 run_ab.py setup ../class-assistant          the class assistant, from GitHub
@@ -13,6 +14,7 @@ loads; and runs an LLM judge on blind pairs.
     python3 run_ab.py plan  examples/demo-graph-removed.toml
     python3 run_ab.py run   examples/demo-graph-removed.toml --assistant ../class-assistant --jobs 4
     python3 run_ab.py judge runs/demo-graph-removed
+    python3 run_ab.py score examples/demo-program-check.toml   program checks (CHECKS.md), on runs made
     python3 run_ab.py suite my-suites/suites.yaml       Personal I: run a packet's suites
 
 Every run leaves out the person's own Claude Code settings, memory, plugins,
@@ -70,8 +72,13 @@ OVERLAY = HERE / "class-assistant" / "overlay"
 
 HOWS = {"as-is", "blank", "removed", "revised", "someone-else's", "neutral-edit"}
 ROLES = {"baseline", "improvement", "control-should-change", "control-should-not-change"}
+# The built-in check kinds, which the wizard runs (and run_check below, for
+# the suites); and the program check, a Python program of the group's own
+# that the runner runs on each output (CHECKS.md).
 CHECK_KINDS = {"contains", "not-contains", "matches", "word-count", "json-parses",
                "trace-ran-command", "trace-no-tool-outside"}
+PROGRAM_KIND = "program"
+PROGRAM_TIMEOUT = 60
 # Tools that act on files: confined to the run's folder by the permission mode,
 # so they are offered (--tools) but never allowed everywhere (--allowedTools).
 FILE_TOOLS = {"Read", "Write", "Edit", "Glob", "Grep", "NotebookEdit", "LS"}
@@ -439,12 +446,20 @@ class Experiment:
                     errors.append(f'Prompt "{pid}": its starting file {f} is missing. Save it at {self.base / "prompts" / pid / "files" / f}.')
         if set(self.development) & set(self.held_out):
             errors.append("A prompt is on both lists, development and held_out. Take it off one of them.")
+        ids = set()
         for c in d.get("checks", []):
-            if c.get("kind") not in CHECK_KINDS:
+            if c.get("kind") not in CHECK_KINDS | {PROGRAM_KIND}:
                 errors.append(f"Check {c.get('id')!r} has a kind Skill Eval Lite doesn't know: {c.get('kind')!r}. "
-                              f"Use one of: {', '.join(sorted(CHECK_KINDS))}.")
+                              f"Use one of: {', '.join(sorted(CHECK_KINDS | {PROGRAM_KIND}))}.")
             if c.get("object") not in ("product", "process"):
                 warns.append(f"Check {c.get('id')!r}: set object = \"product\" (it checks the output) or \"process\" (it checks the steps).")
+            if c.get("id") in ids:
+                errors.append(f"Two checks are called {c.get('id')!r}. Give each its own id.")
+            ids.add(c.get("id"))
+            if c.get("kind") == PROGRAM_KIND:
+                e, w = self.program_problems(c)
+                errors += e
+                warns += w
         if not d.get("checks"):
             warns.append("There are no [[checks]] yet. Add two or three (the README's \"The experiment file\" lists the kinds).")
         runner = self.model.get("runner", "claude-code")
@@ -457,6 +472,52 @@ class Experiment:
                           f"(runner = {runner!r}).")
         if not self.judge.get("prompt"):
             warns.append("[judge] has no prompt, so the LLM judge can't run. Add a [judge] prompt.")
+        return errors, warns
+
+    def program_checks(self) -> list[dict]:
+        return [c for c in self.data.get("checks", []) if isinstance(c, dict) and c.get("kind") == PROGRAM_KIND]
+
+    def program_path(self, c: dict) -> Path | None:
+        """A program check's program, when its path is one the runner takes:
+        checks/<folder>/<name>.py, in this experiment's folder (files_from)."""
+        return self.base / c["program"] if program_path_ok(c.get("program")) else None
+
+    def program_problems(self, c: dict) -> tuple[list[str], list[str]]:
+        """What is wrong with a program check, without running it. The
+        designer's copy of check (wizard.html) says the same, word for word."""
+        errors, warns = [], []
+        cid, prog = c.get("id"), c.get("program")
+        if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", str(cid or "")):
+            errors.append(f"Check {cid!r}: a program check's id names the files of its results, so use small letters, "
+                          "digits and dashes, such as looked-up-first.")
+        if not prog:
+            errors.append(f"Check {cid!r} is a program check: add program = \"checks/<id>/check.py\", the path of its program "
+                          "(CHECKS.md says how to write one).")
+            return errors, warns
+        if not program_path_ok(prog):
+            errors.append(f"Check {cid!r}: its program must be a Python file in a folder of its own under checks/, "
+                          f"such as checks/{cid}/check.py, not {prog!r}.")
+            return errors, warns
+        f = self.base / prog
+        if not f.is_file():
+            errors.append(f"Check {cid!r}: its program {prog} isn't there (looked in {self.base}). Check the name.")
+            return errors, warns
+        digest = hashlib.sha256(f.read_bytes()).hexdigest()
+        if not c.get("sha256"):
+            errors.append(f"Check {cid!r}: add this line to it, so that the freeze covers its program: sha256 = \"{digest}\"")
+        elif c["sha256"] != digest:
+            errors.append(f"Check {cid!r}: its program has changed since its sha256 was written. If the change is meant, "
+                          f"test it with check, then write the new one: sha256 = \"{digest}\". "
+                          "A frozen experiment must then be frozen again.")
+        if "params" in c and not isinstance(c["params"], dict):
+            errors.append(f"Check {cid!r}: params must be a table, such as params = {{ amounts = [\"120,000\"] }}.")
+        t = c.get("timeout_seconds")
+        if "timeout_seconds" in c and (isinstance(t, bool) or not isinstance(t, (int, float)) or not 1 <= t <= 600):
+            errors.append(f"Check {cid!r}: timeout_seconds must be a number of seconds, from 1 to 600.")
+        if not any(e.get("expect") == "fail" for _, e in program_fixtures(f.parent)):
+            folder = PurePosixPath(prog).parent.as_posix()
+            warns.append(f"Check {cid!r}: add a fixture its program should fail: a folder in {folder}/fixtures/ with an "
+                         "expect.json that says \"fail\" (CHECKS.md). It shows that the program catches what it is for.")
         return errors, warns
 
     def tool_lists(self) -> tuple[list[str], list[str]]:
@@ -480,12 +541,14 @@ class Experiment:
 # --- Working copies -------------------------------------------------------
 
 # Never copied into a run: the assistant's history, machine-local settings,
-# private samples, earlier outputs, and the intake skill.
+# private samples, earlier outputs, and Skill Eval Lite's own skills.
 EXCLUDE_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", "drafts", "notes", "research"}
 EXCLUDE_FILES = {".claude/settings.local.json", "CLAUDE.local.md", ".claude/setup/answers.md", ".DS_Store"}
-EXCLUDE_TREES = {".claude/skills/experiment-intake", ".claude/skills/skill-eval-helper", "writing-samples"}
+EXCLUDE_TREES = {".claude/skills/experiment-intake", ".claude/skills/skill-eval-helper", ".claude/skills/check-authoring",
+                 "writing-samples"}
 INTAKE_MARK = "skill-eval-lite experiment-intake"
 HELPER_MARK = "skill-eval-lite helper"
+CHECKS_MARK = "skill-eval-lite check-authoring"
 
 
 def copy_assistant(src: Path, dst: Path, skip: set[Path] = frozenset()) -> None:
@@ -509,6 +572,8 @@ def copy_assistant(src: Path, dst: Path, skip: set[Path] = frozenset()) -> None:
             if r == "AGENTS.md" and INTAKE_MARK in p.read_text(encoding="utf-8", errors="replace")[:400]:
                 continue
             if r == "HELPER.md" and HELPER_MARK in p.read_text(encoding="utf-8", errors="replace")[:400]:
+                continue
+            if r == "CHECKS.md" and CHECKS_MARK in p.read_text(encoding="utf-8", errors="replace")[:400]:
                 continue
             (dst / rel).mkdir(parents=True, exist_ok=True)
             shutil.copy2(p, dst / rel / f)
@@ -1768,6 +1833,10 @@ FROZEN_LINE = {"frozen": "yes, {date}", "old": "yes, {date} (frozen with 0.1.0; 
 def cmd_check(a) -> int:
     exp = load(a.experiment)
     errors, warns = exp.problems()
+    # Program checks are run here on the references and on their fixtures,
+    # which the wizard can't do: it doesn't run programs.
+    st_errors, notes = program_selftest(exp)
+    errors += st_errors
     state, date = exp.freeze_state()
     if state == "changed":
         errors.append(changed_since_frozen(date))
@@ -1776,6 +1845,8 @@ def cmd_check(a) -> int:
         say("  must fix:  " + e)
     for w in warns:
         say(("  (demo)    " if exp.data.get("demo") else "  to do:     ") + w)
+    for n in notes:
+        say("  program:   " + n)
     if not errors and not warns:
         say("  Nothing is missing.")
     if exp.data.get("demo") and warns:
@@ -2015,6 +2086,12 @@ def one_run(exp: Experiment, assistant: Path, skip: set[Path], p: str, r: str, k
             entry["frozen"] = False
         if codex:
             entry["usage"] = run.usage
+        if exp.program_checks():
+            # The program checks as they were when this run was made: a result
+            # for a check that isn't here, at this version, was added after it.
+            entry["program_checks"] = {c["id"]: program_version(c) for c in exp.program_checks()}
+            record["program_checks"] = entry["program_checks"]
+            (folder / "run.json").write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
         return {"entry": entry, "breach": run.breach, "not_logged_in": run.not_logged_in and status == "failed"}
     finally:
         if keep_work:
@@ -2063,6 +2140,8 @@ def cmd_run(a) -> int:
     name = runner_name(a, configured)
     if name != configured:
         errors = [e for e in errors if not e.startswith("[model] model ")]
+    if not errors and exp.program_checks():
+        errors, _ = program_selftest(exp)
     if errors:
         say("This experiment can't be run yet:")
         for e in errors:
@@ -2112,6 +2191,11 @@ def cmd_run(a) -> int:
                 (out.path / "judge" / str(j.get("comparison", "")).replace("|", "-") / f"{j.get('prompt')}__{j.get('repeat')}.json").unlink(missing_ok=True)
             if stale:
                 say(f"Dropped {len(stale)} LLM verdicts on the runs made again; run judge again afterwards.")
+        # ...and its program checks' results, which are made again at the end.
+        again_runs = {x for x in todo if x in have}
+        if again_runs and out.bundle and out.bundle.get("program_results"):
+            out.bundle["program_results"] = [r for r in out.bundle["program_results"]
+                                             if (r.get("prompt"), r.get("round"), r.get("repeat")) not in again_runs]
         skipped = len(runs) - len(todo)
         # Leave the experiment's own files out of the copies if they sit inside the assistant.
         skip = set()
@@ -2124,6 +2208,9 @@ def cmd_run(a) -> int:
                 skip |= {exp.path.resolve(), folder / "rounds", folder / "prompts"}
             else:
                 skip.add(folder)
+        # The program checks' folders too: the assistant must never see what grades it.
+        for c in exp.program_checks():
+            skip.add((exp.base / PurePosixPath(c["program"]).parent).resolve())
         git_state = {}
         if (assistant / ".git").exists():
             h = git("rev-parse", "--short", "HEAD", cwd=assistant, check=False).stdout.strip()
@@ -2159,6 +2246,11 @@ def cmd_run(a) -> int:
         if not todo:
             say(f"Nothing to run. The bundle is {out.bundle_path}")
             out.save()
+            if exp.program_checks():
+                done = score_programs(exp, out, jobs=a.jobs)
+                if done["outputs"] or done["references"]:
+                    say(f"\nRan the program checks where they had no result yet: {results_text(done)}.")
+                    say_program_results(exp, out)
             return 0
         registry: set = set()
         stop = threading.Event()
@@ -2227,9 +2319,382 @@ def cmd_run(a) -> int:
              f"of them cached) and {sum(u.get('output_tokens', 0) for u in toks):,} out, as Codex reports them") if toks else ""
     say(f"\n{n_ok} of {len(outs)} runs finished; {len(outs) - n_ok} failed or timed out (kept as failures). "
         f"{total / 60:.1f} minutes" + (f"; ${cost:.2f} as Claude Code reports it" if cost else "") + usage + ".")
+    if exp.program_checks():
+        done = score_programs(exp, out, jobs=a.jobs)
+        say(f"Ran the program checks (CHECKS.md): {results_text(done)}.")
+        say_program_results(exp, out)
     say(f"The bundle for the wizard: {out.bundle_path}")
     say(f"Next, run the LLM judge:  python3 run_ab.py judge {out.path}")
     say("Then open wizard.html and load the bundle in step 1.")
+    return 0
+
+
+# --- Program checks -------------------------------------------------------
+#
+# A program check is a Python program of the group's own, for what the
+# built-in kinds can't see (CHECKS.md). The runner runs it: on every output
+# at the end of `run` (or later, with `score`), and on each reference and
+# fixture in `check`. Each time it gets a fresh folder holding only what it
+# may read, never the round, the repeat or the run's folder, so that it can't
+# tell which version of the assistant wrote what it checks. The sha256 in the
+# experiment file puts the program under the freeze; the wizard shows the
+# results, which the bundle carries.
+
+def program_path_ok(prog) -> bool:
+    """checks/<folder>/<name>.py, and nothing that climbs out of the folder."""
+    if not isinstance(prog, str):
+        return False
+    parts = prog.split("/")
+    return (len(parts) == 3 and parts[0] == "checks" and parts[2].endswith(".py") and len(parts[2]) > 3
+            and not any(p in ("", ".", "..") for p in parts) and not re.search(r"[\\:]", prog))
+
+
+def program_fixtures(folder: Path) -> list[tuple[Path, dict]]:
+    """A program's fixtures: the folders in its fixtures/, each with what its
+    expect.json says ({} when there is none, or it can't be read)."""
+    fx = folder / "fixtures"
+    out = []
+    for d in sorted(p for p in fx.iterdir() if p.is_dir()) if fx.is_dir() else []:
+        try:
+            e = json.loads((d / "expect.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            e = None
+        out.append((d, e if isinstance(e, dict) else {}))
+    return out
+
+
+def program_version(c: dict) -> str:
+    """A program check's version, from its program's sha256 and its params:
+    a result counts for the check as it is only if it has this version.
+    wizard.html's programVersion gives the same."""
+    params = c.get("params") if isinstance(c.get("params"), dict) else {}
+    key = canonical_json({"program": c.get("program") or "", "sha256": c.get("sha256") or "", "params": params})
+    return hashlib.sha256(key.encode("utf-8")).hexdigest()[:12]
+
+
+def program_current(c: dict, o: dict, old: dict | None) -> bool:
+    """Whether a kept result is for this output (made at its time) and this version of the check."""
+    return bool(old) and old.get("version") == program_version(c) and old.get("output_when") == o.get("when")
+
+
+def check_applies(c: dict, prompt: dict) -> bool:
+    """Whether a check applies to a prompt (its prompts, else its tags, else every prompt), as the wizard's applies()."""
+    if c.get("prompts") is not None:
+        return prompt.get("id") in c["prompts"]
+    if c.get("tags") is not None:
+        return any(t in c["tags"] for t in prompt.get("tags", []))
+    return True
+
+
+def program_verdict(stdout: str, stderr: str) -> tuple[str, str]:
+    """A program's first line: pass, fail or n/a, then its reason. Anything
+    else is n/a, with what it printed."""
+    first = (stdout.strip().splitlines() or [""])[0]
+    word, _, why = first.partition(" ")
+    err = stderr.strip()[-200:]
+    if word.lower() in ("pass", "fail", "n/a"):
+        return word.lower(), why.strip() or (err if word.lower() == "n/a" else "")
+    if not first:
+        return "n/a", "the program printed nothing" + (": " + err if err else "")
+    return "n/a", f"the program printed {first!r}, not pass, fail or n/a" + (": " + err if err else "")
+
+
+def program_env() -> dict:
+    """A program check's environment: the runs' own, without API keys or
+    tokens (a check calls no model)."""
+    return {k: v for k, v in child_env().items() if not re.search(r"API_KEY|TOKEN|SECRET|PASSWORD", k, re.I)}
+
+
+def run_program(prog: Path, folder: Path, timeout: float, cwd: Path, isolated: bool = False) -> tuple[str, str]:
+    """Run a check's program on a folder: (result, reason). An experiment's
+    program (isolated) runs with Python's isolated mode (-I: no user site,
+    no PYTHON* variables, nothing imported from the folder it reads), in
+    UTF-8, with no API keys; a suite's runs as it always has."""
+    if prog.suffix == ".py":
+        cmd = [sys.executable] + (["-I", "-B", "-X", "utf8"] if isolated else []) + [str(prog)]
+    else:
+        cmd = [str(prog)]
+    extra = {"encoding": "utf-8", "errors": "replace", "env": program_env()} if isolated else {}
+    try:
+        p = subprocess.run(cmd + [str(folder)], capture_output=True, text=True, timeout=timeout, cwd=cwd, **extra)
+    except subprocess.TimeoutExpired as e:
+        return "n/a", (f"the program took longer than {timeout:g} second{'' if timeout == 1 else 's'}, so it gave no result"
+                       if isolated else f"the program did not run: {e}")
+    except OSError as e:
+        return "n/a", f"the program did not run: {e}"
+    return program_verdict(p.stdout, p.stderr)
+
+
+def starting_files(exp: Experiment, prompt: dict | None, files: dict | None = None) -> dict:
+    """A prompt's starting files, by the path they take in a run."""
+    out = {}
+    for f in (prompt or {}).get("files", []):
+        if files and f"{prompt['id']}:{f}" in files:
+            out[f] = files[f"{prompt['id']}:{f}"]
+        else:
+            src = exp.prompt_file_source(prompt["id"], f)
+            if src:
+                out[f] = src.read_text(encoding="utf-8", errors="replace")
+    return out
+
+
+def write_case(case: Path, c: dict, kind: str, prompt: dict | None, output: str | None = None, trace=None,
+               transcript: Path | None = None, files: Path | None = None, starting: dict | None = None,
+               fixture: Path | None = None, runner: str | None = None):
+    """The folder a program reads: output.md, reference.md, trace.jsonl,
+    transcript.jsonl, files/ (what the run wrote), starting/ (the prompt's
+    starting files) and context.json; for a fixture, its own files."""
+    case.mkdir(parents=True)
+    if fixture:
+        for p in sorted(fixture.rglob("*")):
+            rel = p.relative_to(fixture).as_posix()
+            if p.is_file() and rel != "expect.json" and "__pycache__" not in p.parts:
+                (case / rel).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(p, case / rel)
+    if output is not None:
+        (case / "output.md").write_text(output, encoding="utf-8")
+    if prompt and prompt.get("reference") and not (case / "reference.md").exists():
+        (case / "reference.md").write_text(str(prompt["reference"]).strip() + "\n", encoding="utf-8")
+    if isinstance(trace, list):
+        with open(case / "trace.jsonl", "w", encoding="utf-8") as fh:
+            for st in trace:
+                fh.write(json.dumps(st, ensure_ascii=False) + "\n")
+    elif trace and Path(trace).is_file():
+        shutil.copyfile(trace, case / "trace.jsonl")
+    if transcript and transcript.is_file():
+        shutil.copyfile(transcript, case / "transcript.jsonl")
+    if files and files.is_dir():
+        shutil.copytree(files, case / "files")
+    for path, text in (starting or {}).items():
+        (case / "starting" / path).parent.mkdir(parents=True, exist_ok=True)
+        (case / "starting" / path).write_text(text, encoding="utf-8")
+    written = sorted(p.relative_to(case / "files").as_posix() for p in (case / "files").rglob("*") if p.is_file()) \
+        if (case / "files").is_dir() else []
+    ctx = {"check": c.get("id"), "case": kind, "object": c.get("object"),
+           "params": c.get("params") if isinstance(c.get("params"), dict) else {},
+           "prompt": {k: prompt.get(k) for k in ("id", "title", "tags", "text")} if prompt else None,
+           "output": "output.md" if (case / "output.md").is_file() else None,
+           "reference": "reference.md" if (case / "reference.md").is_file() else None,
+           "trace": "trace.jsonl" if (case / "trace.jsonl").is_file() else None,
+           "transcript": "transcript.jsonl" if (case / "transcript.jsonl").is_file() else None,
+           "runner": runner, "files": written, "starting_files": sorted(starting or {}), "tool": TOOL}
+    (case / "context.json").write_text(json.dumps(ctx, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def program_result(exp: Experiment, c: dict, kind: str, prompt: dict | None, **case) -> tuple[str, str]:
+    """Run a program check on one case, in a fresh folder that is deleted afterwards."""
+    prog = exp.program_path(c)
+    tmp = Path(tempfile.mkdtemp(prefix="skill-eval-lite-check-", dir=safe_temp_parent()))
+    try:
+        folder = tmp / "case"
+        write_case(folder, c, kind, prompt, **case)
+        timeout = c.get("timeout_seconds") or PROGRAM_TIMEOUT
+        result, reason = run_program(prog.resolve(), folder, timeout=timeout, cwd=folder, isolated=True)
+        return result, Redactor(folder).text(reason)[:500]
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def program_selftest(exp: Experiment) -> tuple[list[str], list[str]]:
+    """Each program check on every reference it applies to (a product check)
+    and on each of its fixtures: (errors, a note for each check)."""
+    errors, notes = [], []
+    prompts = [exp.prompts[p] for p in exp.development + exp.held_out if p in exp.prompts]
+    for c in exp.program_checks():
+        prog, cid = exp.program_path(c), c.get("id")
+        if not prog or not prog.is_file():
+            continue
+        refs = passed = 0
+        if c.get("object") == "product":
+            for p in prompts:
+                if not p.get("reference") or not check_applies(c, p):
+                    continue
+                refs += 1
+                r, why = program_result(exp, c, "reference", p, output=str(p["reference"]).strip() + "\n", starting=starting_files(exp, p))
+                if r == "pass":
+                    passed += 1
+                else:
+                    errors.append(f"Check {cid!r} gives {r} on the reference of {p.get('id')} ({why or 'no reason given'}). "
+                                  "A check that fails a known-good output is set up wrong: fix its program, or the reference.")
+        fixtures, good = program_fixtures(prog.parent), 0
+        for d, e in fixtures:
+            want = e.get("expect")
+            if want not in ("pass", "fail", "n/a"):
+                errors.append(f"Check {cid!r}: fixture {d.name} needs an expect.json that says what its program should give: "
+                              '{"expect": "fail", "note": "..."} (or "pass", or "n/a").')
+                continue
+            p = exp.prompts.get(e.get("prompt")) if e.get("prompt") else None
+            if e.get("prompt") and not p:
+                errors.append(f"Check {cid!r}: fixture {d.name} names the prompt {e['prompt']!r}, which the experiment doesn't have.")
+                continue
+            r, why = program_result(exp, c, "fixture", p, fixture=d, starting=starting_files(exp, p) if p else None)
+            if r == want:
+                good += 1
+            else:
+                errors.append(f"Check {cid!r}: fixture {d.name} should give {want}, but its program gave {r} ({why or 'no reason given'}).")
+        s = lambda n, w: f"{n} {w}" + ("" if n == 1 else "s")  # noqa: E731
+        notes.append(f"{cid}: " + (f"passes {passed} of {s(refs, 'reference')}; " if c.get("object") == "product"
+                                   else "a process check, so it isn't run on the references (they have no trace); ")
+                     + f"{good} of {s(len(fixtures), 'fixture')} as expected.")
+    return errors, notes
+
+
+def bundle_steps(o: dict) -> list[dict]:
+    """A bundle output's trace as trace.jsonl's steps, for a run folder that has lost its files."""
+    out = []
+    for st in o.get("trace") or []:
+        mark = st[2] if len(st) > 2 else ""
+        out.append({"tool": st[0], "detail": st[1] if len(st) > 1 else "", "error": mark in ("error", "refused"),
+                    **({"refused": True} if mark == "refused" else {})})
+    return out
+
+
+def score_programs(exp: Experiment, out: Out, again: bool = False, only: set | None = None, jobs: int = 4) -> dict:
+    """Run the experiment's program checks on each output in a run folder
+    that has no result for the check as it is now (or on all, with again),
+    and on the references; keep the results in the bundle and beside each
+    output, and the programs in the run folder's checks/. A failed or
+    timed-out run is not given to the program: the wizard fails every check
+    on it, as it does the built-in ones."""
+    checks = [c for c in exp.program_checks() if not only or c.get("id") in only]
+    done = {"outputs": 0, "references": 0, "checks": len(checks)}
+    if not checks or not out.bundle:
+        return done
+    for folder in sorted({PurePosixPath(c["program"]).parent.as_posix() for c in checks}):
+        dst = out.path / folder
+        if dst.exists():
+            shutil.rmtree(dst)
+        shutil.copytree(exp.base / folder, dst, ignore=shutil.ignore_patterns("__pycache__"))
+    files = out.bundle.get("files", {})
+    have = {(r["check"], r["prompt"], r["round"], r["repeat"]): r for r in out.bundle.get("program_results", [])}
+    refs = {(r["check"], r["prompt"]): r for r in out.bundle.get("program_reference_results", [])}
+    tasks = []
+    for o in out.bundle.get("outputs", []):
+        p = exp.prompts.get(o["prompt"])
+        if not p or o.get("status") != "ok":
+            continue
+        for c in checks:
+            if check_applies(c, p) and (again or not program_current(c, o, have.get((c["id"], o["prompt"], o["round"], o["repeat"])))):
+                tasks.append(("output", c, p, o))
+    for pid in exp.development + exp.held_out:
+        p = exp.prompts.get(pid)
+        if not p or not p.get("reference"):
+            continue
+        for c in checks:
+            old = refs.get((c["id"], pid))
+            if c.get("object") == "product" and check_applies(c, p) and (again or not old or old.get("version") != program_version(c)):
+                tasks.append(("reference", c, p, None))
+
+    def work(t):
+        kind, c, p, o = t
+        v = program_version(c)
+        if kind == "reference":
+            r, why = program_result(exp, c, "reference", p, output=str(p["reference"]).strip() + "\n", starting=starting_files(exp, p))
+            return kind, {"check": c["id"], "version": v, "prompt": p["id"], "result": r, "reason": why, "when": now()}
+        folder = out.path / "outputs" / o["prompt"] / o["round"] / str(o["repeat"])
+        output = (folder / "output.md").read_text(encoding="utf-8", errors="replace") if (folder / "output.md").is_file() else o.get("output", "")
+        trace = folder / "trace.jsonl" if (folder / "trace.jsonl").is_file() else bundle_steps(o)
+        r, why = program_result(exp, c, "output", p, output=output, trace=trace,
+                                transcript=out.path / "transcripts" / f"{o['prompt']}__{o['round']}__{o['repeat']}.jsonl",
+                                files=folder / "files", starting=starting_files(exp, p, files), runner=o.get("runner"))
+        e = {"check": c["id"], "version": v, "prompt": o["prompt"], "round": o["round"], "repeat": o["repeat"], "result": r,
+             "reason": why, "when": now(), "output_when": o.get("when"),
+             "added_after_run": (o.get("program_checks") or {}).get(c["id"]) != v}
+        if folder.is_dir():
+            (folder / "checks").mkdir(exist_ok=True)
+            (folder / "checks" / f"{c['id']}.json").write_text(json.dumps(
+                {**e, "program": c["program"], "sha256": c.get("sha256"), "params": c.get("params") or {}, "tool": TOOL},
+                indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+        return kind, e
+
+    with ThreadPoolExecutor(max_workers=max(1, jobs)) as pool:
+        for kind, e in pool.map(work, tasks):
+            if kind == "reference":
+                refs[(e["check"], e["prompt"])] = e
+                done["references"] += 1
+            else:
+                have[(e["check"], e["prompt"], e["round"], e["repeat"])] = e
+                done["outputs"] += 1
+    with out.lock:
+        out.bundle["program_results"] = sorted(have.values(), key=lambda r: (r["check"], r["prompt"], r["round"], r["repeat"]))
+        out.bundle["program_reference_results"] = sorted(refs.values(), key=lambda r: (r["check"], r["prompt"]))
+        out.save()
+    return done
+
+
+def results_text(done: dict) -> str:
+    return (f"{done['outputs']} result{'s' if done['outputs'] != 1 else ''} on the outputs and "
+            f"{done['references']} on the references")
+
+
+def say_program_results(exp: Experiment, out: Out, only: set | None = None):
+    """Each program check's results in a run folder, round by round."""
+    for c in exp.program_checks():
+        if only and c["id"] not in only:
+            continue
+        v = program_version(c)
+        by_round: dict = {}
+        for r in out.bundle.get("program_results", []):
+            if r["check"] == c["id"] and r.get("version") == v:
+                n = by_round.setdefault(r["round"], {})
+                n[r["result"]] = n.get(r["result"], 0) + 1
+        parts = [f"{rd}: " + ", ".join(f"{n} {w}" for w, n in sorted(cnt.items())) for rd, cnt in sorted(by_round.items())]
+        rf = [r for r in out.bundle.get("program_reference_results", []) if r["check"] == c["id"] and r.get("version") == v]
+        say(f"  {c['id']:28} " + (" · ".join(parts) or "no outputs it applies to yet")
+            + (f"  (references: {sum(r['result'] == 'pass' for r in rf)} of {len(rf)} pass)" if rf else ""))
+
+
+def cmd_score(a) -> int:
+    exp = load(a.experiment)
+    errors, _ = exp.problems()
+    if errors:
+        say("This experiment's checks can't be run yet:")
+        for e in errors:
+            say("  " + e)
+        say(f"Fix these, then check again with: {PY} run_ab.py check {a.experiment}")
+        return 1
+    if not exp.program_checks():
+        say(f"{exp.path.name} has no program checks (kind = \"program\"), so there is nothing to score here.\n"
+            "The wizard runs the other checks itself when you load the bundle.")
+        return 0
+    only = {x.strip() for x in a.checks.split(",")} if a.checks else None
+    unknown = sorted((only or set()) - {c["id"] for c in exp.program_checks()})
+    if unknown:
+        raise Fail(f"{exp.path.name} has no program check called {', '.join(unknown)}. "
+                   f"Its program checks are: {', '.join(c['id'] for c in exp.program_checks())}.")
+    folder = Path(a.out) if a.out else Path("runs") / exp.name
+    if folder.is_file() and folder.name == "bundle.json":
+        folder = folder.parent
+    out = Out(folder)
+    if not out.bundle:
+        raise Fail(f"There is no bundle.json in {folder}, so there are no outputs to score yet.\n"
+                   f"Run the experiment first, or name its run folder: {PY} run_ab.py score {a.experiment} --out runs/<name>")
+    st_errors, _ = program_selftest(exp)
+    if st_errors:
+        say("A program check doesn't pass its own tests, so its results on the outputs couldn't be trusted:")
+        for e in st_errors:
+            say("  " + e)
+        say(f"Fix it, then check again with: {PY} run_ab.py check {a.experiment}")
+        return 1
+    done = score_programs(exp, out, again=a.again, only=only, jobs=a.jobs)
+    if done["outputs"] or done["references"]:
+        say(f"Ran the program checks in {out.path} where they had no result for the check as it is now: {results_text(done)}.")
+    else:
+        say(f"Every output in {out.path} already has a result from each program check as it is now "
+            "(add --again to run them again).")
+    say_program_results(exp, out, only)
+    v = {c["id"]: program_version(c) for c in exp.program_checks()}
+    added = sorted({r["check"] for r in out.bundle.get("program_results", []) if r.get("added_after_run") and v.get(r["check"]) == r.get("version")})
+    if added:
+        say(f"\nThe runs were made without {', '.join(added)} as it is now: it was added or changed after the runs. "
+            "The wizard marks its results, and your report should call them exploratory: they were not part of the test "
+            "you froze.")
+    as_run = (out.bundle.get("experiment") or {}).get("text")
+    if as_run is not None and design_text(as_run) != design_text(exp.text):
+        say(f"\n{a.experiment} is not the experiment file these runs were made with. In the wizard, load {a.experiment} "
+            f"in step 1 (freeze it again if it asks), then {out.bundle_path} in step 3.")
+    else:
+        say(f"\nNext: open wizard.html and load {out.bundle_path} in step 1.")
     return 0
 
 
@@ -3693,17 +4158,7 @@ def _suite_rest(a, S, src, root, chosen, only_cases, only_tests, csv_path, todo,
                 content = S.case_content(s, c)
                 if t.get("program"):
                     prog = t["files"]["program"]
-                    cmd = [sys.executable, str(prog)] if prog.suffix == ".py" else [str(prog)]
-                    try:
-                        p = subprocess.run(cmd + [str(c["folder"])], capture_output=True, text=True, timeout=120, cwd=root)
-                        first = (p.stdout.strip().splitlines() or [""])[0]
-                        word, _, why = first.partition(" ")
-                        result = word.lower() if word.lower() in ("pass", "fail", "n/a") else "n/a"
-                        reason = why.strip() or (p.stderr.strip()[-200:] if result == "n/a" else "")
-                        if word.lower() not in ("pass", "fail", "n/a"):
-                            reason = f"the program printed {first!r}, not pass, fail or n/a" + (": " + reason if reason else "")
-                    except (OSError, subprocess.TimeoutExpired) as e:
-                        result, reason = "n/a", f"the program did not run: {e}"
+                    result, reason = run_program(prog, c["folder"], timeout=120, cwd=root)
                     judge = prog.name
                 else:
                     result, reason = run_check(t["check"], content["output"], content["trace"],
@@ -3892,6 +4347,30 @@ def run_folder_state(bundle_path: Path) -> dict | None:
             "unfrozen": sum(o.get("frozen") is False for o in outs)}
 
 
+def run_of(e: dict, runs: list[dict]) -> dict | None:
+    """The run folder of one of your experiments, if it has one."""
+    by_name = {r["experiment"]: r for r in runs}
+    return next((r for n, r in by_name.items() if n and Path(n).stem in (e["name"], "experiment") and e["name"] in r["folder"]), None)
+
+
+def unscored_programs(exp: Experiment, bundle_path: Path) -> int:
+    """How many results of an experiment's program checks a run folder lacks (or has for another version)."""
+    try:
+        b = json.loads(bundle_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return 0
+    have = {(r.get("check"), r.get("prompt"), r.get("round"), r.get("repeat")): r for r in b.get("program_results", [])}
+    n = 0
+    for o in b.get("outputs", []):
+        p = exp.prompts.get(o.get("prompt"))
+        if not p or o.get("status") != "ok":
+            continue
+        for c in exp.program_checks():
+            if check_applies(c, p) and not program_current(c, o, have.get((c.get("id"), o["prompt"], o["round"], o["repeat"]))):
+                n += 1
+    return n
+
+
 def gather_status(a) -> dict:
     st = {"schema": "skill-eval-lite/status@1", "tool": TOOL, "folder": str(HERE.name)}
     git_v = git("--version", check=False).stdout.strip() if shutil.which("git") else None
@@ -3924,13 +4403,14 @@ def gather_status(a) -> dict:
             found.append(("yours", f))
     found += [("demonstration", f) for f in sorted((HERE / "examples").glob("demo-*.toml"))]
     found += [("class example", HERE / "examples" / "class-assistant" / "experiment.toml")]
-    exps, seen = [], set()
+    exps, seen, loaded = [], set(), {}
     for kind, f in found:
         if not f.is_file() or f.resolve() in seen:
             continue
         seen.add(f.resolve())
         try:
             e = Experiment(f)
+            loaded[shown_path(f)] = e
             errors, warns = e.problems()
             state, date = e.freeze_state()
             exps.append({"file": shown_path(f), "kind": kind, "name": e.name, "title": e.data.get("title", ""),
@@ -3941,7 +4421,7 @@ def gather_status(a) -> dict:
                          "notes": 0, "frozen": False, "freeze": "unfrozen", "frozen_date": "", "demo": False})
     st["experiments"] = exps
     # Runs.
-    runs, seen = [], set()
+    runs, seen, bundles = [], set(), {}
     for base in dict.fromkeys([root / "runs", Path.cwd() / "runs"]):
         for b in sorted(base.glob("*/bundle.json")):
             if b.resolve() in seen:
@@ -3950,7 +4430,13 @@ def gather_status(a) -> dict:
             r = run_folder_state(b)
             if r:
                 runs.append(r)
+                bundles[r["folder"]] = b
     st["runs"] = runs
+    # Program checks with no result (or an old one) on the runs of your experiments.
+    for e in exps:
+        x, r = loaded.get(e["file"]), run_of(e, runs)
+        if e["kind"] == "yours" and not e["errors"] and x and x.program_checks() and r:
+            e["unscored"] = unscored_programs(x, bundles[r["folder"]])
     # Personal I packets beside Skill Eval Lite.
     suites = []
     for f in sorted(root.parent.glob("*/suites.yaml")) + sorted(root.parent.glob("*/suites.json")):
@@ -3996,7 +4482,6 @@ def next_step(st: dict) -> dict:
                 "command": f"{PY} run_ab.py setup ../class-assistant"}
     a_flag = "" if asst["folder"] == "../class-assistant" else f" (your assistant is in {asst['folder']})"
     mine = [e for e in st["experiments"] if e["kind"] == "yours"]
-    runs = {r["experiment"]: r for r in st["runs"]}
     for e in mine:
         if e["errors"]:
             return {"what": f"Your experiment {e['file']} has {len(e['errors'])} thing(s) to fix. Check it to see them.",
@@ -4010,10 +4495,14 @@ def next_step(st: dict) -> dict:
             return {"what": f"Your experiment {e['file']} is ready to freeze. " + "Freeze it in the wizard: load it in step 1, press Freeze in step 2, then press 'Export the frozen experiment' "
                             f"(now in step 2) and save the file over {e['file']}.",
                     "command": OPEN_WIZARD}
-        r = next((r for n, r in runs.items() if n and Path(n).stem in (e["name"], "experiment") and e["name"] in r["folder"]), None)
+        r = run_of(e, st["runs"])
         if not r:
             return {"what": f"Run rounds A and B of your experiment{a_flag} (the controls C and D come next).",
                     "command": f"{PY} run_ab.py run {e['file']} --assistant {asst['folder']} --rounds A,B --jobs 4{rflag}"}
+        if e.get("unscored"):
+            return {"what": f"Run the program checks of {e['file']} on the runs in {r['folder']}: {e['unscored']} of their "
+                            "results are missing or out of date. No model is called.",
+                    "command": f"{PY} run_ab.py score {e['file']} --out {r['folder']}"}
         if r["judged"] < r["pairs"]:
             return {"what": f"Run the LLM judge on {r['folder']}: it reads each blind pair and says which is better.",
                     "command": f"{PY} run_ab.py judge {r['folder']}"}
@@ -4148,6 +4637,13 @@ def cmd_new(a) -> int:
         if (exp.base / sub).is_dir():
             shutil.copytree(exp.base / sub, dest / sub)
             copied.append(f"{sub}/ ({', '.join(sorted(p.name for p in (dest / sub).iterdir() if p.is_dir()))})")
+    # The program checks' folders: only those the experiment uses.
+    progs = sorted({PurePosixPath(c["program"]).parent.as_posix() for c in exp.program_checks() if program_path_ok(c.get("program"))})
+    for folder in progs:
+        if (exp.base / folder).is_dir():
+            shutil.copytree(exp.base / folder, dest / folder, ignore=shutil.ignore_patterns("__pycache__"))
+    if progs:
+        copied.append(f"checks/ ({', '.join(PurePosixPath(f).name for f in progs)})")
     (dest / "experiment.toml").write_text(text, encoding="utf-8")
     errors, _ = Experiment(dest / "experiment.toml").problems()
     what = "the class experiment" if a.source == "class" else shown_path(src)
@@ -4357,6 +4853,14 @@ def main(argv=None) -> int:
     s.add_argument("--timeout", type=int, default=180, help="seconds before a judgment counts as timed out (default 180)")
     add_runner_args(s, "the judge's model (default: the experiment's [judge] model)")
     s.set_defaults(fn=cmd_judge)
+
+    s = sub.add_parser("score", help="run an experiment's program checks on the outputs in a run folder (no model is called)")
+    s.add_argument("experiment", help="the experiment file whose program checks to run")
+    s.add_argument("--out", help="the run folder (default: runs/<experiment name>)")
+    s.add_argument("--checks", help="only these program checks, e.g. looked-up-first")
+    s.add_argument("--again", action="store_true", help="run them again on outputs that already have a result")
+    s.add_argument("--jobs", type=int, default=4, help="programs at the same time (default 4)")
+    s.set_defaults(fn=cmd_score)
 
     s = sub.add_parser("suite", help="Personal I: run every mechanical and LLM test of a suites file on every case")
     s.add_argument("suites", help="the suites file, e.g. my-suites/suites.yaml")

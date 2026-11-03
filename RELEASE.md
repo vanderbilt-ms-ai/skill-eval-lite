@@ -1,8 +1,75 @@
 Skill Eval Lite is published as a public repository,
 https://github.com/vanderbilt-ms-ai/skill-eval-lite. Version 0.1.0 was
-released on 27 October 2026, and version 0.1.1 on 3 November 2026. Each
-release is one commit on the public `main`, made from the course's private
-development history and tagged `v0.1.0` and `v0.1.1`.
+released on 27 October 2026, and versions 0.1.1 and 0.1.2 on 3 November
+2026. Each release is one commit on the public `main`, made from the
+course's private development history and tagged (`v0.1.0`, `v0.1.1`,
+`v0.1.2`).
+
+## 0.1.2, 3 November 2026
+
+Program checks: a check that is a short Python program of the group's own,
+for what the seven built-in kinds can't see (the order of a run's steps;
+"only these amounts"; a date copied from the starting file), with a guide
+for writing one, for Claude Code, Codex and people.
+
+### If you are on 0.1.1
+
+1. In your `skill-eval-lite` folder, type `git pull`. Nothing in an
+   experiment needs to change: the built-in checks work as before.
+2. Personal I: a program test that prints something other than `pass`,
+   `fail` or `n/a` still gets `n/a`, but its reason no longer repeats the end
+   of its own line; one that prints nothing says "the program printed
+   nothing", with its error.
+
+### What changed
+
+| # | What | In 0.1.2 |
+| --- | --- | --- |
+| 1 | The experiment file | A check can be `kind = "program"`, with `program` (`checks/<folder>/<name>.py`, in the experiment's folder), `sha256` (the program's), and optionally `params` (a table the program reads) and `timeout_seconds` (1 to 600; 60). `files_from` now covers `checks/` too. Two checks with one id are a "must fix", for every kind |
+| 2 | `check` | Says what is wrong with a program check without running it: its id, its path, a missing program, a missing or wrong `sha256` (it prints the line to write), `params`, `timeout_seconds`, and no fixture the program should fail (a "to do"). Then runs each program on every reference it applies to (product checks), which must pass, and on each of its fixtures (`checks/<id>/fixtures/<case>/expect.json`), which must give what they say. A `program:` line for each check |
+| 3 | `run` | Tests the programs as `check` does before the first run, and doesn't start if one fails. Runs each program check on every output at the end. Keeps the results in the bundle (`program_results`, `program_reference_results`), beside each output (`outputs/.../checks/<id>.json`), and the programs in the run folder (`checks/`). Each output records the versions of the program checks it was made with. A run made again with `--again` is scored again |
+| 4 | `score` (new) | `python3 run_ab.py score EXPERIMENT [--out RUN_FOLDER] [--checks ID,ID] [--again]` runs the program checks on saved outputs that have no result for the check as it is now, with no runs and no model. A result for a check the runs weren't made with is marked `added_after_run`, and `score` says its results are exploratory |
+| 5 | How a program runs | In a fresh folder per case: the output, reference, trace, transcript, the files the run wrote, the starting files and `context.json`, but never the round, the repeat or the run's folder. `python3 -I -B -X utf8`, in that folder, with no API keys or tokens, and a time limit. The first line is the answer: `pass`, `fail` or `n/a` and a reason; anything else is `n/a`. A failed run isn't given to it. The assistant never sees a program check's folder (SAFETY.md, "Program checks") |
+| 6 | The wizard | Shows the bundle's results as checks, everywhere the built-in ones are: the run drawer, the results, the controls, `judgments.csv` (with the runner's version, and `<program> (run_ab.py)` as who ran it). A result for another version of the check, or for an earlier run, is `n/a` with why. Step 3 says when a bundle has results the experiment loaded in step 1 doesn't have. A check added after the runs is marked "added after the runs". The freeze list and the references panel say that `check` runs the programs on the references |
+| 7 | The designer | Keeps a program check it is given, with its folder, and saves them; its copy of `check` says what `run_ab.py` says about program checks, word for word (it works out the program's SHA-256 itself). It doesn't write or edit programs: its checks screen points to the guide |
+| 8 | The guide | `CHECKS.md`, and the same text as the check-authoring skill (`.claude/skills/check-authoring/SKILL.md`, `/check-authoring` in Claude Code): when a program is the right tool (and when it is the judge's question instead), where the files go, what the program gets and prints, a template, fixtures, testing with `check`, and what changes after the freeze and after the runs. The intake (version 3) and the helper (version 2) point to it. The runner leaves the skill and `CHECKS.md` out of every run, as it does the intake and the helper |
+| 9 | A demonstration | `examples/demo-program-check.toml` (`demo-graph-removed`'s design) with two program checks in `examples/class-assistant/checks/`: `looked-up-first` (on the process: a lookup in the knowledge graph before the first write; adapted from Personal I's `search-before-write`) and `no-made-up-amounts` (on the product, with `params`), each with fixtures |
+| 10 | `status` and `new` | `status` says when your experiment's program checks have results missing or out of date on its runs, and gives the `score` command. `new` copies the program checks' folders an experiment uses |
+
+### What was verified for 0.1.2
+
+- `python3 -m unittest`: all 144 tests pass, on Python 3.14 and 3.11. The
+  19 new ones are in `tests/test_programs.py` (README, "Tested").
+- `dev/embed_examples.py --check`, `node dev/diagrams.mjs --check` and
+  `tutorial/build.py --check`: all up to date.
+- With the fake `claude`, `demo-program-check`: `looked-up-first` passed
+  both of round A's briefs and failed both of round C's (the graph removed;
+  "no lookup in the knowledge graph before the first write (step 2)"), and
+  `no-made-up-amounts` passed all four and both references.
+- Not yet: a run of `demo-program-check` with a real model, and a
+  `dev/fresh-trial.sh`.
+
+### Decided for 0.1.2
+
+These were the plan's open questions; each took the plan's recommendation.
+
+- **The freeze covers a program through its `sha256`** in the experiment
+  file, so the fingerprint itself didn't change. A program's fixtures, the
+  round files and the starting files are still not covered (a limit, in the
+  README).
+- **Python only**, standard library, one file: it runs with the runner's own
+  Python on every system. A suite's program test can still be any program.
+- **The designer keeps program checks but doesn't write them.** Writing one
+  is the guide's job, with Claude Code or Codex, and `check` tests it.
+- **A program may read the reference**, and the prompt's starting files.
+
+### Open, for Simon
+
+- Writing a program check in the designer, as the suite designer lets a
+  student write a program test.
+- An LLM check per output (the suites' LLM test, in an experiment).
+- Fingerprinting the round files, the starting files and the fixtures.
+- A small library of vetted program checks that groups can copy.
 
 ## 0.1.1, 3 November 2026
 
@@ -176,21 +243,22 @@ move").
 
 ## What the release contains
 
-As of 0.1.1 (the files 0.1.1 added: `tests/test_shared.py`, `tests/test_freeze.py` and `tests/fixtures/`).
+As of 0.1.2 (the files 0.1.2 adds: `CHECKS.md`, `.claude/skills/check-authoring/`, `examples/demo-program-check.toml`, `examples/class-assistant/checks/` and `tests/test_programs.py`; 0.1.1 added `tests/test_shared.py`, `tests/test_freeze.py` and `tests/fixtures/`).
 
 | Path | What it is |
 | --- | --- |
 | `README.md` | What it is, the walkthrough, the experiment file, the run folder, the commands, what was tested, the limits |
 | `SAFETY.md` | The isolation flags, what each excludes, and what was verified |
 | `VERSION` | The version, in one place (`run_ab.py` reads it; a test checks `wizard.html`'s copy) |
-| `run_ab.py` | The runner: `setup`, `doctor`, `check`, `plan`, `run`, `judge`, and for Personal I `suite` (Python 3.11+, standard library), with Claude Code or Codex (`--runner codex`); `status`, `ask` and `new` for students who are stuck |
+| `run_ab.py` | The runner: `setup`, `doctor`, `check`, `plan`, `run`, `judge`, `score` (program checks), and for Personal I `suite` (Python 3.11+, standard library), with Claude Code or Codex (`--runner codex`); `status`, `ask` and `new` for students who are stuck |
 | `HELPER.md`, `.claude/skills/skill-eval-helper/SKILL.md` | The helper's instructions, which `ask` gives Claude Code or Codex (the same text twice) |
 | `wizard.html` | The wizard: one offline page, with the class intake and a made-up practice pack embedded; Shared I's five steps, and Personal I's checks-only mode (four steps) when a suite bundle is loaded; and two designers that make the files on screen: the experiment designer (nine screens, saving `experiments/<name>/`) and the suite designer (six screens, saving a packet), each into a folder the student picks or as a ZIP |
-| `dev/embed_examples.py` | Writes the designers' starting points into `wizard.html`: the class experiment's round and starting files, the four demonstrations, and the worked example of Personal I (`--check` says whether they are up to date) |
+| `dev/embed_examples.py` | Writes the designers' starting points into `wizard.html`: the class experiment's round, starting and check files, the demonstrations, and the worked example of Personal I (`--check` says whether they are up to date) |
 | `.claude/skills/experiment-intake/SKILL.md`, `AGENTS.md` | The intake instructions, for Claude Code and for Codex |
+| `CHECKS.md`, `.claude/skills/check-authoring/SKILL.md` | How to write a program check, for Claude Code, Codex and people (the same text twice) |
 | `class-assistant/overlay/` | What `setup` lays over the AI 5100 template: `overlay.toml` (the pinned commit and the copies) and 26 knowledge-graph pages |
-| `examples/class-assistant/` | The class intake: `experiment.toml`, round files B and D, starting files |
-| `examples/demo-*.toml` | The four demonstrations (`demo-one-line` added 2026-10-27 for the live session) |
+| `examples/class-assistant/` | The class intake: `experiment.toml`, round files B and D, starting files; and `checks/`, the program checks of `demo-program-check` |
+| `examples/demo-*.toml` | The five demonstrations (`demo-one-line` added 2026-10-27 for the live session; `demo-program-check` for 0.1.2) |
 | `examples/personal-suites/` | Personal I's worked example: two suites (a product, six real drafts; a process, four real runs), each with a reference, two planted faults, two harmless variations and three tests |
 | `examples/recorded/` | Real runs of the four demonstrations, with the judge (`demo-one-line` made 2026-10-27), and of the worked example's suites, with eight real LLM test runs (made 2026-10-26); and a real Codex run of the first demonstration, with its judge (`demo-graph-removed-codex/`) |
 | `tests/` | The tests, with stand-ins for `claude` and `codex` and a small Chrome DevTools client |
@@ -309,6 +377,10 @@ this and say: run `claude`, log in, type `/exit`, and try again.
   are offered subagent tools that can't be switched off (same isolation).
 - The isolation flags were verified on Claude Code 2.1.310. A later version
   is checked on every run (a run that loads anything personal stops).
+- A program check runs on the student's computer with their permissions,
+  in Python's isolated mode with a time limit, but not in a sandbox
+  (SAFETY.md, "Program checks"). The wizard can't run one, and the designer
+  doesn't write one.
 - The wizard keeps its state in the browser's storage, per browser.
 - The checks-only mode's human tests are collected in the browser, one
   rater per browser; agreement needs the second rater's exported

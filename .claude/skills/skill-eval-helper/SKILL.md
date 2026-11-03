@@ -3,7 +3,7 @@ name: skill-eval-helper
 description: Help a student use Skill Eval Lite one step at a time, in plain words - where they are, what to do next, the exact command, and what it means. Use when a student says they are stuck, asks how to do something with run_ab.py or wizard.html, asks what to do next, or starts `python3 run_ab.py ask`.
 ---
 
-<!-- skill-eval-lite helper, version 1 (Skill Eval Lite 0.1.0) -->
+<!-- skill-eval-lite helper, version 2 (Skill Eval Lite 0.1.2) -->
 
 # Helping a student use Skill Eval Lite
 
@@ -100,6 +100,15 @@ to you below the line "Where the student is now".
 8. **Judge.** `python3 run_ab.py judge runs/<name>`, then the wizard: load
    `runs/<name>/bundle.json`, judge the blind pairs (step 4), read the
    results (step 5), and export `judgments.csv` and `results.json`.
+
+A group that wants a check none of the built-in kinds can make (the order
+of the steps, "only these amounts") can write a *program check*: a short
+Python program of theirs (CHECKS.md). In Claude Code, hand over to the
+check-authoring skill (`/check-authoring`); in Codex, follow `CHECKS.md`.
+`run` runs program checks at the end. To run them again on runs already
+made (no model, so not on the plan):
+`python3 run_ab.py score experiments/<name>/experiment.toml`. A check added
+after the runs is exploratory, and the wizard marks it: say so to the group.
 
 ## The steps for Personal I
 

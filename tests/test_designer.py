@@ -157,8 +157,9 @@ class Writers(Page):
         files = json.loads(out)
         got, want = tomllib.loads(files.pop("experiment.toml")), tomllib.loads((CLASS / "experiment.toml").read_text())
         self.assertEqual(without(got, "provenance"), without(want, "provenance"))
-        # rounds/one-line/ is the round file of demo-one-line.toml (the live session's demonstration), not the class experiment's.
-        want_files = {k: v for k, v in files_of(CLASS, skip=("experiment.toml",)).items() if not k.startswith("rounds/one-line/")}
+        # rounds/one-line/ is the round file of demo-one-line.toml (the live session's demonstration), and checks/
+        # holds demo-program-check.toml's programs: neither is the class experiment's.
+        want_files = {k: v for k, v in files_of(CLASS, skip=("experiment.toml",)).items() if not k.startswith(("rounds/one-line/", "checks/"))}
         self.assertEqual(files, want_files, "the round and starting files, byte for byte")
         # The page's own TOML reader reads it as tomllib does.
         page = json.loads(self.js("JSON.stringify(parseToml(edOutput(ED).text))"))

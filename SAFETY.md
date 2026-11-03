@@ -306,3 +306,49 @@ Verified on 2026-10-26 (Claude Code 2.1.311, Codex 0.164.0, with the API keys
 unset): Claude Code showed "manual mode on"; Codex showed its approval prompt
 before running `doctor`, with the helper's reason, and the temporary
 `CODEX_HOME` was gone after the session.
+
+## Program checks (new in 0.1.2)
+
+A program check (`kind = "program"`, [CHECKS.md](CHECKS.md)) is a Python
+program of your group's own, which the runner runs: in `check`, on the
+references and the program's fixtures; in `run`, before the first run and on
+every output at the end; and in `score`. It is not the assistant, and no
+model sees it. What the runner does:
+
+- **The assistant never sees it.** Each program check's folder is left out
+  of every run's copy of the assistant, even when the experiment sits inside
+  the assistant's folder (an assistant's own folder called `checks/` is
+  kept). The program is never in a prompt.
+- **It sees only its case.** Each time, it gets a fresh temporary folder: a
+  copy of the output, the reference, the trace, the transcript, the files the
+  run wrote and the starting files, with a `context.json`. Never the round,
+  the repeat or the run's folder, so it can't tell which version of the
+  assistant wrote what it checks. The folder is deleted afterwards, so the
+  program can't change an output.
+- **Python's isolated mode.** It runs as `python3 -I -B -X utf8 check.py
+  CASE_FOLDER`, with the runner's own Python, in the case folder: no
+  `PYTHON*` variables, no user site-packages, nothing imported from the
+  folder it reads.
+- **No keys.** Environment variables whose names hold `API_KEY`, `TOKEN`,
+  `SECRET` or `PASSWORD` are taken out of its environment, and so are the
+  variables a Claude Code session sets for its own children.
+- **A time limit.** `timeout_seconds` in the check (1 to 600; 60 if not
+  set). A program that takes longer is stopped, and its result is `n/a`.
+- **Under the freeze.** The check's `sha256` is the program's. `check`
+  lists a program that doesn't match it as a must-fix, and `run` and
+  `score` refuse it, so a program can't change after the freeze without the
+  experiment file changing too.
+
+What this does not cover: the program runs on your computer with your
+permissions. Isolated mode is not a sandbox: a program could read or write
+your files, or use the network. A program check calls no model and needs
+no network, and CHECKS.md says so; nothing stops one that does. Read a
+program before you run one that someone else wrote.
+
+Verified on 2026-11-03 with the fake `claude` (`tests/test_programs.py`):
+the assistant's copy has no program check's folder, with the experiment
+inside the assistant; a program sees only its case folder and
+`sys.flags.isolated` is 1; a variable named `MY_SERVICE_API_KEY` doesn't
+reach it; a module on `PYTHONPATH` isn't imported; a program that deletes
+its `output.md` leaves the run's output as it was; a program that sleeps
+past its time limit gives `n/a`.
