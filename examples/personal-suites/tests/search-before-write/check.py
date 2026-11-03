@@ -4,9 +4,11 @@ before it wrote a file?
 
     python3 check.py CASE_FOLDER
 
-Reads CASE_FOLDER/trace.jsonl (one step a line: {"tool", "detail", "error"}),
-or CASE_FOLDER/transcript.jsonl (Claude Code's stream-json events). Prints one
-line: "pass <reason>" or "fail <reason>". A lookup is a shell command
+Reads CASE_FOLDER/transcript.jsonl (Claude Code's stream-json events) or,
+if there is none, CASE_FOLDER/trace.jsonl (one step a line: {"tool",
+"detail", "error"}): the order Skill Eval Lite's own checks read them in.
+Prints one line: "pass <reason>" or "fail <reason>", or "n/a <reason>" when
+the case has no record, so there is nothing to test. A lookup is a shell command
 `kb/kb search`, `kb/kb node` or `kb/kb query` (alone or in a chain of
 commands), or the knowledge-graph skill, in a step that didn't fail. A write
 is a Write or Edit step, or a shell step that redirects into a file.
@@ -23,12 +25,17 @@ from pathlib import Path
 
 
 def steps(folder: Path):
-    t = folder / "trace.jsonl"
-    if t.is_file():
-        return [json.loads(l) for l in t.read_text().splitlines() if l.strip()]
+    """The case's steps, or None when it has no record."""
     s = folder / "transcript.jsonl"
+    if not s.is_file():
+        t = folder / "trace.jsonl"
+        if not t.is_file():
+            return None
+        return [json.loads(l) for l in t.read_text().split("\n") if l.strip()]
     out, by_id = [], {}
-    for line in s.read_text().splitlines() if s.is_file() else []:
+    for line in s.read_text().split("\n"):
+        if not line.strip():
+            continue
         e = json.loads(line)
         content = (e.get("message") or {}).get("content") if isinstance(e.get("message"), dict) else None
         for c in content if isinstance(content, list) else []:
@@ -61,8 +68,8 @@ def is_write(st):
 def main():
     folder = Path(sys.argv[1])
     trace = steps(folder)
-    if not trace:
-        print("fail no trace in the case folder")
+    if trace is None:
+        print(f"n/a no transcript.jsonl or trace.jsonl in {folder.name}/")
         return
     first_write = next((k for k, st in enumerate(trace) if is_write(st) and not st.get("error")), len(trace))
     lookup = next((k for k, st in enumerate(trace[:first_write]) if is_lookup(st)), None)

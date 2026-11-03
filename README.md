@@ -26,7 +26,9 @@ It was made for AI 5500 (Vanderbilt, Fall 2026), for Shared I and Personal I. Th
 assistant is Wren, the AI 5100 assistant template's fictional example: Wren
 works for Morgan Reyes, and nobody in it is real.
 
-Version 0.1.0 (the version is in `VERSION`).
+Version 0.1.1 (the version is in `VERSION`). On 0.1.0? In this folder, type `git pull`:
+[RELEASE.md](RELEASE.md) says what changed. `doctor` and `status` say when a newer
+version is out.
 
 ## Getting started, in pictures
 
@@ -334,7 +336,7 @@ experiment can change.
 
    You should see: `Frozen: yes`, with today’s date.
 
-   If not: `Frozen: not yet`? The old file is still there. Do the step before again.
+   If not: `Frozen: not yet`? The old file is still there. Do the step before again. `must fix: The file has changed since it was frozen`? Someone edited it after the freeze: freeze it again, and keep the earlier file, dated.
 
    <img src="docs/diagrams/steps/group-11.svg" alt="Terminal: Check that it is frozen." width="420">
 
@@ -751,9 +753,27 @@ same structure as `suites.json` or `suites.toml`.
 | `suites[].items` | The instances or runs: folders under `<object>/` |
 | `suites[].file` | The file in each case that is the product (default `output.md`) |
 | `suites[].tests[]` | `id`, `kind` (`mechanical`, `llm` or `human`), `question`, `criterion`, `why` |
-| mechanical | `check`: a built-in check (the kinds under "The experiment file"; a process case's trace is its `transcript.jsonl` or `trace.jsonl`), or `program`: any program that takes the case's folder and prints `pass` or `fail` and a reason on one line |
-| llm | `prompt` (a prompt file; `{{case}}` marks where the case goes, else it is added at the end) or `skill` (a SKILL.md); `model`; `decision` (the rule: the last line is PASS, FAIL or UNKNOWN) |
+| mechanical | `check`: a built-in check (the kinds under "The experiment file"; a process case's trace is its record, below), or `program`: any program that takes the case's folder and prints `pass` or `fail` and a reason on one line, or `n/a` and a reason when it can't test the case (a case with no record, say), so that nothing tested is not counted as a failure |
+| llm | `prompt` (a prompt file; `{{case}}` marks where the case goes, else it is added at the end) or `skill` (a SKILL.md); `model`; `decision` (the rule: the last line is PASS, FAIL or UNKNOWN, as below) |
 | human | `form` (`rating` or `comparison`), `scale` (each point and what it means), `pass_at` (the lowest passing rating), `instructions`, `pairs` (for a comparison) |
+
+A process case's record of its run is one file in its folder: either
+`transcript.jsonl` (a Claude Code or Codex session's events: copy a saved
+session in under this name) or `trace.jsonl` (one step a line: `{"tool",
+"detail", "error"}`). If a case has both, `transcript.jsonl` is read, and
+`suite --check` asks you to keep only one. `suite --check` also says when a
+case has no record, has a record under another name, has a line that isn't
+JSON (with its number), or has a record with no steps in it.
+
+An LLM test's verdict is the last line of its response that isn't blank,
+with `**`, backticks and trailing full stops taken off: `PASS`, `FAIL` or
+`UNKNOWN`. A label is read too (`Verdict: PASS`, `Final answer - FAIL`), and
+so is a line with one of the three words in it and no `not` before it (`The
+answer passes: PASS`); anything else is unknown, and the row's reason says
+why. The LLM judge's last line is read the same way, for LEFT, RIGHT, TIE or
+UNKNOWN. A stored run that an earlier version scored unknown, and that this
+rule reads as pass or fail, gets a new row ("re-read with 0.1.1's rule; no
+new run"), with no new run, and the report marks it "(re-read)".
 
 A control case's `expect.json` gives its `role` (`reference`, `fault` or
 `variation`), the case a variation `varies`, a `note`, and `expect`: for each
@@ -805,7 +825,8 @@ missing, and fails every check.
         run.json                   model, date, seconds, status (ok, failed or timeout),
                                    cost, the exact command, the transcript's path,
                                    what the isolation check saw
-        trace.jsonl                one step a line: {"tool", "detail", "error"}
+        trace.jsonl                one step a line: {"tool", "detail", "error"}, and
+                                   "refused": true for a step Claude Code refused (it never ran)
         files/                     every file the run wrote
     transcripts/<prompt>__<round>__<repeat>.jsonl   the session's events
     judge/prompt.md                the judging prompt
@@ -842,7 +863,7 @@ JSON). `examples/class-assistant/experiment.toml` uses every field.
 | `[model]` | `runner` (`"claude-code"` or `"codex"`), `model`, `allowed_tools`, `timeout_seconds`, `max_budget_usd`, `note`; for Codex also `codex_model`, `reasoning_effort` |
 | `[[checks]]` | `id`, `kind`, `object` (`product` or `process`), the kind's arguments, `prompts` or `tags`, `shows`, `does_not_show` |
 | `[judge]` | `model`, `prompt` (ending in one line: LEFT, RIGHT, TIE or UNKNOWN), `decision` |
-| `[frozen]` | `date`, `hash`: written by the wizard |
+| `[frozen]` | `date`, `hash`: written by the wizard. The hash is `sha256c:` and the SHA-256 of the file without its `[frozen]` table (for JSON, without `frozen`, keys sorted), so `check`, `status`, `run` and the wizard can each check that the file hasn't changed since. A 0.1.0 freeze (`sha256:`) is read as frozen, with a note that it can't be checked |
 | `[provenance]` | Who wrote the file, when, with which skill |
 
 The check kinds: `contains` (every `text` appears), `not-contains` (none
@@ -850,7 +871,30 @@ does), `matches` (the regular expression `pattern` matches), `word-count`
 (`min`, `max`), `json-parses`, `trace-ran-command` (a shell command in the
 trace matches the glob `pattern`, in a step that didn't fail) and
 `trace-no-tool-outside` (every step matches the `allowed` list, each command
-of a shell step included). The wizard runs them; the runner doesn't.
+of a shell step included). The wizard runs them on Shared I's runs, and
+`suite` on Personal I's cases.
+
+How the two trace checks read a shell step:
+- A step is split into its commands at `;`, `&&`, `||`, `|`, `&` and new
+  lines, but not inside quotes, after a backslash, inside `$(...)` or
+  backticks, or in a heredoc's body. So `grep "a|b" notes.md` is one
+  command. The commands in `( ... )` or `{ ...; }` are taken one by one. A
+  command inside `$(...)` is not checked on its own.
+- In a pattern, `*` matches anything, and a pattern that ends in ` *` also
+  matches the command alone (`ls *` matches `ls`). A pattern matches the
+  whole command, also with a leading `./`, the directories before the
+  pattern's own program, `NAME=value` settings, or `command`, `exec` or
+  `time` taken off. So `kb/kb search*` matches `./kb/kb search Dana`,
+  `/tmp/run-1/kb/kb search Dana` and `KB_DEBUG=1 kb/kb search Dana`, but
+  not `echo "kb/kb search"`.
+- Claude Code records one success for a whole step, its last command's. When
+  `trace-ran-command`'s match is in a chain, its reason says so: in `kb/kb
+  search Dana | head`, the search may have failed and `head` succeeded.
+- `trace-no-tool-outside` doesn't count a step Claude Code refused, or that
+  the person rejected in an interactive session (it never ran), and lists
+  them in its reason. A command that writes a
+  file through `>` or `>>` (not `2>&1` or `> /dev/null`) is allowed only by
+  a pattern that itself has `>`.
 
 `allowed_tools` sets what a run may use: `Read`, `Write`, `Edit`, `Glob` and
 `Grep` work inside the run's folder only; `Bash kb/kb *` allows those shell
@@ -901,13 +945,23 @@ in Claude Code). A helper session and each answer use a little of your plan.
     python3 run_ab.py check EXPERIMENT
     python3 run_ab.py plan EXPERIMENT [--runner R] [--rounds A,C] [--prompts ID,ID] [--repeats N] [--held-out] [--jobs N]
     python3 run_ab.py run EXPERIMENT --assistant FOLDER [--runner R] [--model M] [--rounds A,C] [--prompts ID,ID]
-                          [--repeats N] [--held-out] [--jobs N] [--out FOLDER] [--again] [--keep-work]
+                          [--repeats N] [--held-out] [--jobs N] [--out FOLDER] [--again] [--keep-work] [--unfrozen]
     python3 run_ab.py judge RUN_FOLDER [--runner R] [--comparisons A-B,A-C] [--model M] [--jobs N] [--again]
     python3 run_ab.py suite SUITES_FILE [--runner R] [--suite ID] [--tests ID,ID] [--cases ID,ID] [--out FOLDER]
                             [--again] [--no-llm] [--check] [--jobs N]
 
 `R` is `claude-code` (the default) or `codex`. With Codex, `--use-api-key`
 uses `OPENAI_API_KEY` instead of your ChatGPT plan's login.
+
+`run` runs an experiment only when it is frozen and hasn't changed since (a
+demonstration, `demo = true`, runs unfrozen). `--unfrozen` runs it anyway:
+each run, its `run.json` and the bundle then say `"frozen": false`, and the
+wizard's steps 3 to 5 say the runs were made before the experiment was
+frozen.
+
+`doctor` and `status` ask GitHub for the latest version (one small request,
+with nothing of yours in it) and say when a newer one is out; offline, they
+say nothing.
 
 `python3 run_ab.py COMMAND --help` describes each option.
 
@@ -964,7 +1018,7 @@ class start, the demonstrations and the worked example, written out
 unchanged, match `examples/`; that awkward text survives the TOML and YAML
 writers; that the designers' copies of `check` and `suite --check` say what
 `run_ab.py` says, word for word, on the class experiment and fifteen broken
-versions of it, and on the worked example and nine broken packets; and three journeys through the page's own buttons and fields: an
+versions of it, and on the worked example and 22 broken packets; and three journeys through the page's own buttons and fields: an
 experiment from the class start, changed; one from blank, with an
 assistant's folder, a new prompt and a starting file; and a packet from
 blank. Each is saved as a ZIP (and through a stand-in for the folder
@@ -1003,6 +1057,13 @@ is recorded in `examples/recorded/demo-graph-removed-codex/`. The other two
 demonstrations and the suites' LLM tests were not run on Codex for real;
 `suite --runner codex` was tested with the stand-in.
 
+Since 0.1.1, `tests/test_shared.py` holds `run_ab.py` and the wizard to
+one set of answers (`tests/fixtures/`): how shell steps split, which
+patterns match which commands, the two trace checks' results and reasons,
+and the freeze's fingerprint. `tests/test_freeze.py` checks that `check`,
+`status`, `run` and the wizard act on the fingerprint, that `--unfrozen`
+marks its runs, and the version check.
+
 The Codex tests (`tests/test_codex.py`) use a stand-in for `codex`
 (`tests/fake_codex.py`) that answers from the `CODEX_HOME` it is given, as
 Codex does: runs, the judge, a suite's LLM tests and `doctor`; that only the
@@ -1011,7 +1072,7 @@ asked; that a global `AGENTS.md`, a personal skill, an MCP tool or an MCP
 call stops the run; that runners are not mixed; and the import inlining,
 the trace names and the check before each run on their own.
 
-## Limits in 0.1.0
+## Limits in 0.1.1
 
 - The runner runs Claude Code or Codex. A Codex run reads the assistant
   through a generated `AGENTS.md` (see "With Codex"), so its results are not
@@ -1020,6 +1081,8 @@ the trace names and the check before each run on their own.
 - Codex was tested at 0.164.0 on Linux only, and `--use-api-key` only with
   the stand-in.
 - Tested on Linux. Not yet on macOS or Windows.
+- The trace checks don't look inside `$(...)` or backticks, and a refused
+  step is marked only in a Claude Code record (not yet in a Codex one).
 - The checks-only mode reads suites the runner has run; the wizard itself
   runs no tests and calls no model. A suite's LLM tests use Claude Code, or
   Codex with `--runner codex` (tested with the stand-in only).

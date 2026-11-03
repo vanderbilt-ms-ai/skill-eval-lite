@@ -112,3 +112,6 @@ def fake_codex_env(root: Path, **more) -> dict:
            "FAKE_CODEX_LOG": str(root / "codex-log.jsonl")}
     env.update(more)
     return env
+
+# doctor and status never ask GitHub for the latest version in the tests.
+os.environ.setdefault("SKILL_EVAL_LITE_UPDATE_URL", "off")

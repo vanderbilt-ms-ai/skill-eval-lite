@@ -259,15 +259,32 @@ class CheckMirror(Page):
             "a control with an odd role": "SD.suites[0].controls[0].role = 'odd';",
             "too few controls and runs": "SD.suites[0].controls = SD.suites[0].controls.slice(0, 2); SD.suites[1].items = SD.suites[1].items.slice(0, 2);",
             "no human test": "SD.suites[1].tests = SD.suites[1].tests.slice(0, 2);",
+            # A process case's record (0.1.1): renamed, missing, two of them, a line that isn't JSON, no steps.
+            "a renamed record": "const f = SD.suites[1].items[0].files; f['abc123.jsonl'] = f['transcript.jsonl']; delete f['transcript.jsonl'];",
+            "a record and another JSON file": "const f = SD.suites[1].items[1].files; f['session.json'] = '{}'; delete f['transcript.jsonl'];",
+            "no record": "delete SD.suites[1].items[2].files['transcript.jsonl'];",
+            "two records": "SD.suites[1].items[3].files['trace.jsonl'] = '{\"tool\": \"Bash\", \"detail\": \"ls\"}\\n';",
+            "a control with two records": "const c = SD.suites[1].controls.find(x => x.id === 'reference'); c.files['transcript.jsonl'] = '{}\\n';",
+            "a line that isn't JSON": "SD.suites[1].items[0].files['transcript.jsonl'] += 'not JSON\\n';",
+            "a line that is JSON but not an object": "const c = SD.suites[1].controls.find(x => x.id === 'fault-no-search'); c.files['trace.jsonl'] = '{\"tool\": \"Read\"}\\n[1, 2]\\n';",
+            "a record with no steps": "SD.suites[1].items[1].files['transcript.jsonl'] = '{\"type\": \"system\", \"subtype\": \"init\"}\\n\\n';",
+            "an empty trace": "const c = SD.suites[1].controls.find(x => x.id === 'variation-other-words'); c.files['trace.jsonl'] = '';",
+            "a session saved as trace.jsonl": "const f = SD.suites[1].items[3].files; f['trace.jsonl'] = f['transcript.jsonl']; delete f['transcript.jsonl'];",
+            "no process suite": "SD.suites = [SD.suites[0]];",
+            "two process suites": "SD.suites[0].object = 'process';",
         }
         for i, (name, code) in enumerate(mutations.items()):
-            got = json.loads(self.js("(() => { SD = sdFromExample(); " + code + " const o = sdOutput(SD); const c = suiteCheck(SD, o.files);"
+            got = json.loads(self.js("(() => { SD = sdFromExample(); { " + code + " } const o = sdOutput(SD); const c = suiteCheck(SD, o.files);"
                                      " return JSON.stringify({ files: o.files, errors: c.errors.map(e => e.t), notes: c.notes.map(e => e.t) }); })()"))
             folder = self.root / "suites-mirror" / str(i)
             write_tree(folder, got["files"])
             S = R.Suites(folder / "suites.yaml")
             self.assertEqual(got["errors"], S.errors, name)
-            self.assertEqual(got["notes"], [w for s in S.suites for w in s["warnings"]], name)
+            self.assertEqual(got["notes"], [w for s in S.suites for w in s["warnings"]] + S.warnings, name)
+            if name != "as it is":
+                self.assertNotEqual((got["errors"], got["notes"]), (base["errors"], base["notes"]), f"{name}: suite --check says something")
+            else:
+                base = got
 
 
 def own_assistant(root: Path) -> Path:
@@ -465,8 +482,15 @@ class ExperimentJourneys(Page):
         self.assertIn("Nothing is missing.", r.stdout)
         os.chmod(FAKE, 0o755)
         r = self.sel(copy, "run", "experiments/sam-voice/experiment.toml", "--assistant", asst, "--claude", FAKE, "--jobs", "4", "--out", root / "runs")
+        self.assertEqual(r.returncode, 2, "run refuses an experiment that isn't frozen")
+        self.assertIn("isn't frozen yet, so it can't be run", r.stderr)
+        self.assertIn("--unfrozen", r.stderr)
+        r = self.sel(copy, "run", "experiments/sam-voice/experiment.toml", "--assistant", asst, "--claude", FAKE, "--jobs", "4", "--out", root / "runs",
+                     "--unfrozen")
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         bundle = json.loads((root / "runs" / "bundle.json").read_text())
+        self.assertIs(bundle["frozen"], False, "the bundle says its runs were made before a freeze")
+        self.assertTrue(all(o["frozen"] is False for o in bundle["outputs"]))
         self.assertEqual(len(bundle["outputs"]), 4 * 4 * 2)
         self.assertTrue(all(o["status"] == "ok" for o in bundle["outputs"]), [o["status"] for o in bundle["outputs"]])
 

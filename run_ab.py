@@ -177,6 +177,81 @@ def sha256(text: str) -> str:
     return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+# --- The freeze's fingerprint ---------------------------------------------
+#
+# The wizard freezes an experiment by writing [frozen] date and hash into it.
+# The hash is a fingerprint of the file without its [frozen] record, so that
+# anyone can check it from the frozen file itself. wizard.html's fingerprint()
+# gives the same; tests/fixtures/fingerprints.json holds what both must give.
+# 0.1.0 wrote "sha256:" fingerprints of the text as loaded, which can't be
+# checked from the file; they are read as frozen, with a note.
+
+FINGERPRINT = "sha256c:"
+OLD_FINGERPRINT = re.compile(r"sha256:[0-9a-f]{64}|fnv1a:[0-9a-f]{8}")   # what 0.1.0's wizard wrote
+_TABLE = re.compile(r"[ \t]*\[")
+_FROZEN_TABLE = re.compile(r"[ \t]*\[[ \t]*frozen[ \t]*\][ \t]*(?:#.*)?")
+
+
+def _js_number(x: float) -> str:
+    """A number as JavaScript's JSON.stringify writes it."""
+    if x != x or x in (float("inf"), float("-inf")):
+        return "null"
+    if x == 0:
+        return "0"
+    m = re.fullmatch(r"(\d+)(?:\.(\d+))?(?:e([+-]\d+))?", repr(abs(x)))
+    whole, frac, exp = m.group(1), m.group(2) or "", int(m.group(3) or 0)
+    all_digits = whole + frac
+    n = len(whole) - (len(all_digits) - len(all_digits.lstrip("0"))) + exp
+    digits = all_digits.strip("0") or "0"
+    k = len(digits)
+    if k <= n <= 21:
+        s = digits + "0" * (n - k)
+    elif 0 < n <= 21:
+        s = digits[:n] + "." + digits[n:]
+    elif -6 < n <= 0:
+        s = "0." + "0" * -n + digits
+    else:
+        s = digits[0] + ("." + digits[1:] if k > 1 else "") + "e" + ("+" if n - 1 >= 0 else "-") + str(abs(n - 1))
+    return ("-" if x < 0 else "") + s
+
+
+def canonical_json(o) -> str:
+    """JSON with sorted keys and no spaces, as the wizard writes it for a fingerprint."""
+    if isinstance(o, dict):
+        return "{" + ",".join(json.dumps(str(k), ensure_ascii=False) + ":" + canonical_json(o[k]) for k in sorted(o)) + "}"
+    if isinstance(o, list):
+        return "[" + ",".join(canonical_json(x) for x in o) + "]"
+    if isinstance(o, bool) or o is None or isinstance(o, str):
+        return json.dumps(o, ensure_ascii=False)
+    if isinstance(o, int):
+        return str(o)
+    return _js_number(float(o))
+
+
+def design_text(text: str) -> str:
+    """The experiment without its freeze: for TOML, the text with the
+    [frozen] table (its header to the next table's header, or the end)
+    taken out, line endings made \\n and trailing spaces trimmed; for JSON,
+    the object without "frozen", with sorted keys."""
+    t = text.replace("\r\n", "\n").replace("\r", "\n")
+    if t.lstrip(_WS).startswith("{"):
+        o = json.loads(t)
+        if isinstance(o, dict):
+            o.pop("frozen", None)
+        return canonical_json(o)
+    out, skip = [], False
+    for line in t.split("\n"):
+        if _TABLE.match(line):
+            skip = bool(_FROZEN_TABLE.fullmatch(line))
+        if not skip:
+            out.append(line.rstrip(" \t"))
+    return "\n".join(out).rstrip("\n")
+
+
+def fingerprint(text: str) -> str:
+    return FINGERPRINT + hashlib.sha256(design_text(text).encode("utf-8")).hexdigest()
+
+
 def say(*parts, err=False):
     print(*parts, file=sys.stderr if err else sys.stdout, flush=True)
 
@@ -252,6 +327,24 @@ class Experiment:
     @property
     def name(self) -> str:
         return self.path.stem if self.path.stem != "experiment" else self.path.parent.name
+
+    def freeze_state(self) -> tuple[str, str]:
+        """(state, date): "frozen" (its fingerprint matches the file),
+        "changed" (the file has changed since it was frozen), "old" (frozen
+        with 0.1.0, whose fingerprint can't be checked) or "unfrozen"."""
+        fr = self.data.get("frozen") if isinstance(self.data.get("frozen"), dict) else {}
+        h, date = str(fr.get("hash") or ""), str(fr.get("date") or "")
+        if not h:
+            return "unfrozen", ""
+        if OLD_FINGERPRINT.fullmatch(h):
+            return "old", date
+        if not h.startswith(FINGERPRINT):
+            return "unfrozen", ""
+        try:
+            same = h == fingerprint(self.text)
+        except ValueError:
+            same = False
+        return ("frozen" if same else "changed"), date
 
     def part_paths(self, part_id: str) -> list[str]:
         p = self.parts.get(part_id, {})
@@ -571,11 +664,11 @@ def step_detail(name: str, inp: dict, red: Redactor) -> str:
     if not isinstance(inp, dict):
         return red.text(str(inp))[:300]
     if name == "Bash":
-        d = inp.get("command", "")
+        d = inp.get("command") or ""
     elif name in ("Read", "Write", "Edit", "NotebookEdit"):
         d = inp.get("file_path") or inp.get("notebook_path") or ""
     elif name in ("Glob", "Grep"):
-        d = inp.get("pattern", "") + (" in " + inp["path"] if inp.get("path") else "")
+        d = str(inp.get("pattern") or "") + (" in " + str(inp["path"]) if inp.get("path") else "")
     elif name == "Skill":
         d = inp.get("skill") or inp.get("command") or json.dumps(inp)
     else:
@@ -584,14 +677,25 @@ def step_detail(name: str, inp: dict, red: Redactor) -> str:
     return d[2:] if d.startswith("./") else d
 
 
+# How Claude Code answers a step it refused to run (in a run, one that would
+# have asked for a permission nobody can give) or that the person rejected
+# (in a saved interactive session): such a step never ran.
+DENIED = "Permission for this tool use was denied"
+REJECTED = "The user doesn't want to proceed with this tool use"
+REFUSALS = (DENIED, REJECTED)
+
+
 def trace_of(events: list[dict], red: Redactor, results: bool = False) -> list[dict]:
-    """The steps of a session: tool, detail and whether it failed; with
+    """The steps of a session: tool, detail and whether it failed, and
+    "refused": True for a step Claude Code refused to run; with
     results=True, also the first 400 characters of what each step returned.
-    A Codex stream is read by codex_steps."""
+    A Codex stream is read by codex_steps (a refusal there is not marked)."""
     if is_codex_stream(events):
         return codex_steps(events, red, results)
     steps, by_id = [], {}
     for e in events:
+        if not isinstance(e, dict):
+            continue
         msg = e.get("message") or {}
         content = msg.get("content") if isinstance(msg, dict) else None
         if e.get("type") == "assistant" and isinstance(content, list):
@@ -603,12 +707,18 @@ def trace_of(events: list[dict], red: Redactor, results: bool = False) -> list[d
         elif e.get("type") == "user" and isinstance(content, list):
             for c in content:
                 if isinstance(c, dict) and c.get("type") == "tool_result" and c.get("tool_use_id") in by_id:
-                    by_id[c["tool_use_id"]]["error"] = bool(c.get("is_error"))
+                    st = by_id[c["tool_use_id"]]
+                    st["error"] = bool(c.get("is_error"))
+                    body = c.get("content")
+                    if isinstance(body, list):
+                        body = " ".join(b.get("text", "") for b in body if isinstance(b, dict))
+                    body = str(body or "")
+                    if st["error"] and body.startswith(REFUSALS):
+                        st["refused"] = True
+                    else:
+                        st.pop("refused", None)
                     if results:
-                        body = c.get("content")
-                        if isinstance(body, list):
-                            body = " ".join(b.get("text", "") for b in body if isinstance(b, dict))
-                        by_id[c["tool_use_id"]]["result"] = red.text(str(body or ""))[:400]
+                        st["result"] = red.text(body)[:400]
     return steps
 
 
@@ -1415,7 +1525,9 @@ def _codex_item_steps(item: dict, red: Redactor, results: bool, unfinished: bool
             st["result"] = red.text(str(item.get("aggregated_output") or ""))[:400]
         out.append(st)
     elif kind == "file_change":
-        for ch in item.get("changes") or []:
+        changes = item.get("changes")
+        for ch in changes if isinstance(changes, list) else []:
+            ch = ch if isinstance(ch, dict) else {}
             kind_of = ch.get("kind")
             kind_of = kind_of.get("type") if isinstance(kind_of, dict) else kind_of
             tool = {"add": "Write", "update": "Edit", "delete": "Delete"}.get(kind_of, "Edit")
@@ -1643,9 +1755,22 @@ def load(path: str) -> Experiment:
     return Experiment(p)
 
 
+def changed_since_frozen(date: str) -> str:
+    return (f"The file has changed since it was frozen on {date}. Freeze it again in the wizard, keep the earlier file, "
+            "dated, and say in your report what you changed and why.")
+
+
+FROZEN_LINE = {"frozen": "yes, {date}", "old": "yes, {date} (frozen with 0.1.0; the fingerprint can't be checked)",
+               "changed": "no: it has changed since it was frozen on {date}",
+               "unfrozen": "not yet (the wizard's step 2 freezes it)"}
+
+
 def cmd_check(a) -> int:
     exp = load(a.experiment)
     errors, warns = exp.problems()
+    state, date = exp.freeze_state()
+    if state == "changed":
+        errors.append(changed_since_frozen(date))
     say(f"{exp.path}: {exp.data.get('title', '(no title)')}")
     for e in errors:
         say("  must fix:  " + e)
@@ -1655,8 +1780,8 @@ def cmd_check(a) -> int:
         say("  Nothing is missing.")
     if exp.data.get("demo") and warns:
         say("  This file is a demonstration (demo = true); the (demo) lines are what a full experiment would also need.")
-    frozen = (exp.data.get("frozen") or {}).get("hash")
-    say("  Frozen: " + (f"yes, {exp.data['frozen'].get('date')}" if frozen else "not yet (the wizard's step 2 freezes it)"))
+    frozen = state in ("frozen", "old")
+    say("  Frozen: " + FROZEN_LINE[state].format(date=date))
     if errors:
         say(f"\nFix the lines marked \"must fix\", save the file, and check it again:\n    python3 run_ab.py check {a.experiment}")
     elif exp.data.get("demo") or frozen:
@@ -1792,7 +1917,7 @@ def project_skill_names(work: Path) -> set[str]:
 
 
 def one_run(exp: Experiment, assistant: Path, skip: set[Path], p: str, r: str, k: int, runner, model, out: Out,
-            registry: set, keep_work: bool) -> dict:
+            registry: set, keep_work: bool, unfrozen: bool = False) -> dict:
     started = now()
     prompt = exp.prompts[p]
     rnd = exp.rounds[r]
@@ -1874,6 +1999,8 @@ def one_run(exp: Experiment, assistant: Path, skip: set[Path], p: str, r: str, k
             "transcript": "transcripts/" + tname, "isolation": run.isolation,
             "tool": TOOL,
         }
+        if unfrozen:
+            record["frozen"] = False
         if codex:
             record["usage"] = run.usage
             record["reasoning_effort"] = exp.model.get("reasoning_effort") or "the model's default"
@@ -1881,9 +2008,11 @@ def one_run(exp: Experiment, assistant: Path, skip: set[Path], p: str, r: str, k
         (folder / "run.json").write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
         entry = {"prompt": p, "round": r, "repeat": k, "status": status, "reason": reason, "output": output,
                  "message": red.text(run.final) if run.final else "", "output_from": output_from,
-                 "trace": [[s["tool"], s["detail"], "error"] if s["error"] else [s["tool"], s["detail"]] for s in steps],
+                 "trace": [[s["tool"], s["detail"], step_mark(s)] if s["error"] else [s["tool"], s["detail"]] for s in steps],
                  "model": seen_model, "seconds": run.seconds, "cost_usd": run.cost_usd, "when": started,
                  "runner": runner.name}
+        if unfrozen:
+            entry["frozen"] = False
         if codex:
             entry["usage"] = run.usage
         return {"entry": entry, "breach": run.breach, "not_logged_in": run.not_logged_in and status == "failed"}
@@ -1940,6 +2069,18 @@ def cmd_run(a) -> int:
             say("  " + e)
         say(f"Fix these, then check again with: python3 run_ab.py check {a.experiment}")
         return 1
+    state, date = exp.freeze_state()
+    unfrozen = not exp.data.get("demo") and state not in ("frozen", "old")
+    if unfrozen and not a.unfrozen:
+        anyway = ("To run it as it is anyway, add --unfrozen: the runs are then marked as made before the experiment was frozen,\n"
+                  "and the wizard shows that mark.")
+        if state == "changed":
+            raise Fail(f"{a.experiment} has changed since it was frozen on {date}, so it can't be run as the frozen experiment.\n"
+                       "Freeze it again in the wizard (load it in step 1, press Freeze in step 2, then 'Export the frozen experiment'),\n"
+                       "save it over the old file, and keep the earlier file, dated, for your report.\n" + anyway)
+        raise Fail(f"{a.experiment} isn't frozen yet, so it can't be run: an experiment is frozen before anyone sees an output.\n"
+                   "Freeze it in the wizard: load it in step 1, press Freeze in step 2, then press 'Export the frozen experiment'\n"
+                   f"(now in step 2) and save the file over {a.experiment}. Then run this again.\n" + anyway)
     assistant = Path(a.assistant).expanduser()
     if not assistant.is_dir():
         raise Fail(f"There is no assistant folder at {a.assistant}.\n"
@@ -1991,7 +2132,7 @@ def cmd_run(a) -> int:
         if out.bundle is None:
             out.bundle = {"schema": BUNDLE_SCHEMA, "tool": TOOL, "made_up": False, "outputs": [], "judge": [], "files": {}}
         out.bundle.update({
-            "experiment": {"name": exp.path.name, "text": exp.text, "sha256": sha256(exp.text)},
+            "experiment": {"name": exp.path.name, "text": exp.text, "sha256": sha256(exp.text), "freeze": state},
             "assistant": {"name": assistant.resolve().name, "git": git_state},
             "runner": runner.describe(model, *exp.tool_lists(), exp.model.get("max_budget_usd")),
             "updated": now(),
@@ -2002,8 +2143,11 @@ def cmd_run(a) -> int:
         write_packet_parts(exp, out.path, sorted({x[1] for x in runs}), sorted({x[0] for x in runs}))
         if exp.data.get("demo"):
             say("This file is a demonstration (demo = true), not a full experiment.")
-        if not (exp.data.get("frozen") or {}).get("hash") and not exp.data.get("demo"):
-            say("Note: this experiment is not frozen yet. Freeze it in the wizard (step 2), save the exported file, and run that.")
+        if unfrozen:
+            say("Note: " + ("this file has changed since it was frozen" if state == "changed" else "this experiment is not frozen")
+                + "; with --unfrozen, these runs are marked as made before the freeze.")
+        elif state == "old":
+            say("Note: this experiment was frozen with Skill Eval Lite 0.1.0, whose fingerprint can't be checked.")
         say(f"{len(todo)} runs of {exp.path.name} on {assistant.resolve().name}, {a.jobs} at a time, with {runner.label} "
             f"{runner.version}" + (f" and the model {model}" if model else "")
             + (f" ({skipped} already in {out.path}; add --again to redo them)" if skipped else "") + ".")
@@ -2026,11 +2170,15 @@ def cmd_run(a) -> int:
             if stop.is_set():
                 return None
             p, r, k = item
-            res = one_run(exp, assistant, skip, p, r, k, runner, model, out, registry, a.keep_work)
+            res = one_run(exp, assistant, skip, p, r, k, runner, model, out, registry, a.keep_work, unfrozen)
             e = res["entry"]
             with lock:
                 have[(p, r, k)] = e
                 out.bundle["outputs"] = sorted(have.values(), key=lambda o: (o["prompt"], o["round"], o["repeat"]))
+                if any(o.get("frozen") is False for o in out.bundle["outputs"]):
+                    out.bundle["frozen"] = False
+                else:
+                    out.bundle.pop("frozen", None)
                 out.bundle["updated"] = now()
                 done[0] += 1
                 cost = f"  ${e['cost_usd']:.3f}" if isinstance(e.get("cost_usd"), (int, float)) else ""
@@ -2087,15 +2235,49 @@ def cmd_run(a) -> int:
 
 # --- judge ----------------------------------------------------------------
 
+# The words a verdict may end on: an LLM test's, and the judge's.
+VERDICT_WORDS = ("PASS", "FAIL", "UNKNOWN")
+DECISION_WORDS = ("LEFT", "RIGHT", "TIE", "UNKNOWN")
+_LABEL = re.compile(r"(?:final answer|verdict|decision|answer|result)\s*[:=\u2013\u2014-]\s*([A-Za-z]+)", re.I)
+_NEGATION = re.compile(r"\bnot\b|n't\b|\bnever\b", re.I)
+
+
+def last_line_word(text: str, words: tuple[str, ...]) -> tuple[str, str]:
+    """The word a response ends on, and a note on how it was read. The last
+    line that isn't blank, with Markdown emphasis, backticks, heading marks
+    and trailing punctuation taken off, is read, in this order:
+    1. exactly one of the words (in any case): that word;
+    2. a label and one of the words (Verdict: PASS, Final answer - FAIL):
+       that word, "read from a labelled last line";
+    3. exactly one of the words, as a whole word, with no negation (not,
+       n't, never) before it: that word, "read from the last line";
+    4. otherwise UNKNOWN, "the last line was not ...".
+    The suites' LLM tests and the judge both use it."""
+    unknown = words[-1]
+    lines = [l for l in (text or "").strip().split("\n") if l.strip() and not re.fullmatch(r"\s*(?:```|~~~)[\w-]*\s*", l)]
+    line = lines[-1] if lines else ""
+    line = re.sub(r"^\s*#+\s*", "", line)
+    line = re.sub(r"[*_`]+", "", line).strip()
+    line = re.sub(r"[.!?,;:]+$", "", line).strip()
+    upper = {w.upper(): w for w in words}
+    if line.upper() in upper:
+        return upper[line.upper()], ""
+    m = _LABEL.fullmatch(line)
+    if m and m.group(1).upper() in upper:
+        return upper[m.group(1).upper()], "read from a labelled last line"
+    found = {}
+    for w in words:
+        for hit in re.finditer(r"\b" + w + r"\b", line, re.I):
+            found.setdefault(w, hit.start())
+    if len(found) == 1:
+        w, at = next(iter(found.items()))
+        if not _NEGATION.search(line[:at]):
+            return w, "read from the last line"
+    return unknown, "the last line was not " + ", ".join(words[:-1]) + " or " + words[-1]
+
+
 def parse_decision(text: str) -> tuple[str, str]:
-    lines = [l.strip() for l in text.strip().splitlines() if l.strip()]
-    last = re.sub(r"[^A-Za-z]", "", lines[-1]).upper() if lines else ""
-    if last in ("LEFT", "RIGHT", "TIE", "UNKNOWN"):
-        return last, ""
-    for word in ("UNKNOWN", "TIE", "RIGHT", "LEFT"):
-        if lines and re.search(r"\b" + word + r"\b", lines[-1].upper()):
-            return word, "read from the last line"
-    return "UNKNOWN", "the last line was not LEFT, RIGHT, TIE or UNKNOWN"
+    return last_line_word(text, DECISION_WORDS)
 
 
 def judge_text(exp: Experiment, files: dict, p: str, left: dict, right: dict) -> str:
@@ -2225,6 +2407,46 @@ def cmd_judge(a) -> int:
 # --- doctor ---------------------------------------------------------------
 
 PROBE_WORD = "heliotrope"
+# The public repository's VERSION, which doctor and status compare with this
+# one. SKILL_EVAL_LITE_UPDATE_URL changes where they look; "off" turns it off.
+UPDATE_URL = "https://raw.githubusercontent.com/vanderbilt-ms-ai/skill-eval-lite/main/VERSION"
+
+
+def _version_key(v: str):
+    m = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", (v or "").strip())
+    return tuple(int(x) for x in m.groups()) if m else None
+
+
+def newer_version(timeout: float = 3.0) -> str | None:
+    """The public repository's version when it is newer than this one; None
+    when it isn't, or when it can't be read (offline, say). One small request,
+    which sends nothing but the version asked for."""
+    url = os.environ.get("SKILL_EVAL_LITE_UPDATE_URL", UPDATE_URL)
+    if url.strip().lower() in ("", "off"):
+        return None
+    import urllib.request
+    got: list[str] = []
+
+    def fetch():
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "skill-eval-lite/" + VERSION})
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                got.append(r.read(64).decode("utf-8", "replace").strip())
+        except Exception:
+            pass
+    # In a thread of its own, so that a slow name lookup can't hold up status.
+    th = threading.Thread(target=fetch, daemon=True)
+    th.start()
+    th.join(timeout)
+    if not got:
+        return None
+    mine, theirs = _version_key(VERSION), _version_key(got[0])
+    remote = got[0]
+    return remote if mine and theirs and theirs > mine else None
+
+
+def update_text(remote: str) -> str:
+    return f"Skill Eval Lite {remote} is out; you have {VERSION}. In this folder, run git pull."
 
 
 def cmd_doctor(a) -> int:
@@ -2237,6 +2459,9 @@ def cmd_doctor(a) -> int:
         say(f"  {mark} {what}" + (f": {detail}" if detail else ""))
 
     say(f"Skill Eval Lite {VERSION}")
+    remote = newer_version()
+    if remote:
+        say("  NEW  " + update_text(remote))
     line(True, "Python", sys.version.split()[0])
     g = shutil.which("git")
     line(bool(g), "git", git("--version", check=False).stdout.strip() if g else "not found: install git")
@@ -2660,57 +2885,408 @@ def short_hash(*parts: str) -> str:
     return h.hexdigest()[:12]
 
 
+RECORD_FILES = ("transcript.jsonl", "trace.jsonl")
+
+
+class RecordError(Fail):
+    """A line of a process case's record that is not a JSON object."""
+
+    def __init__(self, path: Path, line: int):
+        super().__init__(f"{path}, line {line}, is not a JSON object. Each line of a record is one JSON object: is it the right file?")
+        self.path, self.line = path, line
+
+
+def record_lines(path: Path) -> list[dict]:
+    """The JSON objects of a record, one a line (blank lines skipped). Lines
+    are split at \\n only, as the wizard splits them."""
+    return [j for _, j in numbered_record_lines(path)]
+
+
+def numbered_record_lines(path: Path) -> list[tuple[int, dict]]:
+    out = []
+    for k, line in enumerate(path.read_text(encoding="utf-8", errors="replace").split("\n"), 1):
+        if not line.strip():
+            continue
+        try:
+            j = json.loads(line)
+        except ValueError:
+            j = None
+        if not isinstance(j, dict):
+            raise RecordError(path, k)
+        out.append((k, j))
+    return out
+
+
 def read_trace(folder: Path, red: Redactor | None = None) -> list | None:
-    """A process case's steps: from a Claude Code stream (transcript.jsonl,
-    as the runner keeps it), with what each step returned; or from
-    trace.jsonl, one step a line: {"tool", "detail", "error", "result"}."""
+    """A process case's steps, from its record, in this order:
+    transcript.jsonl (a Claude Code or Codex session's events, as the runner
+    keeps them), with what each step returned; else trace.jsonl, one step a
+    line: {"tool", "detail", "error", "result", "refused"}. A case should
+    have only one of the two (`suite --check` refuses a case with both); a
+    program test that reads the record should read them in this order too.
+    None when there is neither. A line that isn't a JSON object raises
+    RecordError, which names the file and the line."""
     s = folder / "transcript.jsonl"
     if s.is_file():
-        events = [json.loads(l) for l in s.read_text(encoding="utf-8").splitlines() if l.strip()]
-        return trace_of(events, red or Redactor(None), results=True)
+        return trace_of(record_lines(s), red or Redactor(None), results=True)
     t = folder / "trace.jsonl"
     if t.is_file():
         steps = []
-        for line in t.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                j = json.loads(line)
-                st = {"tool": j.get("tool", "?"), "detail": j.get("detail", j.get("input", "")), "error": bool(j.get("error"))}
-                if j.get("result") is not None:
-                    st["result"] = str(j["result"])[:400]
-                steps.append(st)
+        for j in record_lines(t):
+            st = {"tool": str(j.get("tool", "?")), "detail": str(j.get("detail", j.get("input", "")) or ""), "error": bool(j.get("error"))}
+            if j.get("result") is not None:
+                st["result"] = str(j["result"])[:400]
+            if j.get("refused") or (st["error"] and str(j.get("result") or "").startswith(REFUSALS)):
+                st["refused"] = st["error"] = True
+            steps.append(st)
         return steps
     return None
 
 
-# The check kinds, as the wizard runs them for Shared I.
+def record_problems(folder: Path, rel: str) -> tuple[list[str], list[str]]:
+    """What `suite --check` says about a process case's record: (must fix, notes).
+    The suite designer in wizard.html says the same (recordProblems)."""
+    have = [n for n in RECORD_FILES if (folder / n).is_file()]
+    if len(have) == 2:
+        return [f"{rel}/ has both transcript.jsonl and trace.jsonl. Keep one: the one this case's tests should read."], []
+    if not have:
+        other = sorted((p.name for p in folder.iterdir() if p.is_file() and p.suffix in (".jsonl", ".json") and p.name != "expect.json"),
+                       key=lambda n: (not n.endswith(".jsonl"), n))
+        if other:
+            return [f"{rel}/ has {other[0]} but no transcript.jsonl or trace.jsonl. "
+                    f"If {other[0]} is a Claude Code session, rename it transcript.jsonl."], []
+        return [f"{rel}/ has no record of the run. Put the session in it as transcript.jsonl "
+                "(a Claude Code or Codex session) or trace.jsonl (one step a line)."], []
+    try:
+        lines = numbered_record_lines(folder / have[0])
+        steps = read_trace(folder)
+    except RecordError as e:
+        return [f"{rel}/{have[0]}, line {e.line}, is not a JSON object. Each line of a record is one JSON object: is it the right file?"], []
+    except Exception as e:  # a record a program made by hand, say; the wizard has no copy of this
+        return [f"{rel}/{have[0]} can't be read as a record ({type(e).__name__}). Is it the right file?"], []
+    if have[0] == "trace.jsonl":
+        k = next((k for k, j in lines if "tool" not in j), None)
+        if k is not None:
+            return [f'{rel}/trace.jsonl, line {k}, has no "tool". A trace.jsonl has one step a line: '
+                    '{"tool", "detail", "error"}. If this is a Claude Code or Codex session, rename it transcript.jsonl.'], []
+    if not steps:
+        return [], [f"{rel}/{have[0]} has no tool steps. Is it the right session?"]
+    return [], []
+
+
+# --- Reading a shell step ----------------------------------------------------
+#
+# The trace checks look at each command in a shell step, the way a shell
+# would split it. wizard.html has the same code (shellSplit, commandForms,
+# patternMatches); tests/fixtures/shell.json holds what both must give.
+
+_WS = " \t\n\r\f\v"
+_WORD_END = _WS + ";&|<>()"
+
+
+def shell_split(cmd: str) -> list[tuple[str, bool]]:
+    """The commands in a shell step, in order, each as (text, writes).
+
+    It splits at newlines, ;, &, &&, ||, | and |&, but not inside single or
+    double quotes, after a backslash, inside $(...), <(...) or backticks, or
+    in a heredoc's body, which stays with its command. A comment (# at the
+    start of a word) is dropped. `writes` is True when the command has an
+    output redirection into a file: >, >>, >| or &>, but not one that
+    duplicates a descriptor (2>&1, >&2) or goes to /dev/null.
+
+    A limit: a command inside $(...) or backticks is not split out. It stays
+    part of the command around it, and is not checked on its own."""
+    s, n = cmd or "", len(cmd or "")
+    parts: list[list] = []
+    cur: list[str] = []
+    writes = False
+    heredocs: list[tuple[str, bool, int]] = []   # (delimiter, tabs stripped, its command's index)
+    depth = 0                                    # inside $(...), <(...) or >(...)
+    groups = 0                                   # inside ( ... ), a subshell
+    i = 0
+
+    def last() -> str:
+        return cur[-1][-1:] if cur else ""
+
+    def at_start() -> bool:
+        return not "".join(cur).strip(_WS)
+
+    def word_at(k: int) -> tuple[str, int]:
+        """The word that starts at k (after spaces), and where it ends."""
+        while k < n and s[k] in " \t":
+            k += 1
+        start = k
+        while k < n and s[k] not in _WORD_END:
+            if s[k] in "'\"":
+                q = s.find(s[k], k + 1)
+                k = n if q < 0 else q + 1
+            else:
+                k += 2 if s[k] == "\\" else 1
+        return s[start:k], k
+
+    def flush():
+        nonlocal cur, writes
+        text = "".join(cur).strip(_WS)
+        if text:
+            parts.append([text, writes])
+        cur, writes = [], False
+
+    while i < n:
+        c, nxt = s[i], s[i + 1:i + 2]
+        if c == "\\":
+            cur.append(s[i:i + 2])
+            i += 2
+            continue
+        if c == "'":
+            j = s.find("'", i + 1)
+            j = n - 1 if j < 0 else j
+            cur.append(s[i:j + 1])
+            i = j + 1
+            continue
+        if c == "$" and nxt == "'":
+            j = i + 2
+            while j < n and s[j] != "'":
+                j += 2 if s[j] == "\\" else 1
+            cur.append(s[i:j + 1])
+            i = j + 1
+            continue
+        if c in "\"`":
+            j = i + 1
+            while j < n and s[j] != c:
+                j += 2 if s[j] == "\\" else 1
+            cur.append(s[i:j + 1])
+            i = j + 1
+            continue
+        if c in "$<>" and nxt == "(":
+            depth += 1
+            cur.append(c + "(")
+            i += 2
+            continue
+        if depth:
+            depth += 1 if c == "(" else -1 if c == ")" else 0
+            cur.append(c)
+            i += 1
+            continue
+        if c == "#" and (not cur or last() in tuple(_WS)):
+            j = s.find("\n", i)
+            i = n if j < 0 else j
+            continue
+        if c == "\n":
+            flush()
+            i += 1
+            for delim, tabs, owner in heredocs:
+                body = []
+                while i < n:
+                    j = s.find("\n", i)
+                    line = s[i:] if j < 0 else s[i:j]
+                    i = n if j < 0 else j + 1
+                    body.append(line)
+                    if (line.lstrip("\t") if tabs else line) == delim:
+                        break
+                if owner < len(parts):
+                    parts[owner][0] += "\n" + "\n".join(body)
+            heredocs = []
+            continue
+        if c == ";":
+            flush()
+            i += 1
+            continue
+        if c == "&":
+            if nxt == "&":
+                flush()
+                i += 2
+            elif nxt == ">" or last() in ("<", ">"):
+                cur.append(c)
+                i += 1
+            else:
+                flush()
+                i += 1
+            continue
+        if c == "|":
+            if nxt == "|":
+                flush()
+                i += 2
+            elif last() == ">":
+                cur.append(c)
+                i += 1
+            else:
+                flush()
+                i += 2 if nxt == "&" else 1
+            continue
+        if s.startswith("<<<", i):
+            cur.append("<<<")
+            i += 3
+            continue
+        if s.startswith("<<", i):
+            j = i + 2
+            tabs = s[j:j + 1] == "-"
+            j += 1 if tabs else 0
+            while j < n and s[j] in " \t":
+                j += 1
+            word, k = [], j
+            while k < n and s[k] not in _WORD_END:
+                if s[k] in "'\"":
+                    q = s.find(s[k], k + 1)
+                    q = n if q < 0 else q
+                    word.append(s[k + 1:q])
+                    k = q + 1
+                elif s[k] == "\\":
+                    word.append(s[k + 1:k + 2])
+                    k += 2
+                else:
+                    word.append(s[k])
+                    k += 1
+            if "".join(word):
+                heredocs.append(("".join(word), tabs, len(parts)))
+            cur.append(s[i:k])
+            i = k
+            continue
+        if c == ">":
+            j = i + 1
+            if j < n and s[j] in ">|":
+                j += 1
+            dup = s[j:j + 1] == "&"
+            target, _ = word_at(j + 1 if dup else j)
+            if dup and re.fullmatch(r"[0-9]+|-", target):
+                pass                                 # >&2, 2>&1: a descriptor, not a file
+            elif target and target.strip("'\"") != "/dev/null":
+                writes = True
+            cur.append(s[i:j + 1] if dup else s[i:j])
+            i = j + 1 if dup else j
+            continue
+        if c == "(" and at_start():
+            groups += 1
+            i += 1
+            continue
+        if c == ")" and groups:
+            flush()
+            groups -= 1
+            i += 1
+            continue
+        if c in "{}" and at_start() and (i + 1 >= n or s[i + 1] in _WORD_END):
+            i += 1
+            continue
+        cur.append(c)
+        i += 1
+    flush()
+    return [(t, w) for t, w in parts]
+
+
+_ASSIGN = re.compile(r"""[A-Za-z_][A-Za-z0-9_]*=(?:'[^']*'|"(?:[^"\\]|\\[\s\S])*"|\\[\s\S]|[^ \t\n\r\f\v'"\\])*[ \t\n\r\f\v]+""")
+_PREFIX = re.compile(r"(?:command|exec|time)[ \t\n\r\f\v]+")
+_PROGRAM = re.compile(r"([^ \t\n\r\f\v]+)([\s\S]*)")
+
+
+def command_forms(part: str, head: str = "") -> list[str]:
+    """The forms of one command that a pattern is tried on: as written; with
+    any leading NAME=value assignments and a leading command, exec or time
+    dropped; and, when its program is a path, with a leading ./ removed and
+    with the directories before `head` (the pattern's own program, such as
+    kb/kb) removed. So /tmp/run-1/kb/kb search Dana is also tried as
+    kb/kb search Dana."""
+    forms, t = [part], part
+    while True:
+        m = _ASSIGN.match(t) or _PREFIX.match(t)
+        if not m:
+            break
+        t = t[m.end():]
+    forms.append(t)
+    m = _PROGRAM.fullmatch(t)
+    if m and "/" in m.group(1):
+        prog, rest = m.group(1), m.group(2)
+        if prog.startswith("./"):
+            forms.append(prog[2:] + rest)
+        if head and "*" not in head and prog != head and prog.endswith("/" + head):
+            forms.append(head + rest)
+    return list(dict.fromkeys(forms))
+
+
 def _glob(pattern: str):
-    return re.compile("^" + ".*".join(re.escape(p) for p in pattern.split("*")) + "$", re.S)
+    """A check's pattern as a regular expression for re.fullmatch: * matches
+    anything, and a pattern that ends in " *" also matches the command with
+    nothing after it (ls * matches ls, as well as ls -la)."""
+    if pattern.endswith(" *"):
+        return re.compile(".*".join(re.escape(p) for p in pattern[:-2].split("*")) + r"(?:[ \t][\s\S]*)?", re.S)
+    return re.compile(".*".join(re.escape(p) for p in pattern.split("*")), re.S)
+
+
+def pattern_matches(pattern: str, command: str) -> bool:
+    """Does a check's pattern (* for anything) match one command, in any of its forms?"""
+    g = _glob(pattern)
+    return any(g.fullmatch(f) for f in command_forms(command, pattern.split(" ", 1)[0]))
 
 
 def _shell_parts(cmd: str) -> list[str]:
-    return [p.strip() for p in re.split(r"\n|;|&&|\|\||\|", cmd or "") if p.strip()]
+    return [t for t, _ in shell_split(cmd)]
+
+
+def _allowed_part(part: str, writes: bool, allowed: list[str]) -> bool:
+    """A command in a shell step is allowed by a `Bash <pattern>` entry that
+    matches it; one that writes a file (a redirection) only by a pattern that
+    itself contains >."""
+    return any(a.startswith("Bash ") and (not writes or ">" in a[5:]) and pattern_matches(a[5:], part) for a in allowed)
 
 
 def _allowed_step(st: dict, allowed: list[str]) -> bool:
     if st["tool"] in allowed:
         return True
     if st["tool"] == "Bash":
-        return all(any(a.startswith("Bash ") and _glob(a[5:]).match(p) for a in allowed) for p in _shell_parts(st["detail"]))
-    return any(" " in a and _glob(a).match(st["tool"] + " " + st["detail"]) for a in allowed)
+        return all(_allowed_part(p, w, allowed) for p, w in shell_split(st["detail"]))
+    return any(" " in a and _glob(a).fullmatch(st["tool"] + " " + st["detail"]) for a in allowed)
 
 
-def run_check(c: dict, text: str | None, trace: list | None) -> tuple[str, str]:
+def _brief(text: str, n: int = 120) -> str:
+    """A command as a reason shows it: its first line, at most n characters."""
+    first = (text or "").split("\n", 1)[0]
+    return first if first == text and len(first) <= n else first[:n].rstrip(_WS) + " ..."
+
+
+CHAIN_NOTE = " (in a chain: the step's success is its last command's)"
+
+
+def step_mark(st: dict) -> str:
+    """A step's mark in a bundle's trace: "refused" (it never ran), "error" (it failed) or ""."""
+    return "refused" if st.get("refused") else "error" if st.get("error") else ""
+
+
+def run_check(c: dict, text: str | None, trace: list | None, no_trace: str = "no trace kept") -> tuple[str, str]:
+    """One check on an output and its trace: (pass, fail or n/a, the reason).
+    wizard.html's CHECK_KINDS and runCheck give the same results."""
     kind = c.get("kind")
     if kind in ("trace-ran-command", "trace-no-tool-outside"):
         if trace is None:
-            return "n/a", "no trace kept"
+            return "n/a", no_trace
         if kind == "trace-ran-command":
-            tries = [s for s in trace if s["tool"] == "Bash" and any(_glob(c["pattern"]).match(p) for p in _shell_parts(s["detail"]))]
-            hit = next((s for s in tries if not s["error"]), None)
-            return ("pass", "ran a command matching " + c["pattern"]) if hit else \
-                ("fail", "tried it in a step that failed" if tries else "never ran " + c["pattern"])
-        out = next((s for s in trace if not _allowed_step(s, c.get("allowed", []))), None)
-        return ("fail", "outside the list: " + out["tool"] + " " + out["detail"][:120]) if out else ("pass", "every step on the list")
+            tries = []
+            for st in trace:
+                if st["tool"] != "Bash":
+                    continue
+                parts = shell_split(st["detail"])
+                cmd = next((p for p, _ in parts if pattern_matches(c["pattern"], p)), None)
+                if cmd is not None:
+                    tries.append((st, cmd, len(parts) > 1))
+            hit = next((t for t in tries if not t[0]["error"]), None)
+            if hit:
+                return "pass", "ran " + _brief(hit[1]) + (CHAIN_NOTE if hit[2] else "")
+            if tries:
+                st, cmd, chain = tries[0]
+                return "fail", "tried " + _brief(cmd) + ", in a step that failed" + (" (refused)" if st.get("refused") else "") \
+                    + (CHAIN_NOTE if chain and not st.get("refused") else "")
+            return "fail", "never ran " + c["pattern"]
+        allowed = c.get("allowed", [])
+        refused = [st for st in trace if st.get("refused")]
+        for st in trace:
+            if st.get("refused") or _allowed_step(st, allowed):
+                continue
+            if st["tool"] == "Bash":
+                p, w = next((p, w) for p, w in shell_split(st["detail"]) if not _allowed_part(p, w, allowed))
+                return "fail", "outside the list: Bash " + _brief(p) + (" (it writes a file)" if w else "")
+            return "fail", "outside the list: " + st["tool"] + " " + _brief(st["detail"])
+        if not refused:
+            return "pass", "every step on the list"
+        shown = [_brief(st["detail"] if st["tool"] == "Bash" else st["tool"] + " " + st["detail"], 60) for st in refused[:3]]
+        return "pass", (f"every step that ran was on the list; {len(refused)} attempt{'s were' if len(refused) != 1 else ' was'} "
+                        f"refused: " + ", ".join(shown) + (", ..." if len(refused) > 3 else ""))
     if text is None:
         return "n/a", "no output to check"
     if kind == "contains":
@@ -2746,10 +3322,14 @@ class Suites:
         self.suites = []
         if self.data.get("schema") not in (None, SUITES_SCHEMA):
             self.errors.append(f'schema should be "{SUITES_SCHEMA}".')
+        self.warnings: list[str] = []
         for s in self.data.get("suites") or []:
             self.suites.append(self._suite(s))
         if not self.suites:
             self.errors.append("There are no suites (a `suites:` list).")
+        objects = {s["object"] for s in self.suites}
+        if self.suites and ("process" not in objects or not objects & {"product", "stage"}):
+            self.warnings.append("The brief asks for two suites: one on a product or a stage, and one on a process.")
 
     def _file(self, rel):
         return (self.root / rel) if rel else None
@@ -2799,9 +3379,15 @@ class Suites:
             version = short_hash(json.dumps(t, sort_keys=True, ensure_ascii=False),
                                  *[files[k].read_text(encoding="utf-8", errors="replace") for k in sorted(files)])
             tests.append({**t, "files": files, "version": version})
+        warns = []
+        if obj == "process":
+            for c in cases:
+                if c["folder"].is_dir() and (c["role"] == "item" or (c["folder"] / "expect.json").is_file()):
+                    errs, notes = record_problems(c["folder"], c["folder"].relative_to(self.root).as_posix())
+                    self.errors += [f"Suite {sid}: {e}" for e in errs]
+                    warns += [f"Suite {sid}: {w}" for w in notes]
         n_items = sum(1 for c in cases if c["role"] == "item")
         roles = [c["role"] for c in cases]
-        warns = []
         if obj in ("product", "stage") and n_items < 6:
             warns.append(f"Suite {sid}: {n_items} instances; the brief asks for at least six.")
         if obj == "process" and n_items < 3:
@@ -2839,9 +3425,13 @@ def render_case(suite: dict, content: dict) -> str:
 
 
 def parse_verdict(text: str) -> str:
-    lines = [l.strip() for l in text.strip().splitlines() if l.strip()]
-    last = re.sub(r"[^A-Za-z]", "", lines[-1]).upper() if lines else ""
-    return {"PASS": "pass", "FAIL": "fail", "UNKNOWN": "unknown"}.get(last, "unknown")
+    return parse_verdict_noted(text)[0]
+
+
+def parse_verdict_noted(text: str) -> tuple[str, str]:
+    """An LLM test's verdict, from its response's last line: (pass, fail or unknown, a note)."""
+    word, note = last_line_word(text, VERDICT_WORDS)
+    return word.lower(), note
 
 
 def append_rows(csv_path: Path, rows: list[dict]):
@@ -2910,7 +3500,7 @@ def suite_report(suite: dict, rows: list[dict], when: str) -> str:
             verdicts = {human_pass(t, r["result"]) for _, r in rs} - {None}
             return vals, (verdicts.pop() if len(verdicts) == 1 else ("split" if verdicts else None))
         r = L["auto"].get((case["id"], t["id"]))
-        return (r["result"], r["result"]) if r else ("not run", None)
+        return (r["result"] + (" (re-read)" if r.get("reason", "").startswith(REREAD) else ""), r["result"]) if r else ("not run", None)
 
     grid = {(c["id"], t["id"]): cell(c, t) for c in cases for t in tests}
     role = {"item": "instance", "reference": "reference", "fault": "planted fault", "variation": "harmless variation"}
@@ -3018,7 +3608,7 @@ def cmd_suite(a) -> int:
             src = out / src.name
     S = Suites(src)
     root = src.parent
-    for w in (w for s in S.suites for w in s["warnings"]):
+    for w in [w for s in S.suites for w in s["warnings"]] + S.warnings:
         say("  note: " + w)
     if S.errors:
         say("The suites file can't be run yet. Fix these, then run the same command again:")
@@ -3055,6 +3645,40 @@ def cmd_suite(a) -> int:
             runner.__exit__(None, None, None)
 
 
+REREAD = "re-read with 0.1.1's rule; no new run"
+
+
+def reread_unknowns(S, chosen, only_cases, only_tests, root: Path) -> list[dict]:
+    """Rows for the stored LLM runs of each test's current version whose
+    verdict was unknown and which the last-line rule (last_line_word) now
+    reads as pass or fail. No model is called, and the run's record is kept
+    as it is; each run is re-read once (its row names the run's file)."""
+    rows = read_rows(root / "judgments.csv")
+    done = [r["reason"] for r in rows if r.get("route") == "llm" and r.get("reason", "").startswith(REREAD)]
+    out = []
+    for s in chosen:
+        ids = {c["id"] for c in s["cases"]}
+        for t in s["tests"]:
+            if t.get("kind") != "llm" or (only_tests and t["id"] not in only_tests):
+                continue
+            for f in sorted((root / "tests" / t["id"] / "runs").glob("*.json")):
+                rel = f.relative_to(root).as_posix()
+                try:
+                    rec = json.loads(f.read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    continue
+                if rec.get("version") != t["version"] or rec.get("decision") != "unknown" or rec.get("status") != "ok" \
+                        or rec.get("case") not in ids or (only_cases and rec.get("case") not in only_cases) \
+                        or any(x.endswith(f"({rel})") for x in done):
+                    continue
+                word, note = parse_verdict_noted(rec.get("response", ""))
+                if word in ("pass", "fail"):
+                    out.append({"item": rec["case"], "object": s["object"], "check": t["id"], "route": "llm", "judge": rec.get("model", ""),
+                                "version": t["version"], "result": word, "reason": f"{REREAD}: {note} ({rel})", "when": rec.get("when", "")})
+                    say(f"  {t['id']:24} {rec['case']:24} {word:8} re-read from {rel}, with no new run")
+    return out
+
+
 def _suite_rest(a, S, src, root, chosen, only_cases, only_tests, csv_path, todo, skipped, runner) -> int:
     codex = runner is not None and runner.name == "codex"
     when = now()
@@ -3074,18 +3698,20 @@ def _suite_rest(a, S, src, root, chosen, only_cases, only_tests, csv_path, todo,
                         p = subprocess.run(cmd + [str(c["folder"])], capture_output=True, text=True, timeout=120, cwd=root)
                         first = (p.stdout.strip().splitlines() or [""])[0]
                         word, _, why = first.partition(" ")
-                        result = word.lower() if word.lower() in ("pass", "fail") else "n/a"
+                        result = word.lower() if word.lower() in ("pass", "fail", "n/a") else "n/a"
                         reason = why.strip() or (p.stderr.strip()[-200:] if result == "n/a" else "")
-                        if result == "n/a":
-                            reason = f"the program printed {first!r}, not pass or fail" + (": " + reason if reason else "")
+                        if word.lower() not in ("pass", "fail", "n/a"):
+                            reason = f"the program printed {first!r}, not pass, fail or n/a" + (": " + reason if reason else "")
                     except (OSError, subprocess.TimeoutExpired) as e:
                         result, reason = "n/a", f"the program did not run: {e}"
                     judge = prog.name
                 else:
-                    result, reason = run_check(t["check"], content["output"], content["trace"])
+                    result, reason = run_check(t["check"], content["output"], content["trace"],
+                                               no_trace=f"no transcript.jsonl or trace.jsonl in {c['folder'].relative_to(root.resolve()).as_posix()}/")
                     judge = TOOL + " (" + t["check"]["kind"] + ")"
                 new_rows.append({"item": c["id"], "object": s["object"], "check": t["id"], "route": "mechanical", "judge": judge,
                                  "version": t["version"], "result": result, "reason": reason, "when": when})
+    new_rows += reread_unknowns(S, chosen, only_cases, only_tests, root)
     if todo:
         say(f"LLM tests: {len(todo)} runs with {runner.label}, {a.jobs} at a time"
             + (f" ({skipped} already run for this version; add --again to run them again)" if skipped else "")
@@ -3107,7 +3733,7 @@ def _suite_rest(a, S, src, root, chosen, only_cases, only_tests, csv_path, todo,
                 d = tmp / (".agents" if codex else ".claude") / "skills" / name
                 d.mkdir(parents=True)
                 shutil.copyfile(t["files"]["skill"], d / "SKILL.md")
-                text = (f"Use the {name} skill to judge the case below. End your answer with one line: PASS, FAIL or UNKNOWN.\n\n"
+                text = (f"Use the {name} skill to judge the case below. End your answer with one line that says only PASS, FAIL or UNKNOWN.\n\n"
                         f"## The case\n\n{case_text}\n")
                 tools, allowed, shell = ["Skill"], ["Skill"], True
             else:
@@ -3129,11 +3755,11 @@ def _suite_rest(a, S, src, root, chosen, only_cases, only_tests, csv_path, todo,
                 return
             response = red.text(run.final.strip())
             ok = run.ok
-            decision = parse_verdict(response) if ok else "unknown"
+            decision, note = parse_verdict_noted(response) if ok else ("unknown", "the run " + ("timed out" if run.timed_out else "failed"))
             model = run.model_seen or model or ""
             rec = {"suite": s["id"], "test": t["id"], "version": t["version"], "case": c["id"], "when": started, "model": model,
                    **runner.record(), "command": run.command, "decision_rule": t.get("decision", "The last line is PASS, FAIL or UNKNOWN."),
-                   "decision": decision, "status": "ok" if ok else ("timeout" if run.timed_out else "failed"), "seconds": run.seconds,
+                   "decision": decision, "decision_note": note, "status": "ok" if ok else ("timeout" if run.timed_out else "failed"), "seconds": run.seconds,
                    "cost_usd": run.cost_usd, "input": red.text(text), "response": response,
                    "isolation": run.isolation, "tool": TOOL}
             if run.usage:
@@ -3142,6 +3768,8 @@ def _suite_rest(a, S, src, root, chosen, only_cases, only_tests, csv_path, todo,
             d.mkdir(parents=True, exist_ok=True)
             (d / f"{c['id']}__{started.replace(':', '')}.json").write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
             reason = " ".join(response.splitlines()[:-1]).strip()[:300] if response else (rec["status"])
+            if note:
+                reason = (note[0].upper() + note[1:] + ". " + reason).strip()
             with lock:
                 new_rows.append({"item": c["id"], "object": s["object"], "check": t["id"], "route": "llm", "judge": model,
                                  "version": t["version"], "result": decision, "reason": reason, "when": started})
@@ -3169,7 +3797,7 @@ def _suite_rest(a, S, src, root, chosen, only_cases, only_tests, csv_path, todo,
             content = S.case_content(s, c)
             cases.append({"id": c["id"], "role": c["role"], "varies": c.get("varies"), "expect": c.get("expect") or {},
                           "note": c.get("note", ""), "files": content["files"],
-                          "trace": [[x["tool"], x["detail"], "error" if x["error"] else "", x.get("result", "")] for x in content["trace"]]
+                          "trace": [[x["tool"], x["detail"], step_mark(x), x.get("result", "")] for x in content["trace"]]
                           if content["trace"] is not None else None})
         tests = []
         for t in s["tests"]:
@@ -3260,7 +3888,8 @@ def run_folder_state(bundle_path: Path) -> dict | None:
             "runner": names.pop() if len(names) == 1 else ("mixed" if names else None),
             "runs": len(outs), "ok": sum(o.get("status") == "ok" for o in outs),
             "failed": sum(o.get("status") == "failed" for o in outs), "timed_out": sum(o.get("status") == "timeout" for o in outs),
-            "pairs": len(pairs), "judged": len(pairs & judged), "updated": b.get("updated")}
+            "pairs": len(pairs), "judged": len(pairs & judged), "updated": b.get("updated"),
+            "unfrozen": sum(o.get("frozen") is False for o in outs)}
 
 
 def gather_status(a) -> dict:
@@ -3303,12 +3932,13 @@ def gather_status(a) -> dict:
         try:
             e = Experiment(f)
             errors, warns = e.problems()
+            state, date = e.freeze_state()
             exps.append({"file": shown_path(f), "kind": kind, "name": e.name, "title": e.data.get("title", ""),
-                         "errors": errors, "notes": len(warns), "frozen": bool((e.data.get("frozen") or {}).get("hash")),
-                         "demo": bool(e.data.get("demo")), "runner": e.model.get("runner", "claude-code")})
+                         "errors": errors, "notes": len(warns), "frozen": state in ("frozen", "old"), "freeze": state,
+                         "frozen_date": date, "demo": bool(e.data.get("demo")), "runner": e.model.get("runner", "claude-code")})
         except Fail as err:
             exps.append({"file": shown_path(f), "kind": kind, "name": f.stem, "errors": [str(err).splitlines()[0]],
-                         "notes": 0, "frozen": False, "demo": False})
+                         "notes": 0, "frozen": False, "freeze": "unfrozen", "frozen_date": "", "demo": False})
     st["experiments"] = exps
     # Runs.
     runs, seen = [], set()
@@ -3330,6 +3960,7 @@ def gather_status(a) -> dict:
         suites.append({"file": shown_path(f), "has_run": (f.parent / "bundle.json").is_file(), "rows": rows})
     st["suites"] = suites
     st["next"] = next_step(st)
+    st["update"] = newer_version()
     return st
 
 
@@ -3370,6 +4001,11 @@ def next_step(st: dict) -> dict:
         if e["errors"]:
             return {"what": f"Your experiment {e['file']} has {len(e['errors'])} thing(s) to fix. Check it to see them.",
                     "command": f"{PY} run_ab.py check {e['file']}"}
+        if e.get("freeze") == "changed":
+            return {"what": f"Your experiment {e['file']} has changed since it was frozen on {e['frozen_date']}. Freeze it again in the wizard "
+                            "(step 1, then Freeze in step 2 and 'Export the frozen experiment'), save it over the old file, and keep "
+                            "the earlier file, dated: your report says what you changed and why.",
+                    "command": OPEN_WIZARD}
         if not e["frozen"]:
             return {"what": f"Your experiment {e['file']} is ready to freeze. " + "Freeze it in the wizard: load it in step 1, press Freeze in step 2, then press 'Export the frozen experiment' "
                             f"(now in step 2) and save the file over {e['file']}.",
@@ -3404,7 +4040,10 @@ def next_step(st: dict) -> dict:
 
 def status_text(st: dict) -> str:
     s, asst = st["setup"], st["assistant"]
-    L = [f"Skill Eval Lite {VERSION}: where you are now", "", "Your setup"]
+    L = [f"Skill Eval Lite {VERSION}: where you are now", ""]
+    if st.get("update"):
+        L += ["  NEW  " + update_text(st["update"]), ""]
+    L.append("Your setup")
 
     def mark(good):
         return {True: "ok  ", False: "FIX ", None: "--  "}[good]
@@ -3438,6 +4077,8 @@ def status_text(st: dict) -> str:
             state = f"{len(e['errors'])} thing(s) to fix"
         elif e["demo"]:
             state = "ready to run"
+        elif e.get("freeze") == "changed":
+            state = "changed since it was frozen: freeze it again"
         else:
             state = "frozen, ready to run" if e["frozen"] else "ready to freeze in the wizard"
         L.append(f"  {e['file']:44} {e['kind']}: {state}")
@@ -3447,7 +4088,8 @@ def status_text(st: dict) -> str:
     for r in st["runs"]:
         fails = r["failed"] + r["timed_out"]
         L.append(f"  {r['folder']:36} {RUNNER_LABEL.get(r['runner'], r['runner'] or '?'):12} {r['ok']} of {r['runs']} finished"
-                 + (f" ({fails} failed)" if fails else "") + f"; judge: {r['judged']} of {r['pairs']} pairs")
+                 + (f" ({fails} failed)" if fails else "") + f"; judge: {r['judged']} of {r['pairs']} pairs"
+                 + (f"; {r['unfrozen']} made before the freeze" if r.get("unfrozen") else ""))
     if not st["runs"]:
         L.append("  none yet")
     if st["suites"]:
@@ -3692,6 +4334,8 @@ def main(argv=None) -> int:
                                          "--runner codex on an experiment written for Claude Code)")
             s.add_argument("--again", action="store_true", help="redo runs already in the run folder (replacing them)")
             s.add_argument("--keep-work", action="store_true", help="keep each run's working copy, and print where")
+            s.add_argument("--unfrozen", action="store_true", help="run an experiment that isn't frozen, or has changed since it was "
+                                                                   "(the runs are marked as made before the freeze)")
             add_runner_args(s, "the model for every run (default: the experiment's)")
         else:
             s.add_argument("--runner", choices=RUNNERS, help="claude-code or codex (default: the experiment's)")

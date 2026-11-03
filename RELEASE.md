@@ -1,9 +1,182 @@
-Skill Eval Lite 0.1.0 is published as a public repository,
-https://github.com/vanderbilt-ms-ai/skill-eval-lite, released 27 October
-2026 as one commit squashed from the course's private development
-history.
+Skill Eval Lite is published as a public repository,
+https://github.com/vanderbilt-ms-ai/skill-eval-lite. Version 0.1.0 was
+released on 27 October 2026, and version 0.1.1 on 3 November 2026. Each
+release is one commit on the public `main`, made from the course's private
+development history and tagged `v0.1.0` and `v0.1.1`.
+
+## 0.1.1, 3 November 2026
+
+Nine fixes to how Skill Eval Lite reads and checks a process, freezes an
+experiment and reads a verdict, from the course's proposal of 3 November
+(revision 2), and a version check.
+
+### If you are on 0.1.0
+
+1. In your `skill-eval-lite` folder, type `git pull`. Your `experiments/`
+   and `runs/` folders are yours, not part of the repository, and are left
+   as they are.
+2. Shared I: if your group copied the class experiment (`new <name> --from
+   class`) before 0.1.1, its `stayed-in-bounds` check has the old list,
+   which fails nearly every run. Before you freeze, copy the new `allowed`
+   list from `examples/class-assistant/experiment.toml` into your file.
+3. Shared I: `run` now runs only a frozen experiment. A file frozen with
+   0.1.0 still counts as frozen, with a note that its fingerprint can't be
+   checked. If you change it, freeze it again, and keep the earlier file,
+   dated.
+4. Personal I: run `python3 run_ab.py suite <your packet>/suites.yaml
+   --check` again. It now says more about each process case's record. If
+   an LLM test's verdict was "unknown" because its last line was
+   `Verdict: PASS`, the next `suite` reads it again, with no new run.
+
+### What changed
+
+| # | In 0.1.0 | In 0.1.1 |
+| --- | --- | --- |
+| 1 | A process case's record under any name but `transcript.jsonl` or `trace.jsonl` was silently ignored. `suite --check` said "Nothing to fix", the trace tests said n/a, and the example's program said fail | `suite --check` says it is a "must fix" when a case has no record, a record under another name (it names the file), or a line that isn't JSON (with its number). It says the same of a `trace.jsonl` whose lines have no `"tool"` (a session saved under the wrong name). It notes a record with no steps, and a suites file without both a product or stage suite and a process suite. The suite designer says the same, word for word. A built-in trace test's n/a names the folder |
+| 2 | A case with both record files was read two ways: `transcript.jsonl` by the built-in checks, `trace.jsonl` by the example's `check.py` | `suite --check` and the designer refuse such a case. `check.py` reads in `read_trace`'s order, `transcript.jsonl` first. The README says so |
+| 3 | An LLM test whose last line was `Verdict: PASS` or `Final answer: FAIL` was scored unknown | One rule for the suites' LLM tests and the judge (`last_line_word`). It reads the exact word, a labelled word, or the one word in the line with no `not` before it. Otherwise it is unknown, and the run record (`decision_note`) and the row's reason say why. A stored unknown run that the rule now reads as pass or fail gets one new row ("re-read with 0.1.1's rule; no new run"), and the report marks it "(re-read)". A skill-based test now asks for "one line that says only PASS, FAIL or UNKNOWN" |
+| 4 | `run` printed a note and ran an unfrozen experiment | `run` refuses unless the experiment is frozen and unchanged, or is a demonstration. Held-out runs are refused too. `--unfrozen` runs it anyway, and marks each run, its `run.json` and the bundle `"frozen": false`. The wizard's steps 3 to 5 then say "These runs were made before the experiment was frozen" |
+| 5 | `trace-ran-command` matched only the whole command as written: `./kb/kb search Dana` was not a search | A pattern also matches the command with a leading `./`, the directories before its own program, `NAME=value` settings, or `command`, `exec` or `time` taken off. A pattern ending in ` *` also matches the bare command (`ls *` matches `ls`). A match inside a chain says so: "(in a chain: the step's success is its last command's)" |
+| 6 | `stayed-in-bounds` failed every recorded run, in every round, and counted steps Claude Code refused | Refused steps are marked `"refused": true`: in a run, a result beginning "Permission for this tool use was denied"; in a saved interactive session, a step the person rejected ("The user doesn't want to proceed with this tool use"). They are not counted, and are listed in the reason. A command that writes a file through `>` or `>>` is allowed only by a pattern with `>`. The class experiment's list, and the three demonstrations', adds `ls`, `cat`, `head`, `find`, `rg`, `wc`, `git log` and `git status` (not `echo` or `printf`) |
+| 7 | Nothing compared the freeze's fingerprint with the file, and the fingerprint couldn't be rebuilt from the frozen file | The fingerprint is `sha256c:` and the SHA-256 of the file without its `[frozen]` table (for JSON, without `frozen`, keys sorted). The wizard and the runner compute it the same way, and the wizard's own SHA-256 needs no secure context. `check` says "must fix" when the file has changed since it was frozen, and so do `status`, `run` and the wizard's step 2. A 0.1.0 fingerprint (`sha256:` and 64 hex digits, or `fnv1a:` and 8) is read as frozen, with a note; any other hash is not a freeze. The wizard's export finds the `[frozen]` table as the fingerprint does |
+| 8 | The example's program test said **fail** on a case with no record | It says `n/a no transcript.jsonl or trace.jsonl in <folder>/`. `suite` reads a program's `n/a` as n/a, with its reason. The READMEs say a program prints `n/a` when it can't test a case |
+| 9 | Commands were split at every `;`, `\|`, `&&` and new line, quoted or not | Split outside quotes (`$'...'` included), escapes, `$(...)`, backticks and heredoc bodies, and at a lone `&` too. The commands in a `( ... )` or `{ ...; }` group are checked one by one. `>& file` counts as a write. A command inside `$(...)` is not checked on its own (a limit, in the README) |
+| | | `doctor` and `status` say "Skill Eval Lite 0.1.2 is out; you have 0.1.1. In this folder, run git pull." when the public repository's `VERSION` is newer (one HTTPS request; offline, nothing) |
+
+The shell splitter, the command matching, both trace checks and the
+fingerprint are in `run_ab.py` and `wizard.html`, as before. They are held
+to one set of answers in `tests/fixtures/shell.json` and
+`tests/fixtures/fingerprints.json` (`tests/test_shared.py`). The guided
+tour's builder now uses `run_ab.py`'s checks instead of a third copy.
+
+### Recorded verdicts, before and after
+
+Every process check was rerun on every recorded run, with no new model
+calls. Where a run's own experiment has the check, it keeps that file's
+0.1.0 list, as it was recorded. Those verdicts, the ones the wizard and the
+tour show for `examples/recorded/`, are the same as in 0.1.0. Only their
+reasons are more exact: the command outside the list, rather than the whole
+step, and the chain note. The worked example's `search-before-write` gives
+the same nine results.
+
+The class experiment's checks, with 0.1.1's list, on every recorded Shared I
+run (`searched-the-graph` only where the run's prompt is tagged `in-graph`):
+
+| Recorded run | `searched-the-graph` | `stayed-in-bounds`, 0.1.0 | `stayed-in-bounds`, 0.1.1 | 0.1.1's reason |
+| --- | --- | --- | --- | --- |
+| demo-board-memo ellis-board-note/A/1 | pass | fail | pass | every step that ran was on the list; 1 refused |
+| demo-board-memo ellis-board-note/B/1 | pass | fail | pass | every step that ran was on the list; 1 refused |
+| demo-board-memo summarize-committee-notes/A/1 | - | fail | pass | every step that ran was on the list; 1 refused |
+| demo-board-memo summarize-committee-notes/B/1 | - | fail | pass | every step that ran was on the list; 1 refused |
+| demo-graph-removed prep-dana-checkin/A/1 | pass | fail | fail | outside the list: Bash echo --- |
+| demo-graph-removed prep-dana-checkin/C/1 | pass | fail | fail | outside the list: Bash cd . |
+| demo-graph-removed prep-priya-call/A/1 | pass | fail | fail | outside the list: Bash cd kb/wiki |
+| demo-graph-removed prep-priya-call/C/1 | pass | fail | pass | every step that ran was on the list; 2 refused |
+| demo-graph-removed-codex prep-dana-checkin/A/1 | pass | fail | fail | outside the list: Bash mkdir -p notes |
+| demo-graph-removed-codex prep-dana-checkin/C/1 | fail | fail | fail | outside the list: Bash pwd |
+| demo-graph-removed-codex prep-priya-call/A/1 | pass | fail | fail | outside the list: Bash pwd |
+| demo-graph-removed-codex prep-priya-call/C/1 | pass | fail | fail | outside the list: Bash pwd |
+| demo-one-line reply-to-priya/A/1 | - | fail | pass | every step that ran was on the list; 1 refused |
+| demo-one-line reply-to-priya/B/1 | - | fail | pass | every step that ran was on the list; 1 refused |
+| demo-one-line reply-to-sam/A/1 | - | fail | pass | every step on the list |
+| demo-one-line reply-to-sam/B/1 | - | fail | fail | outside the list: Bash mkdir -p drafts |
+| demo-one-line reply-to-school/A/1 | - | fail | pass | every step that ran was on the list; 1 refused |
+| demo-one-line reply-to-school/B/1 | - | fail | pass | every step that ran was on the list; 1 refused |
+| demo-voice-reordered reply-to-priya/A/1 | pass | fail | pass | every step on the list |
+| demo-voice-reordered reply-to-priya/D/1 | pass | fail | pass | every step on the list |
+| demo-voice-reordered summarize-committee-notes/A/1 | - | fail | pass | every step that ran was on the list; 1 refused |
+| demo-voice-reordered summarize-committee-notes/D/1 | - | fail | pass | every step that ran was on the list; 1 refused |
+
+So `stayed-in-bounds` now moves. With 0.1.1's list it passes 14 of the 22
+runs, against none before. The demonstrations' rounds A and B, and A and D,
+pass alike, as they should. What still fails is a command that only prints
+or moves (`echo ---`, `cd`, `pwd`), which the list leaves out, or a
+directory made through the shell (`mkdir`). In `demo-one-line`
+`reply-to-sam/B/1`, that `mkdir` came before a draft written with `printf …
+> drafts/…`, which the check is meant to catch. The four 0.1.0 failures of
+`demo-graph-removed` stay in the tour, as recorded, as the lesson: a check
+whose list didn't match what the system may do, caught because it failed
+the round that should have passed (`starting.html`, "A check that didn't
+move").
+
+### What was verified for 0.1.1
+
+- `python3 -m unittest`: all 125 tests pass, on Python 3.14 and 3.11. The 27
+  new ones:
+  - `tests/test_shared.py`: both copies against the fixtures. That covers
+    36 shell steps (chains, quoted pipes and semicolons, an escaped pipe,
+    heredocs, command substitutions, groups), 19 pattern matches (the four
+    forms in fix 5, `cd sub && ./kb/kb node X`, `echo "kb/kb search"`), 36
+    trace check results (`echo x > notes.md` fails) and 13 fingerprints. The wizard runs in headless Chrome.
+  - `tests/test_freeze.py`: `check`, `status` and `run` on frozen, changed,
+    0.1.0 and unfrozen files, `--unfrozen` and its marks in the bundle and
+    the wizard, the wizard's step 2 on a changed file, and the version
+    check, read from a file.
+  - `tests/test_suites.py`: the record states through `suite --check`, the
+    example's `check.py` against `read_trace` on every case, the last-line
+    tables for verdicts and decisions, every recorded verdict read the same
+    as before, the refusals marked in the four recorded graph-removed runs
+    and the worked example, and a stored unknown re-read once and not again.
+  - `tests/test_designer.py`: the designer's copy of `suite --check` agrees
+    word for word with `run_ab.py` on thirteen more broken packets.
+  - `tests/test_onboarding.py` and `tests/test_wizard.py`: a file frozen in
+    the wizard and exported verifies in `check`.
+- `dev/embed_examples.py --check`, `node dev/diagrams.mjs --check` and
+  `tutorial/build.py --check`: all up to date.
+- The wizard's SHA-256 against Node's on six strings, ASCII to emoji.
+- An independent review (a separate Claude session, reading the diff). It
+  ran about 100,000 random inputs through both copies of the splitter, the
+  matching and the checks, and froze and re-read files the wizard's way.
+  It found ten problems, all fixed above with tests: a rejected step in an
+  interactive session, made-up hashes, a session saved as `trace.jsonl`,
+  re-reading again when a folder's name has "(", a traceback on odd
+  records, the export's `[frozen]` table, the folder loader's marks,
+  emoji in reasons, three shell forms, and a verdict in a code fence.
+- One `dev/fresh-trial.sh --no-shell --keep-api-key` (2026-11-03), cloned
+  from the 0.1.1 commit. It used Claude Code 2.1.317 from the official
+  installer, in a fresh home, with an API key. Then the walkthrough as
+  typed:
+  - `doctor` passed. Its probe took 1.9 s and $0.0004, and its version
+    check reached GitHub and said nothing, since GitHub still had 0.1.0.
+  - `setup` worked.
+  - `run` refused the class experiment, unfrozen, with the message above.
+  - `demo-one-line` ran 6 of 6 in 15 s ($0.30), and the judge its 3 pairs
+    ($0.03).
+  - Every refused `mkdir -p drafts && cat > … <<'EOF'` was marked
+    `refused` in the bundle and in `trace.jsonl`, and the wizard showed it
+    so.
+  - The class experiment was frozen in the wizard (headless Chrome) and
+    exported. Then `check` said `Frozen: yes`, `status` said "frozen, ready
+    to run", and one real run of it worked ($0.05).
+
+### Decided for 0.1.1
+
+- **Fix 4: `run` refuses unfrozen runs**, as the Shared I brief says
+  ("frozen before you look at any output"). If the brief's freezing rule is
+  relaxed, the refusal could become a note again; `--unfrozen` already lets
+  a group run first, with the runs marked.
+- **Fix 6: the recommended option.** Count only the steps that ran, and
+  widen the class list with the proposal's eight read-only commands.
+  `echo` and `printf` stay off the list.
+
+### Open, for Simon
+
+- `echo`, `cd` and `pwd` are off the class list, so `demo-graph-removed`'s
+  two round A runs still fail `stayed-in-bounds` (`echo ---`, `cd kb/wiki`).
+  With the redirection rule, `Bash echo *` would allow only an `echo` that
+  writes no file. Adding `Bash echo *`, `Bash cd *` and `Bash pwd` would
+  pass all four graph-removed Claude Code runs. It would not pass the four
+  Codex runs, which still fail on Codex's own MCP resource tools
+  (`ListMcpResources`, `ListMcpResourceTemplates`) or a `mkdir`. Nor would
+  it pass `demo-one-line`'s `reply-to-sam/B/1`, which fails on a `mkdir`
+  before a draft written through the shell.
+- Not in 0.1.1, as the proposal says: giving program tests the normalised
+  steps (`SKILL_EVAL_STEPS`); the course's project pages, packs and
+  announcement.
 
 ## What the release contains
+
+As of 0.1.1 (the files 0.1.1 added: `tests/test_shared.py`, `tests/test_freeze.py` and `tests/fixtures/`).
 
 | Path | What it is |
 | --- | --- |
@@ -25,7 +198,7 @@ history.
 | `starting.html`, `tutorial/` | The guided tour for new students: 22 stops in six chapters, with the class assistant as its worked example, built from the recorded runs (`tutorial/build.py`, `tutorial/excerpts.json`) |
 | `docs/diagrams/`, `dev/diagrams.mjs` | The Getting started pictures as standalone SVGs (light and dark), for the README and other pages; `dev/diagrams.mjs` writes them, and the README's step lists, from the drawing code in `wizard.html` (`--check` says whether they are up to date) |
 
-## What was verified
+## What was verified for 0.1.0
 
 - `python3 -m unittest`: all 98 tests pass, on Python 3.14 and 3.11 (the
   pipeline offline with the fake `claude`; the wizard's TOML reader against
@@ -125,6 +298,8 @@ this and say: run `claude`, log in, type `/exit`, and try again.
 ## Known limits
 
 - Tested on Linux only.
+- The trace checks don't look inside `$(...)` or backticks, and refused
+  steps are marked in Claude Code's records only, not yet in Codex's.
 - Codex: a run reads the assistant through an `AGENTS.md` written from
   `CLAUDE.md` with its imports inlined, and its skills copied to
   `.agents/skills/`, so Codex results are not comparable with Claude Code's

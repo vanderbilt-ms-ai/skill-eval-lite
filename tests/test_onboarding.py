@@ -13,6 +13,7 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
 import time
 import tomllib
 import unittest
@@ -23,7 +24,7 @@ import sys as _sys
 _sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from cdp import Browser, find_chrome
-from helpers import REPO
+from helpers import EXAMPLES, REPO, run_ab
 
 WIZARD = REPO / "wizard.html"
 DIAGRAMS = REPO / "docs" / "diagrams"
@@ -124,7 +125,18 @@ class GettingStarted(unittest.TestCase):
             if path.exists() and not path.with_name(path.name + ".crdownload").exists():
                 break
             time.sleep(0.05)
-        self.assertRegex(tomllib.loads(path.read_text(encoding="utf-8"))["frozen"]["hash"], r"^sha256:[0-9a-f]{64}$")
+        frozen = path.read_text(encoding="utf-8")
+        self.assertRegex(tomllib.loads(frozen)["frozen"]["hash"], r"^sha256c:[0-9a-f]{64}$")
+        # The frozen file, back in its folder, verifies: its fingerprint is checked from the file itself.
+        folder = Path(tempfile.mkdtemp(prefix="sel-frozen-"))
+        try:
+            shutil.copytree(EXAMPLES / "class-assistant", folder / "class", dirs_exist_ok=True)
+            (folder / "class" / "experiment.toml").write_text(frozen, encoding="utf-8")
+            r = run_ab("check", folder / "class" / "experiment.toml")
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertRegex(r.stdout, r"Frozen: yes, 20\d\d-\d\d-\d\dT")
+        finally:
+            shutil.rmtree(folder, ignore_errors=True)
         self.assertTrue(b.js("document.getElementById('gs-btn').click(); !document.getElementById('start').hidden"))
         self.assertTrue(b.js("document.getElementById('gs-btn').getAttribute('aria-pressed') === 'true'"))
 

@@ -14,6 +14,10 @@ mode. Everything in it is about Wren and Morgan Reyes, who are fictional.
 - `tests/<test>/`: the LLM tests' prompts, the human tests' instructions, and
   the mechanical program `search-before-write/check.py`. The other
   mechanical test, `no-shorthand`, is a built-in check in `suites.yaml`.
+  The program reads a case's record as the built-in checks do
+  (`transcript.jsonl`, or else `trace.jsonl`), and prints `n/a` when a case
+  has neither: with nothing to test, it is not a failure. A program of your
+  own should do the same.
 
 To rerun it, from Skill Eval Lite's folder:
 

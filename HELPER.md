@@ -86,6 +86,11 @@ to you below the line "Where the student is now".
    then press *Export the frozen experiment* (also in step 2) and save the
    file over `experiments/<name>/experiment.toml`. Freezing records the
    experiment before any results, so nobody can change it after seeing them.
+   `check` should then say `Frozen: yes`. If it says the file has changed
+   since it was frozen, it must be frozen again (keep the earlier file,
+   dated). `run` won't run an experiment that isn't frozen. `--unfrozen`
+   runs it anyway, with the runs marked: suggest it only if the group
+   decides to run first and will say so in their report.
 7. **Run it.** Rounds A and B first, then the controls:
    `python3 run_ab.py run experiments/<name>/experiment.toml --assistant ../class-assistant --rounds A,B --jobs 4`
    and then the same with `--rounds C,D`. Every round gets the experiment's

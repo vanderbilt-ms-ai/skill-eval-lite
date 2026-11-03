@@ -26,6 +26,9 @@ _sys.path.insert(0, str(_Path(__file__).resolve().parent))
 from cdp import Browser, find_chrome
 from helpers import EXAMPLES, FAKE, REPO, class_assistant, fake_run, run_ab, tmpdir
 
+_sys.path.insert(0, str(REPO))
+import run_ab as R  # noqa: E402
+
 WIZARD = REPO / "wizard.html"
 CHROME = find_chrome() if os.name == "posix" else None
 TOML_FILES = [EXAMPLES / "class-assistant" / "experiment.toml", *sorted(EXAMPLES.glob("demo-*.toml"))]
@@ -214,7 +217,8 @@ class Journey(unittest.TestCase):
         res = json.loads(self.downloaded("Export results.json", "results.json"))
         self.assertEqual(res["improvement"]["comparison"], "A|C")
         frozen = self.downloaded("Export the frozen experiment", "experiment.toml")
-        self.assertRegex(tomllib.loads(frozen)["frozen"]["hash"], r"^sha256:[0-9a-f]{64}$")
+        self.assertRegex(tomllib.loads(frozen)["frozen"]["hash"], r"^sha256c:[0-9a-f]{64}$")
+        self.assertEqual(tomllib.loads(frozen)["frozen"]["hash"], R.fingerprint(frozen), "the runner computes the same fingerprint")
 
     def test_recorded_bundles_load(self):
         for d in sorted(p for p in (EXAMPLES / "recorded").iterdir() if p.name.startswith("demo-")):

@@ -43,23 +43,16 @@ END = "</script>"
 DEMOS = {"graph": "demo-graph-removed", "voice": "demo-voice-reordered", "board": "demo-board-memo"}
 
 
-# The wizard's mechanical checks (wizard.html, "The mechanical checks"),
-# reimplemented so that the page shows the results the wizard would.
-def _glob(pattern: str) -> re.Pattern:
-    return re.compile("^" + ".*".join(re.escape(s) for s in pattern.split("*")) + "$", re.S)
+# The trace checks are run_ab.py's own (the wizard has the same), so that the
+# page shows the results the wizard and the runner would.
+sys.path.insert(0, str(REPO))
+import run_ab  # noqa: E402
 
 
-def _parts(cmd: str) -> list[str]:
-    return [x.strip() for x in re.split(r"\n|;|&&|\|\||\|", cmd or "") if x.strip()]
-
-
-def _allowed(step: list, allowed: list[str]) -> bool:
-    if step[0] in allowed:
-        return True
-    if step[0] == "Bash":
-        return all(any(a.startswith("Bash ") and _glob(a[5:]).match(p) for a in allowed) for p in _parts(step[1]))
-    text = step[0] + (" " + step[1] if len(step) > 1 and step[1] else "")
-    return any(" " in a and _glob(a).match(text) for a in allowed)
+def steps_of(trace: list) -> list[dict]:
+    """A bundle's trace ([tool, detail] or [tool, detail, "error" or "refused"]) as run_ab.py's steps."""
+    return [{"tool": st[0], "detail": st[1] if len(st) > 1 else "", "error": len(st) > 2 and st[2] in ("error", "refused"),
+             "refused": len(st) > 2 and st[2] == "refused"} for st in trace]
 
 
 def run_check(c: dict, prompt: dict, o: dict) -> dict | None:
@@ -83,16 +76,9 @@ def run_check(c: dict, prompt: dict, o: dict) -> dict | None:
         w = len(out.split())
         ok = (c.get("min") is None or w >= c["min"]) and (c.get("max") is None or w <= c["max"])
         why = f"{w} words" + ("" if ok else f", over {c['max']}")
-    elif k == "trace-ran-command":
-        g = _glob(c["pattern"])
-        tries = [st for st in trace if st[0] == "Bash" and any(g.match(p) for p in _parts(st[1]))]
-        hit = next((st for st in tries if not (len(st) > 2 and st[2] == "error")), None)
-        cmd = lambda st: next(p for p in _parts(st[1]) if g.match(p))
-        ok = hit is not None
-        why = ("ran " + cmd(hit)) if hit else (("tried " + cmd(tries[0]) + ", in a step that failed") if tries else "never ran " + c["pattern"])
-    elif k == "trace-no-tool-outside":
-        bad = next((st for st in trace if not _allowed(st, c["allowed"])), None)
-        ok, why = bad is None, ("outside the list: " + bad[0] + " " + (bad[1] or "")[:80]) if bad else "every step on the list"
+    elif k in ("trace-ran-command", "trace-no-tool-outside"):
+        result, why = run_ab.run_check(c, out, steps_of(trace))
+        ok = result == "pass"
     else:
         return None
     return {"result": "pass" if ok else "fail", "reason": why}
@@ -105,8 +91,8 @@ def short(detail: str, n: int = 160) -> str:
 
 
 def trace_steps(o: dict) -> list[list]:
-    # The bundle keeps each step as [tool, detail] or [tool, detail, "error"].
-    return [[s[0], short(s[1] if len(s) > 1 else ""), bool(len(s) > 2 and s[2] == "error")] for s in o["trace"]]
+    # The bundle keeps each step as [tool, detail] or [tool, detail, "error" or "refused"].
+    return [[s[0], short(s[1] if len(s) > 1 else ""), bool(len(s) > 2 and s[2] in ("error", "refused"))] for s in o["trace"]]
 
 
 def tool_results(transcript: Path) -> list[str]:

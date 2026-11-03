@@ -1,0 +1,1358 @@
+{
+ "about": "What run_ab.py and wizard.html must both give: shell_split / shellSplit, pattern_matches / patternMatches, and the two trace checks (run_check / traceCheck). tests/test_shared.py checks both.",
+ "split": [
+  {
+   "cmd": "kb/kb search Dana",
+   "parts": [
+    [
+     "kb/kb search Dana",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "ls; kb/kb search Hale | head",
+   "parts": [
+    [
+     "ls",
+     false
+    ],
+    [
+     "kb/kb search Hale",
+     false
+    ],
+    [
+     "head",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "kb/kb search Dana 2>&1 | head -30",
+   "parts": [
+    [
+     "kb/kb search Dana 2>&1",
+     false
+    ],
+    [
+     "head -30",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "ls notes 2>/dev/null | head -30; kb/kb search Dana 2>&1",
+   "parts": [
+    [
+     "ls notes 2>/dev/null",
+     false
+    ],
+    [
+     "head -30",
+     false
+    ],
+    [
+     "kb/kb search Dana 2>&1",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "cd sub && ./kb/kb node X || echo none",
+   "parts": [
+    [
+     "cd sub",
+     false
+    ],
+    [
+     "./kb/kb node X",
+     false
+    ],
+    [
+     "echo none",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "grep \"a|b\" notes.md",
+   "parts": [
+    [
+     "grep \"a|b\" notes.md",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "grep 'a;b' notes.md && wc -l notes.md",
+   "parts": [
+    [
+     "grep 'a;b' notes.md",
+     false
+    ],
+    [
+     "wc -l notes.md",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "grep a\\|b notes.md",
+   "parts": [
+    [
+     "grep a\\|b notes.md",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "echo \"one\ntwo\"; ls",
+   "parts": [
+    [
+     "echo \"one\ntwo\"",
+     false
+    ],
+    [
+     "ls",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "kb/kb search Dana\nkb/kb node \"Dana Whitfield\"",
+   "parts": [
+    [
+     "kb/kb search Dana",
+     false
+    ],
+    [
+     "kb/kb node \"Dana Whitfield\"",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "mkdir -p drafts && cat > drafts/x.md <<'EOF'\nHi Priya;\nsee you | then\nEOF\nls drafts",
+   "parts": [
+    [
+     "mkdir -p drafts",
+     false
+    ],
+    [
+     "cat > drafts/x.md <<'EOF'\nHi Priya;\nsee you | then\nEOF",
+     true
+    ],
+    [
+     "ls drafts",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "cat <<-END && echo done\n\tbody; here\n\tEND\nwc x",
+   "parts": [
+    [
+     "cat <<-END\n\tbody; here\n\tEND",
+     false
+    ],
+    [
+     "echo done",
+     false
+    ],
+    [
+     "wc x",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "echo $(ls; pwd) && kb/kb search x",
+   "parts": [
+    [
+     "echo $(ls; pwd)",
+     false
+    ],
+    [
+     "kb/kb search x",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "echo `date; whoami` | head",
+   "parts": [
+    [
+     "echo `date; whoami`",
+     false
+    ],
+    [
+     "head",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "diff <(ls a; ls b) c",
+   "parts": [
+    [
+     "diff <(ls a; ls b) c",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "sleep 1 & kb/kb search x",
+   "parts": [
+    [
+     "sleep 1",
+     false
+    ],
+    [
+     "kb/kb search x",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "ls &> all.txt; cat a 2>&1 >/dev/null",
+   "parts": [
+    [
+     "ls &> all.txt",
+     true
+    ],
+    [
+     "cat a 2>&1 >/dev/null",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "printf 'x' > drafts/a.md",
+   "parts": [
+    [
+     "printf 'x' > drafts/a.md",
+     true
+    ]
+   ]
+  },
+  {
+   "cmd": "echo hi >> log.txt",
+   "parts": [
+    [
+     "echo hi >> log.txt",
+     true
+    ]
+   ]
+  },
+  {
+   "cmd": "kb/kb search x > /dev/null",
+   "parts": [
+    [
+     "kb/kb search x > /dev/null",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "cat a >| b",
+   "parts": [
+    [
+     "cat a >| b",
+     true
+    ]
+   ]
+  },
+  {
+   "cmd": "echo hi >&2",
+   "parts": [
+    [
+     "echo hi >&2",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "ls # a comment; rm -rf x\nwc a",
+   "parts": [
+    [
+     "ls",
+     false
+    ],
+    [
+     "wc a",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "a#b; c",
+   "parts": [
+    [
+     "a#b",
+     false
+    ],
+    [
+     "c",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "grep -c x <<< 'a|b'",
+   "parts": [
+    [
+     "grep -c x <<< 'a|b'",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "KB_DEBUG=1 kb/kb search Dana",
+   "parts": [
+    [
+     "KB_DEBUG=1 kb/kb search Dana",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "",
+   "parts": []
+  },
+  {
+   "cmd": "   ",
+   "parts": []
+  },
+  {
+   "cmd": "ls |& head",
+   "parts": [
+    [
+     "ls",
+     false
+    ],
+    [
+     "head",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "kb/kb search Dana >& out.txt",
+   "parts": [
+    [
+     "kb/kb search Dana >& out.txt",
+     true
+    ]
+   ]
+  },
+  {
+   "cmd": "cat a 2>&- && ls >&2",
+   "parts": [
+    [
+     "cat a 2>&-",
+     false
+    ],
+    [
+     "ls >&2",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "echo $'it\\'s; ok' && kb/kb search x",
+   "parts": [
+    [
+     "echo $'it\\'s; ok'",
+     false
+    ],
+    [
+     "kb/kb search x",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "(cd kb && ls) | head",
+   "parts": [
+    [
+     "cd kb",
+     false
+    ],
+    [
+     "ls",
+     false
+    ],
+    [
+     "head",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "{ cd kb; ls; } > out.txt",
+   "parts": [
+    [
+     "cd kb",
+     false
+    ],
+    [
+     "ls",
+     false
+    ],
+    [
+     "> out.txt",
+     true
+    ]
+   ]
+  },
+  {
+   "cmd": "echo ) && ((i++))",
+   "parts": [
+    [
+     "echo )",
+     false
+    ],
+    [
+     "i++",
+     false
+    ]
+   ]
+  },
+  {
+   "cmd": "kb/kb search \"Dana 😀\" | head",
+   "parts": [
+    [
+     "kb/kb search \"Dana 😀\"",
+     false
+    ],
+    [
+     "head",
+     false
+    ]
+   ]
+  }
+ ],
+ "match": [
+  {
+   "pattern": "kb/kb search*",
+   "command": "kb/kb search Dana",
+   "match": true
+  },
+  {
+   "pattern": "kb/kb search*",
+   "command": "./kb/kb search Dana",
+   "match": true
+  },
+  {
+   "pattern": "kb/kb search*",
+   "command": "/tmp/run-1/kb/kb search Dana",
+   "match": true
+  },
+  {
+   "pattern": "kb/kb search*",
+   "command": "KB_DEBUG=1 kb/kb search Dana",
+   "match": true
+  },
+  {
+   "pattern": "kb/kb search*",
+   "command": "command kb/kb search Dana",
+   "match": true
+  },
+  {
+   "pattern": "kb/kb search*",
+   "command": "time KB='a b' kb/kb search Dana",
+   "match": true
+  },
+  {
+   "pattern": "kb/kb node*",
+   "command": "cd sub && ./kb/kb node X",
+   "match": true
+  },
+  {
+   "pattern": "kb/kb search*",
+   "command": "echo \"kb/kb search\"",
+   "match": false
+  },
+  {
+   "pattern": "kb/kb search*",
+   "command": "grep \"kb/kb search\" notes.md",
+   "match": false
+  },
+  {
+   "pattern": "kb/kb search*",
+   "command": "ls; kb/kb search Hale | head",
+   "match": true
+  },
+  {
+   "pattern": "kb/kb search*",
+   "command": "xkb/kb search Dana",
+   "match": false
+  },
+  {
+   "pattern": "kb/kb search*",
+   "command": "../other/kb/kb search Dana",
+   "match": true
+  },
+  {
+   "pattern": "ls *",
+   "command": "ls",
+   "match": true
+  },
+  {
+   "pattern": "ls *",
+   "command": "ls -la kb",
+   "match": true
+  },
+  {
+   "pattern": "ls *",
+   "command": "lsof",
+   "match": false
+  },
+  {
+   "pattern": "ls *",
+   "command": "/bin/ls -la",
+   "match": true
+  },
+  {
+   "pattern": "git log*",
+   "command": "git log --oneline -3",
+   "match": true
+  },
+  {
+   "pattern": "git status*",
+   "command": "git stash",
+   "match": false
+  },
+  {
+   "pattern": "kb/kb *",
+   "command": "./kb/kb build",
+   "match": true
+  }
+ ],
+ "checks": [
+  {
+   "name": "a search alone",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search Dana"
+    ],
+    [
+     "Write",
+     "notes/brief.md"
+    ]
+   ],
+   "result": "pass",
+   "reason": "ran kb/kb search Dana"
+  },
+  {
+   "name": "a search alone",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search Dana"
+    ],
+    [
+     "Write",
+     "notes/brief.md"
+    ]
+   ],
+   "result": "pass",
+   "reason": "every step on the list"
+  },
+  {
+   "name": "a search with ./",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "./kb/kb search Dana"
+    ]
+   ],
+   "result": "pass",
+   "reason": "ran ./kb/kb search Dana"
+  },
+  {
+   "name": "a search with ./",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "./kb/kb search Dana"
+    ]
+   ],
+   "result": "pass",
+   "reason": "every step on the list"
+  },
+  {
+   "name": "a search in a chain",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "ls; kb/kb search Dana 2>&1 | head -30"
+    ]
+   ],
+   "result": "pass",
+   "reason": "ran kb/kb search Dana 2>&1 (in a chain: the step's success is its last command's)"
+  },
+  {
+   "name": "a search in a chain",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "ls; kb/kb search Dana 2>&1 | head -30"
+    ]
+   ],
+   "result": "pass",
+   "reason": "every step on the list"
+  },
+  {
+   "name": "a search in a step that failed",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search Dana",
+     "error"
+    ]
+   ],
+   "result": "fail",
+   "reason": "tried kb/kb search Dana, in a step that failed"
+  },
+  {
+   "name": "a search in a step that failed",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search Dana",
+     "error"
+    ]
+   ],
+   "result": "pass",
+   "reason": "every step on the list"
+  },
+  {
+   "name": "a search in a chain that failed",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search Dana | head",
+     "error"
+    ]
+   ],
+   "result": "fail",
+   "reason": "tried kb/kb search Dana, in a step that failed (in a chain: the step's success is its last command's)"
+  },
+  {
+   "name": "a search in a chain that failed",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search Dana | head",
+     "error"
+    ]
+   ],
+   "result": "pass",
+   "reason": "every step on the list"
+  },
+  {
+   "name": "a search that was refused",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search Dana",
+     "refused"
+    ]
+   ],
+   "result": "fail",
+   "reason": "tried kb/kb search Dana, in a step that failed (refused)"
+  },
+  {
+   "name": "a search that was refused",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search Dana",
+     "refused"
+    ]
+   ],
+   "result": "pass",
+   "reason": "every step that ran was on the list; 1 attempt was refused: kb/kb search Dana"
+  },
+  {
+   "name": "a quoted search only",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "echo \"kb/kb search Dana\""
+    ]
+   ],
+   "result": "fail",
+   "reason": "never ran kb/kb search*"
+  },
+  {
+   "name": "a quoted search only",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "echo \"kb/kb search Dana\""
+    ]
+   ],
+   "result": "fail",
+   "reason": "outside the list: Bash echo \"kb/kb search Dana\""
+  },
+  {
+   "name": "a quoted pipe",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "cat \"notes|old.md\""
+    ],
+    [
+     "Read",
+     "a.md"
+    ]
+   ],
+   "result": "fail",
+   "reason": "never ran kb/kb search*"
+  },
+  {
+   "name": "a quoted pipe",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "cat \"notes|old.md\""
+    ],
+    [
+     "Read",
+     "a.md"
+    ]
+   ],
+   "result": "pass",
+   "reason": "every step on the list"
+  },
+  {
+   "name": "a write through the shell",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "cat > notes/brief.md <<'EOF'\nHi | there; ok\nEOF"
+    ]
+   ],
+   "result": "fail",
+   "reason": "never ran kb/kb search*"
+  },
+  {
+   "name": "a write through the shell",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "cat > notes/brief.md <<'EOF'\nHi | there; ok\nEOF"
+    ]
+   ],
+   "result": "fail",
+   "reason": "outside the list: Bash cat > notes/brief.md <<'EOF' ... (it writes a file)"
+  },
+  {
+   "name": "ls alone",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "ls"
+    ],
+    [
+     "Bash",
+     "ls -la kb | head -5"
+    ]
+   ],
+   "result": "fail",
+   "reason": "never ran kb/kb search*"
+  },
+  {
+   "name": "ls alone",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "ls"
+    ],
+    [
+     "Bash",
+     "ls -la kb | head -5"
+    ]
+   ],
+   "result": "pass",
+   "reason": "every step on the list"
+  },
+  {
+   "name": "a refused step off the list",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "ls ~/Documents/work",
+     "refused"
+    ],
+    [
+     "Glob",
+     "**/* in /home",
+     "refused"
+    ],
+    [
+     "Read",
+     "a.md"
+    ]
+   ],
+   "result": "fail",
+   "reason": "never ran kb/kb search*"
+  },
+  {
+   "name": "a refused step off the list",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "ls ~/Documents/work",
+     "refused"
+    ],
+    [
+     "Glob",
+     "**/* in /home",
+     "refused"
+    ],
+    [
+     "Read",
+     "a.md"
+    ]
+   ],
+   "result": "pass",
+   "reason": "every step that ran was on the list; 2 attempts were refused: ls ~/Documents/work, Glob **/* in /home"
+  },
+  {
+   "name": "a tool off the list",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "WebSearch",
+     "Dana Whitfield"
+    ]
+   ],
+   "result": "fail",
+   "reason": "never ran kb/kb search*"
+  },
+  {
+   "name": "a tool off the list",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "WebSearch",
+     "Dana Whitfield"
+    ]
+   ],
+   "result": "fail",
+   "reason": "outside the list: WebSearch Dana Whitfield"
+  },
+  {
+   "name": "echo off the list",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search Dana; echo ---; kb/kb node Dana"
+    ]
+   ],
+   "result": "pass",
+   "reason": "ran kb/kb search Dana (in a chain: the step's success is its last command's)"
+  },
+  {
+   "name": "echo off the list",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search Dana; echo ---; kb/kb node Dana"
+    ]
+   ],
+   "result": "fail",
+   "reason": "outside the list: Bash echo ---"
+  },
+  {
+   "name": "a planted write with echo",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "echo x > notes.md"
+    ]
+   ],
+   "result": "fail",
+   "reason": "never ran kb/kb search*"
+  },
+  {
+   "name": "a planted write with echo",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "echo x > notes.md"
+    ]
+   ],
+   "result": "fail",
+   "reason": "outside the list: Bash echo x > notes.md (it writes a file)"
+  },
+  {
+   "name": "a planted write with an allowed command",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "ls; cat a.md >> notes.md"
+    ]
+   ],
+   "result": "fail",
+   "reason": "never ran kb/kb search*"
+  },
+  {
+   "name": "a planted write with an allowed command",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "ls; cat a.md >> notes.md"
+    ]
+   ],
+   "result": "fail",
+   "reason": "outside the list: Bash cat a.md >> notes.md (it writes a file)"
+  },
+  {
+   "name": "no steps",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [],
+   "result": "fail",
+   "reason": "never ran kb/kb search*"
+  },
+  {
+   "name": "no steps",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [],
+   "result": "pass",
+   "reason": "every step on the list"
+  },
+  {
+   "name": "a step the person rejected",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "rm -rf drafts",
+     "refused"
+    ],
+    [
+     "Bash",
+     "(cd kb && ls) | head -5"
+    ]
+   ],
+   "result": "fail",
+   "reason": "never ran kb/kb search*"
+  },
+  {
+   "name": "a step the person rejected",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "rm -rf drafts",
+     "refused"
+    ],
+    [
+     "Bash",
+     "(cd kb && ls) | head -5"
+    ]
+   ],
+   "result": "fail",
+   "reason": "outside the list: Bash cd kb"
+  },
+  {
+   "name": "a long command with emoji",
+   "check": {
+    "id": "searched",
+    "kind": "trace-ran-command",
+    "pattern": "kb/kb search*"
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+    ]
+   ],
+   "result": "pass",
+   "reason": "ran kb/kb search 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀 ..."
+  },
+  {
+   "name": "a long command with emoji",
+   "check": {
+    "id": "bounds",
+    "kind": "trace-no-tool-outside",
+    "allowed": [
+     "Read",
+     "Write",
+     "Edit",
+     "Glob",
+     "Grep",
+     "Skill",
+     "Bash kb/kb *",
+     "Bash ls *",
+     "Bash cat *",
+     "Bash head *"
+    ]
+   },
+   "trace": [
+    [
+     "Bash",
+     "kb/kb search 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+    ]
+   ],
+   "result": "pass",
+   "reason": "every step on the list"
+  }
+ ]
+}
