@@ -1,9 +1,100 @@
 Skill Eval Lite is published as a public repository,
 https://github.com/vanderbilt-ms-ai/skill-eval-lite. Version 0.1.0 was
-released on 27 October 2026, and versions 0.1.1 and 0.1.2 on 3 November
-2026. Each release is one commit on the public `main`, made from the
-course's private development history and tagged (`v0.1.0`, `v0.1.1`,
-`v0.1.2`).
+released on 27 October 2026, and versions 0.1.1, 0.1.2 and 0.1.3 on
+3 November 2026. Each release is one commit on the public `main`, made from
+the course's private development history and tagged (`v0.1.0` to
+`v0.1.3`).
+
+## 0.1.3, 3 November 2026
+
+Five fixes from a fresh Personal I trial of 0.1.1 (3 November; the course's
+proposal "Skill Eval Lite 0.1.3: five fixes from a fresh Personal I
+trial"): `status` follows a Personal I packet and says who pays for a run;
+a planted fault can name the case it was made from; the suite report says
+when a control shows nothing; and the worked example's board reference is
+repaired, with a second real run. Built on 0.1.2, released the same day.
+
+### If you are on 0.1.2 or earlier
+
+1. In your `skill-eval-lite` folder, type `git pull`.
+2. Personal I: **what your suite report says can change.** In its controls
+   table, a variation, or a fault whose `varies` names the reference, now
+   reads `shows nothing: the test fails reference too (got ...)` when the
+   test doesn't pass the reference, where earlier versions said `ok` or
+   `MISSED`. A note under the table names the test. No result changes: the
+   rows in `judgments.csv` are the same, and only the table reads them
+   differently. If you have exported a report, export it again (the
+   wizard's Report step, or `suite` again), and say in your write-up which
+   version wrote it.
+3. Personal I, if you copied the worked example before 0.1.3: its board
+   reference, and the four controls made from it, had three facts wrong.
+   If you build on that suite, copy the repaired files from
+   `examples/personal-suites/controls/board-drafts/`, and run its LLM test
+   again on them: `python3 run_ab.py suite <your packet>/suites.yaml
+   --suite board-drafts --again`.
+4. A fault you planted in the reference can say so: add
+   `"varies": "reference"` (the reference's id) to its `expect.json`.
+
+### What changed
+
+| # | Before | In 0.1.3 |
+| --- | --- | --- |
+| 1 | `status` never looked at the Personal I packets when it chose the next step: in a Personal I pack it said "Set up the class assistant", even after the packet had run, and then the Shared I demonstration | With a packet beside Skill Eval Lite and no experiment of the student's own, the next step is Personal I's, for the packet, with its exact command: fix it (`suite --check`, with the count), run it, run it again when a test or file has changed, the wizard (reference judgments, then ratings), then the export. Wren is never asked for. With a packet and an experiment, `status` gives a step for each, headed "Next step, Shared I" and "Next step, Personal I", and `--json` adds `next_steps` (each with its `project`; `next` is still the first). With neither, Wren and the first demonstration stay first, with "On Personal I? You don't need Wren. Copy the worked example ..." under the command. A missing Wren reads "not set up yet (Shared I and the demonstrations need it; Personal I's suites don't)". `status --project shared\|personal` and `ask --project ...` force one project |
+| 2 | The demonstration step said "each run uses your plan" whatever the login | One phrase from the status's own login: "each run is billed to your API key" (Claude Code's `api_key` login, or Codex's API key) or "each run uses a little of your plan", in the demonstration step and Personal I's run steps. The setup line says "logged in (api_key): runs are billed to the key". The README says `status` "calls no model" |
+| 3 | The worked example's `fault-shorthand` expected the facts test to pass, but it is the reference with shorthand planted, so it carried the reference's wrong facts | `fault-shorthand` says `"varies": "reference"` and expects `same` for `facts-match-the-source`, with a new note. The suite designer lets a fault name the case it was made from (a fault made from a case names it by default) and expect "the same as the case it varies", and saves both. The example's README tells the story |
+| 4 | A control's cell read `ok` when the test failed the reference too, so it showed nothing about the test | A control made from the reference (a variation, or a fault whose `varies` names it) reads `shows nothing: the test fails reference too (got ...)`, or `shows nothing: the test can't tell on reference (got ...)`, when the test doesn't pass the reference. It is neither `ok` nor `MISSED`. Under the table: "`<test>` fails the reference, so its results on the faults and variations show little until the reference or the test is fixed. Look at why first." In `run_ab.py`'s report and the wizard's, word for word; the wizard's Report step shows the note too. `fault-wrong-date` says `"varies": "reference"` |
+| 5 | The case students copy as their board reference had three facts wrong ("Ellis Park"; "the committee asks the full board to decide"; the camp supplies "were bought in September"), and every board control was copied from it | Option A: the reference and its four controls say what the notes say. Its LLM test was run again for real on all eleven cases, recorded in `examples/recorded/personal-suites-2026-11-03/`, beside the 26 October recording, which is kept as it was. The example's README tells it as history |
+| | `status --root` with a relative folder found no packets | The folder is resolved first (only the tests pass `--root`) |
+
+Fixes 3 and 4 meet on one cell. The proposal's fix 3 expected `ok (same as
+reference, got fail)` on `fault-shorthand` while the reference still
+failed; fix 4 makes that cell `shows nothing`, since the reference failing
+is exactly when the control shows nothing. With fix 5's repaired reference,
+the second real run shows `ok (same as reference, got pass)`.
+
+### What was verified for 0.1.3
+
+- `python3 -m unittest`: all 153 tests pass, on Python 3.14 and 3.11.
+  The new ones: seven in `tests/test_status.py` (fixes 1 and 2), one in
+  `tests/test_suites.py` (fixes 3 and 4: the `shows nothing` cells and notes,
+  `unknown`, a fault that doesn't name its case, and the repaired
+  reference), two cases in `tests/test_wizard.py` (the wizard's report
+  word for word with `run_ab.py`'s on a reference that fails, and the new
+  recording), and one assertion in `tests/test_designer.py` (a fault made
+  from a case names it). The designer's "written out unchanged" test
+  covers `fault-shorthand`'s `varies` and `same`.
+- `dev/embed_examples.py --check`, `node dev/diagrams.mjs --check` and
+  `tutorial/build.py --check`: all up to date.
+- Fix 5's real run (2026-11-03): the board suite on all eleven cases, with
+  Claude Code 2.1.318 and an API key, model `claude-sonnet-5-5`, 4 to 11 s
+  a case, $0.16 in all. The reference passed `facts-match-the-source`;
+  `fault-shorthand` and both variations passed with it; `fault-wrong-date`
+  failed on its two changed dates. Every board control reads `ok` for both
+  automatic tests. Four of the six real drafts failed the facts test.
+- Not yet: a `dev/fresh-trial.sh` of 0.1.3.
+
+### Decided for 0.1.3
+
+- **Fix 5: option A** (Simon, 3 November): repair the copy students start
+  from, and keep the flawed one as the recorded lesson.
+- **0.1.2 and 0.1.3 are two releases**, the same day: 0.1.2 the program
+  checks, 0.1.3 these fixes on top.
+- **The unknown case.** The proposal gave the words for a reference that
+  fails; for one that gives `unknown`, the cell reads `shows nothing: the
+  test can't tell on reference (got ...)` and the note "can't tell on the
+  reference (unknown)".
+- **A fault made from a case in the suite designer names it** (`varies`),
+  so that a new fault planted in the reference gets fix 4's reading.
+
+### Open, for Simon
+
+- The class experiment's reference for `summarize-committee-notes`, and the
+  same text in `demo-board-memo.toml` and `demo-voice-reordered.toml`, still
+  have the three facts that were repaired in the Personal I example. Shared
+  I uses it for its product checks, which it passes; it was left as it is.
+- The course's own steps from the proposal: the 0.1.1 deploy of the project
+  pages and packs, and dating 0.1.2 and 0.1.3 under `tools: skill-eval-lite:
+  releases:` in `term.yaml`.
 
 ## 0.1.2, 3 November 2026
 
@@ -243,7 +334,7 @@ move").
 
 ## What the release contains
 
-As of 0.1.2 (the files 0.1.2 adds: `CHECKS.md`, `.claude/skills/check-authoring/`, `examples/demo-program-check.toml`, `examples/class-assistant/checks/` and `tests/test_programs.py`; 0.1.1 added `tests/test_shared.py`, `tests/test_freeze.py` and `tests/fixtures/`).
+As of 0.1.3 (0.1.3 adds `examples/recorded/personal-suites-2026-11-03/`; the files 0.1.2 added: `CHECKS.md`, `.claude/skills/check-authoring/`, `examples/demo-program-check.toml`, `examples/class-assistant/checks/` and `tests/test_programs.py`; 0.1.1 added `tests/test_shared.py`, `tests/test_freeze.py` and `tests/fixtures/`).
 
 | Path | What it is |
 | --- | --- |
@@ -260,7 +351,7 @@ As of 0.1.2 (the files 0.1.2 adds: `CHECKS.md`, `.claude/skills/check-authoring/
 | `examples/class-assistant/` | The class intake: `experiment.toml`, round files B and D, starting files; and `checks/`, the program checks of `demo-program-check` |
 | `examples/demo-*.toml` | The five demonstrations (`demo-one-line` added 2026-10-27 for the live session; `demo-program-check` for 0.1.2) |
 | `examples/personal-suites/` | Personal I's worked example: two suites (a product, six real drafts; a process, four real runs), each with a reference, two planted faults, two harmless variations and three tests |
-| `examples/recorded/` | Real runs of the four demonstrations, with the judge (`demo-one-line` made 2026-10-27), and of the worked example's suites, with eight real LLM test runs (made 2026-10-26); and a real Codex run of the first demonstration, with its judge (`demo-graph-removed-codex/`) |
+| `examples/recorded/` | Real runs of the four demonstrations, with the judge (`demo-one-line` made 2026-10-27), and of the worked example's suites, with eight real LLM test runs (made 2026-10-26) and, after its board reference was repaired, eleven more (2026-11-03, `personal-suites-2026-11-03/`); and a real Codex run of the first demonstration, with its judge (`demo-graph-removed-codex/`) |
 | `tests/` | The tests, with stand-ins for `claude` and `codex` and a small Chrome DevTools client |
 | `dev/fresh-trial.sh` | The pre-release check below (not in the student walkthrough) |
 | `starting.html`, `tutorial/` | The guided tour for new students: 22 stops in six chapters, with the class assistant as its worked example, built from the recorded runs (`tutorial/build.py`, `tutorial/excerpts.json`) |

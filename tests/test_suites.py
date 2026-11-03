@@ -104,6 +104,48 @@ class Suite(unittest.TestCase):
         self.assertEqual(lines[:len(self.rows1)], self.rows1, "earlier rows are unchanged")
         self.assertEqual(len(lines), len(self.rows1) + 20, "a rerun adds the mechanical rows again")
 
+    def test_controls_made_from_a_reference_that_fails(self):
+        """0.1.3, fixes 3 and 4: a fault names the case it was made from; a control
+        made from a reference that fails (or can't tell on) a test shows nothing."""
+        S = R.Suites(self.out / "suites.yaml")
+        suite = next(s for s in S.suites if s["id"] == "board-drafts")
+        cases = {c["id"]: c for c in suite["cases"]}
+        self.assertEqual(cases["fault-shorthand"]["varies"], "reference")
+        self.assertEqual(cases["fault-shorthand"]["expect"]["facts-match-the-source"], "same")
+        self.assertEqual(cases["fault-wrong-date"]["varies"], "reference")
+        v = {t["id"]: t["version"] for t in suite["tests"]}
+
+        def with_facts(results):
+            rows = [r for r in self.rows() if r["check"] != "facts-match-the-source"]
+            return rows + [{"item": c, "config": "", "object": "product", "check": "facts-match-the-source", "route": "llm", "judge": "m",
+                            "version": v["facts-match-the-source"], "result": res, "reason": "test", "shown_left": "",
+                            "when": "2030-01-01T00:00:00Z"} for c, res in results.items()]
+
+        def facts_line(rep):
+            return next(l for l in rep.splitlines() if l.startswith("| facts-match-the-source |"))
+        fails = {"reference": "fail", "fault-shorthand": "fail", "fault-wrong-date": "fail", "variation-reformatted": "fail",
+                 "variation-reworded": "pass"}
+        rep = R.suite_report(suite, with_facts(fails), "now")
+        line = facts_line(rep)
+        self.assertIn("MISSED (pass, got fail)", line, "the reference's own cell")
+        self.assertEqual(line.count("shows nothing: the test fails reference too (got fail)"), 3)
+        self.assertIn("shows nothing: the test fails reference too (got pass)", line)
+        self.assertNotIn("ok (", line, "no control made from the reference reads ok")
+        self.assertIn("- `facts-match-the-source` fails the reference, so its results on the faults and variations show little "
+                      "until the reference or the test is fixed. Look at why first.", rep)
+        self.assertNotIn("- `no-shorthand` fails the reference", rep, "a test that passes the reference gets no note")
+        unknown = R.suite_report(suite, with_facts(dict(fails, reference="unknown")), "now")
+        self.assertIn("shows nothing: the test can't tell on reference (got fail)", facts_line(unknown))
+        self.assertIn("- `facts-match-the-source` can't tell on the reference (unknown), so", unknown)
+        # A fault that doesn't say what it was made from keeps its ok or MISSED.
+        bare = dict(suite, cases=[dict(c, varies=None) if c["id"] == "fault-wrong-date" else c for c in suite["cases"]])
+        self.assertIn("ok (fail, got fail)", facts_line(R.suite_report(bare, with_facts(fails), "now")))
+        # With the reference passing, the fault made from it expects the reference's result.
+        good = R.suite_report(suite, with_facts(dict(fails, reference="pass", **{"fault-shorthand": "pass"})), "now")
+        self.assertIn("ok (same as reference, got pass)", facts_line(good))
+        self.assertIn("ok (fail, got fail)", facts_line(good))
+        self.assertNotIn("shows nothing", good)
+
     def test_version_changes_with_a_file(self):
         copy = self.root / "copy"
         shutil.copytree(self.out, copy)

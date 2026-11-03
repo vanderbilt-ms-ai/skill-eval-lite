@@ -1,0 +1,5 @@
+{
+ "role": "variation",
+ "varies": "reference",
+ "note": "The reference with its lists numbered and two headings renamed: the same content. Every test should give the same result as on the reference."
+}

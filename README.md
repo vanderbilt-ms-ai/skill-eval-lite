@@ -26,7 +26,7 @@ It was made for AI 5500 (Vanderbilt, Fall 2026), for Shared I and Personal I. Th
 assistant is Wren, the AI 5100 assistant template's fictional example: Wren
 works for Morgan Reyes, and nobody in it is real.
 
-Version 0.1.2 (the version is in `VERSION`). On an earlier version? In this folder, type `git pull`:
+Version 0.1.3 (the version is in `VERSION`). On an earlier version? In this folder, type `git pull`:
 [RELEASE.md](RELEASE.md) says what changed. `doctor` and `status` say when a newer
 version is out.
 
@@ -803,12 +803,22 @@ rule reads as pass or fail, gets a new row ("re-read with 0.1.1's rule; no
 new run"), with no new run, and the report marks it "(re-read)".
 
 A control case's `expect.json` gives its `role` (`reference`, `fault` or
-`variation`), the case a variation `varies`, a `note`, and `expect`: for each
-test, `pass`, `fail`, `same` (as the case it varies) or `any`. A reference
-expects every test to pass, and a variation the same results as its
-original, unless `expect` says otherwise. A test's `version` is the first 12
-characters of the SHA-256 of its definition and files, so a changed test is
-a new version with a new report.
+`variation`), the case it `varies` (the case it was made from: a variation
+must say, a fault may), a `note`, and `expect`: for each test, `pass`,
+`fail`, `same` (as the case it varies) or `any`. A reference expects every
+test to pass, and a variation the same results as its original, unless
+`expect` says otherwise. A test's `version` is the first 12 characters of
+the SHA-256 of its definition and files, so a changed test is a new version
+with a new report.
+
+In the report's controls table, a cell reads `ok` when the test did what
+the control expects, and `MISSED` when it didn't. A control made from the
+reference (a variation, or a fault whose `varies` names the reference)
+reads `shows nothing: the test fails reference too` when the test doesn't
+pass the reference (it fails, or can't tell): the control carries the
+reference's own result, so it can't show whether the test catches the fault
+or ignores the harmless change. A note under the table names each such test.
+Look at why the reference fails it first.
 
 ## What a run does
 
@@ -960,7 +970,13 @@ them in the terminal, in the `skill-eval-lite` folder.
 
 This says what is ready (Python, git, Claude Code or Codex, your login, the
 class assistant), which experiments and runs you have, and the one next
-step, with the exact command to type. It doesn't use your plan.
+step, with the exact command to type. It calls no model. On Personal I,
+it follows your packet: with a packet beside this folder (`../my-suites`)
+and no experiment of your own, it gives Personal I's next step (check it,
+run it, the wizard, the export), and never asks for Wren. With both, it
+gives a step for each. `--project shared` or `--project personal` gives one
+project's steps, if your folders are laid out some other way. Each step
+that uses a model says who pays: your plan, or your API key.
 
     python3 run_ab.py ask
 
@@ -988,8 +1004,8 @@ in Claude Code). A helper session and each answer use a little of your plan.
 ## Commands
 
     python3 run_ab.py setup FOLDER [--from URL] [--commit SHA]
-    python3 run_ab.py status [--assistant FOLDER] [--runner R] [--json]
-    python3 run_ab.py ask [--runner R] ["a question"]
+    python3 run_ab.py status [--assistant FOLDER] [--runner R] [--project shared|personal] [--json]
+    python3 run_ab.py ask [--runner R] [--project shared|personal] ["a question"]
     python3 run_ab.py new NAME [--from class|EXPERIMENT]
     python3 run_ab.py doctor [--runner R] [--no-probe]
     python3 run_ab.py check EXPERIMENT
@@ -1035,8 +1051,13 @@ plan, and with model `claude-sonnet-5-5` for the runs and the judge:
 The checks-only mode's LLM tests were run for real on eight cases of the
 worked example (four per suite, each 6 to 10 s, $0.12 in all), recorded in
 `examples/recorded/personal-suites/`. They found two problems in the
-example's own control cases, which are left in as a worked finding (see
-`examples/personal-suites/README.md`).
+example's own control cases, which are left in that recording as a worked
+finding (see `examples/personal-suites/README.md`). On 2026-11-03, after the
+board suite's reference and its four controls were repaired, its LLM test
+was run again on all eleven cases (each 4 to 11 s, $0.16 in all, Claude Code
+2.1.318 with an API key), recorded in
+`examples/recorded/personal-suites-2026-11-03/`: every control did what it
+expects.
 
 On 2026-10-27, with Claude Code 2.1.311 and an API key, in a fresh home
 folder and a fresh clone (`dev/fresh-trial.sh --keep-api-key`):
@@ -1137,6 +1158,17 @@ folder, and its copy of `check` says what `run_ab.py` says, word for word,
 on ten versions of the demonstration. `demo-program-check` has not been run
 with a real model.
 
+For 0.1.3: `tests/test_status.py` checks that `status` follows a Personal
+I packet (not run, broken, run, judged, changed), gives a step for each
+project when there is a packet and an experiment (and `next_steps` in
+`--json`), keeps Wren first with a line for Personal I when there is
+neither, takes `--project` (and `ask` passes it on), and says who pays,
+plan or API key. `tests/test_suites.py` and `tests/test_wizard.py` check
+that a control made from a reference that fails a test reads `shows
+nothing`, with its note, in both copies of the report, word for word. The
+worked example's board suite was run again for real after its reference was
+repaired (see `examples/personal-suites/README.md`).
+
 The Codex tests (`tests/test_codex.py`) use a stand-in for `codex`
 (`tests/fake_codex.py`) that answers from the `CODEX_HOME` it is given, as
 Codex does: runs, the judge, a suite's LLM tests and `doctor`; that only the
@@ -1145,7 +1177,7 @@ asked; that a global `AGENTS.md`, a personal skill, an MCP tool or an MCP
 call stops the run; that runners are not mixed; and the import inlining,
 the trace names and the check before each run on their own.
 
-## Limits in 0.1.2
+## Limits in 0.1.3
 
 - The runner runs Claude Code or Codex. A Codex run reads the assistant
   through a generated `AGENTS.md` (see "With Codex"), so its results are not

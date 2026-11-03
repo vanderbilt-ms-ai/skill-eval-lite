@@ -3947,6 +3947,20 @@ def human_pass(test: dict, value: str) -> str | None:
     return "pass" if v >= float(test.get("pass_at", 3)) else "fail"
 
 
+def shows_nothing(base: str, on_base: str, got: str) -> str:
+    """A control's cell when the test doesn't pass the reference it was made from."""
+    return (f"shows nothing: the test fails {base} too (got {got})" if on_base == "fail"
+            else f"shows nothing: the test can't tell on {base} (got {got})")
+
+
+def reference_note(test: str, ref: str, result: str) -> str:
+    """The note under the controls table for a test that doesn't pass a reference."""
+    which = "the reference" + ("" if ref == "reference" else f" ({ref})")
+    return (f"- `{test}` " + (f"fails {which}" if result == "fail" else f"can't tell on {which} (unknown)")
+            + ", so its results on the faults and variations show little until the reference or the test is fixed. "
+              "Look at why first.")
+
+
 def suite_report(suite: dict, rows: list[dict], when: str) -> str:
     """The suite report, as Markdown: a row per case and a column per test,
     the failures, where tests disagree, the controls and the agreement."""
@@ -4003,17 +4017,27 @@ def suite_report(suite: dict, rows: list[dict], when: str) -> str:
             for c in controls:
                 want = (c.get("expect") or {}).get(t["id"], {"reference": "pass", "variation": "same"}.get(c["role"], "any"))
                 got = grid[(c["id"], t["id"])][1]
+                base = by_id.get(c.get("varies"))
                 if want == "same":
-                    base = by_id.get(c.get("varies"))
                     want = grid[(base["id"], t["id"])][1] if base else None
                     label = "same as " + (c.get("varies") or "?")
                 else:
                     label = want
+                # A control made from the reference (a variation, or a fault that
+                # says it varies the reference) shows nothing about a test that
+                # doesn't pass the reference: it carries the reference's own result.
+                on_base = grid[(base["id"], t["id"])][1] if base and base["role"] == "reference" else None
                 if want in (None, "any") or got not in ("pass", "fail"):
                     marks.append("-" if want == "any" else f"? ({label}; got {got or 'nothing'})")
+                elif c["role"] in ("fault", "variation") and on_base in ("fail", "unknown"):
+                    marks.append(shows_nothing(base["id"], on_base, got))
                 else:
                     marks.append(("ok" if got == want else "MISSED") + f" ({label}, got {got})")
             out.append(f"| {t['id']} | " + " | ".join(marks) + " |")
+        notes = [reference_note(t["id"], r["id"], grid[(r["id"], t["id"])][1]) for t in tests for r in controls
+                 if r["role"] == "reference" and grid[(r["id"], t["id"])][1] in ("fail", "unknown")]
+        if notes:
+            out += [""] + notes
     else:
         out.append("No control cases.")
     out += ["", "## Agreement", ""]
@@ -4347,6 +4371,30 @@ def run_folder_state(bundle_path: Path) -> dict | None:
             "unfrozen": sum(o.get("frozen") is False for o in outs)}
 
 
+def packet_state(f: Path) -> dict:
+    """A Personal I packet: whether its suites file has problems (suite
+    --check's, with no model called), whether it has run, whether it has
+    changed since (a newer suites or test file, or a test whose current
+    version has no rows), and whether the wizard has added human rows."""
+    rows = read_rows(f.parent / "judgments.csv")
+    bundle = f.parent / "bundle.json"
+    x = {"file": shown_path(f), "folder": shown_path(f.parent), "has_run": bundle.is_file(), "rows": len(rows),
+         "human": sum(r.get("route") == "human" for r in rows)}
+    try:
+        S = Suites(f)
+    except Exception:  # status never stops on a broken packet: an unreadable file is one thing to fix, which --check names
+        x["errors"] = 1
+        return x
+    x["errors"] = len(S.errors)
+    if not S.errors and x["has_run"]:
+        tests = [t for s in S.suites for t in s["tests"] if t.get("kind") in ("mechanical", "llm")]
+        have = {(r.get("check"), r.get("version")) for r in rows if r.get("route") in ("mechanical", "llm")}
+        x["changed"] = sum((t["id"], t["version"]) not in have for t in tests)
+        made = bundle.stat().st_mtime
+        x["newer"] = any(p.stat().st_mtime > made for p in [f] + [p for t in tests for p in t["files"].values()] if p.is_file())
+    return x
+
+
 def run_of(e: dict, runs: list[dict]) -> dict | None:
     """The run folder of one of your experiments, if it has one."""
     by_name = {r["experiment"]: r for r in runs}
@@ -4396,7 +4444,7 @@ def gather_status(a) -> dict:
         asst["uncommitted_changes"] = bool(git("status", "--porcelain", cwd=folder, check=False).stdout.strip())
     st["assistant"] = asst
     # Experiments.
-    root = Path(getattr(a, "root", None) or HERE)
+    root = Path(getattr(a, "root", None) or HERE).resolve()
     found = []
     for base in dict.fromkeys([root / "experiments", Path.cwd() / "experiments"]):
         for f in sorted(base.glob("*/experiment.toml")) + sorted(base.glob("*.toml")):
@@ -4442,19 +4490,92 @@ def gather_status(a) -> dict:
     for f in sorted(root.parent.glob("*/suites.yaml")) + sorted(root.parent.glob("*/suites.json")):
         if f.parent.resolve() in (HERE.resolve(), root.resolve()):
             continue
-        rows = len(read_rows(f.parent / "judgments.csv"))
-        suites.append({"file": shown_path(f), "has_run": (f.parent / "bundle.json").is_file(), "rows": rows})
+        suites.append(packet_state(f))
     st["suites"] = suites
-    st["next"] = next_step(st)
+    st["next_steps"] = next_steps(st, getattr(a, "project", None))
+    st["next"] = st["next_steps"][0]
     st["update"] = newer_version()
     return st
 
 
-def next_step(st: dict) -> dict:
+def pays(st: dict, what: str = "run") -> str:
+    """Who pays for a model call, from the status's own login state: an API
+    key, or the plan (as doctor says)."""
+    s = st["setup"]
+    rn = s.get("runner")
+    t = s.get("claude_code" if rn == "claude-code" else "codex") or {}
+    key = (rn == "claude-code" and t.get("login") == "api_key") or (rn == "codex" and t.get("login") == "API key")
+    return f"each {what} is billed to your API key" if key else f"each {what} uses a little of your plan"
+
+
+PERSONAL_HINT = ("On Personal I? You don't need Wren. Copy the worked example, `cp -r examples/personal-suites ../my-suites`, "
+                 f"then run `{PY} run_ab.py status` again.")
+
+
+def next_steps(st: dict, project: str | None = None) -> list[dict]:
+    """The next step for each project the student is on, each with its
+    `project`: "setup" (what both need), "shared" or "personal". A Personal I
+    packet beside Skill Eval Lite, and no experiment of the student's own,
+    means Personal I; both mean a step for each; neither, Shared I's, with a
+    line for Personal I. `project` forces one."""
+    s = setup_step(st)
+    if s:
+        return [dict(s, project="setup")]
+    packets = st.get("suites") or []
+    mine = [e for e in st["experiments"] if e["kind"] == "yours"]
+    if project == "personal" or (project is None and packets and not mine):
+        return [dict(personal_step(st, packets), project="personal")]
+    shared = dict(shared_step(st), project="shared")
+    if project == "shared":
+        return [shared]
+    if packets:
+        return [shared, dict(personal_step(st, packets), project="personal")]
+    return [dict(shared, note=PERSONAL_HINT)]
+
+
+def next_step(st: dict, project: str | None = None) -> dict:
     """The one next step, in plain words, with its exact command."""
-    s, asst = st["setup"], st["assistant"]
+    return next_steps(st, project)[0]
+
+
+def personal_step(st: dict, packets: list[dict]) -> dict:
+    """Personal I's next step, for the first packet that isn't finished: fix
+    it, run it, run it again, judge and rate in the wizard, then export."""
+    rflag = " --runner codex" if st["setup"]["runner"] == "codex" else ""
+    if not packets:
+        return {"what": "To start Personal I, copy the worked example into a packet of your own beside this folder, "
+                        f"then run `{PY} run_ab.py status` again.",
+                "command": "cp -r examples/personal-suites ../my-suites"}
+    steps = []
+    for x in packets:
+        cmd = f"{PY} run_ab.py suite {x['file']}"
+        if x.get("errors"):
+            steps.append({"what": f"Your suites file {x['file']} has {x['errors']} thing(s) to fix. Check it to see them.",
+                          "command": cmd + " --check"})
+        elif not x["has_run"]:
+            steps.append({"what": f"Run every mechanical and LLM test on every case in {x['file']} "
+                                  f"({pays(st, 'LLM test run')}; the mechanical tests call no model).", "command": cmd + rflag})
+        elif x.get("changed") or x.get("newer"):
+            steps.append({"what": f"Run {x['file']} again: " + (f"{x['changed']} test(s) have changed since the last run, or have no "
+                                                                "results yet" if x.get("changed") else
+                                                                "the suites file or a test's file has changed since the last run")
+                                  + f" ({pays(st, 'LLM test run')}).", "command": cmd + rflag})
+        elif not x.get("human"):
+            steps.append({"what": f"Open the wizard and load {x['folder']}/bundle.json in step 1. Judge each LLM test's criterion "
+                                  "yourself (Reference), then rate the cases (Human tests).", "command": OPEN_WIZARD})
+        else:
+            steps.append({"what": f"In the wizard's Report step, export judgments.csv into {x['folder']}/ and each report into "
+                                  f"{x['folder']}/reports/. Then ask a classmate to rate the same cases.",
+                          "command": OPEN_WIZARD, "done": True})
+    s = next((s for s in steps if not s.get("done")), steps[0])
+    s.pop("done", None)
+    return s
+
+
+def setup_step(st: dict) -> dict | None:
+    """What both projects need first: Python, git, Claude Code or Codex, and its login."""
+    s = st["setup"]
     rn = s["runner"]
-    rflag = " --runner codex" if rn == "codex" else ""
     if not s["python_ok"]:
         return {"what": "Install Python 3.11 or later (https://www.python.org/downloads/), then run this again.",
                 "command": f"{PY} run_ab.py status"}
@@ -4473,6 +4594,15 @@ def next_step(st: dict) -> dict:
             return {"what": "Log in to Codex: this opens your browser; sign in with the ChatGPT account that has your plan.",
                     "command": "codex login"}
         return {"what": "Log in to Claude Code: type the command, log in when it asks, then type /exit.", "command": "claude"}
+    return None
+
+
+def shared_step(st: dict) -> dict:
+    """Shared I's next step (and the demonstrations'): the class assistant,
+    your experiments, their runs."""
+    s, asst = st["setup"], st["assistant"]
+    rn = s["runner"]
+    rflag = " --runner codex" if rn == "codex" else ""
     if not asst["exists"]:
         return {"what": "Set up the class assistant, Wren, in a folder beside this one (about a minute; it needs the internet).",
                 "command": f"{PY} run_ab.py setup ../class-assistant"}
@@ -4511,7 +4641,7 @@ def next_step(st: dict) -> dict:
                         "in step 1: judge the blind pairs (step 4) and read the results (step 5).", "command": OPEN_WIZARD}
     if not st["runs"]:
         return {"what": "Try the first demonstration: six runs of the class assistant, with and without one line added "
-                        "to its voice file (about half a minute; each run uses your plan).",
+                        f"to its voice file (about half a minute; {pays(st)}).",
                 "command": f"{PY} run_ab.py run examples/demo-one-line.toml --assistant {asst['folder']} --jobs 6{rflag}"}
     for r in st["runs"]:
         if r["ok"] == 0 and r["runs"]:
@@ -4546,14 +4676,15 @@ def status_text(st: dict) -> str:
         elif t.get("logged_in") is False:
             L.append(f"  {mark(False if s['runner'] == name else None)} {label} {t.get('version')}: not logged in")
         else:
-            L.append(f"  ok   {label} {t.get('version')}: logged in" + (f" ({t['login']})" if t.get("login") else ""))
+            L.append(f"  ok   {label} {t.get('version')}: logged in" + (f" ({t['login']})" if t.get("login") else "")
+                     + (": runs are billed to the key" if t.get("login") in ("api_key", "API key") else ""))
     if s["runner"]:
         other = "codex" if s["runner"] == "claude-code" else "claude-code"
         L.append(f"  You need only one of the two. This status uses {RUNNER_LABEL[s['runner']]}"
                  + (f"; add --runner {other} for {RUNNER_LABEL[other]}." if s[other.replace('-', '_')].get("installed") else "."))
     L += ["", "The assistant"]
     if not asst["exists"]:
-        L.append(f"  --   {asst['folder']}: not set up yet")
+        L.append(f"  --   {asst['folder']}: not set up yet (Shared I and the demonstrations need it; Personal I's suites don't)")
     else:
         bits = ["a git project" if asst["git"] else "not a git project",
                 "with a CLAUDE.md" if asst["claude_md"] else "with no CLAUDE.md"]
@@ -4584,11 +4715,16 @@ def status_text(st: dict) -> str:
     if st["suites"]:
         L += ["", "Personal I packets"]
         for x in st["suites"]:
-            L.append(f"  {x['file']:44} " + (f"run, {x['rows']} rows in judgments.csv" if x["has_run"] else "not run yet"))
-    n = st["next"]
-    L += ["", "Next step", "  " + n["what"]]
-    if n.get("command"):
-        L += ["", "      " + n["command"]]
+            L.append(f"  {x['file']:44} " + (f"{x['errors']} thing(s) to fix" if x.get("errors") else
+                                              f"run, {x['rows']} rows in judgments.csv" if x["has_run"] else "not run yet"))
+    steps = st.get("next_steps") or [st["next"]]
+    heads = {"shared": "Next step, Shared I", "personal": "Next step, Personal I"}
+    for n in steps:
+        L += ["", heads.get(n.get("project"), "Next step") if len(steps) > 1 else "Next step", "  " + n["what"]]
+        if n.get("command"):
+            L += ["", "      " + n["command"]]
+        if n.get("note"):
+            L += ["", "  " + n["note"]]
     return "\n".join(L) + "\n"
 
 
@@ -4800,6 +4936,8 @@ def main(argv=None) -> int:
     s.add_argument("--claude", help=argparse.SUPPRESS)
     s.add_argument("--codex", help=argparse.SUPPRESS)
     s.add_argument("--json", action="store_true", help="print the same as JSON")
+    s.add_argument("--project", choices=("shared", "personal"),
+                   help="give this project's next step (default: Personal I when there is a packet and no experiment of yours)")
     s.add_argument("--root", help=argparse.SUPPRESS)
     s.set_defaults(fn=cmd_status)
 
@@ -4807,6 +4945,7 @@ def main(argv=None) -> int:
     s.add_argument("question", nargs="*", help='a question to answer once, e.g. "how do I freeze my experiment?"')
     s.add_argument("--assistant", help="the assistant's folder (default: ../class-assistant)")
     add_runner_args(s)
+    s.add_argument("--project", choices=("shared", "personal"), help="the project you are on, if status can't tell")
     s.add_argument("--show-command", action="store_true", help=argparse.SUPPRESS)
     s.add_argument("--root", help=argparse.SUPPRESS)
     s.set_defaults(fn=cmd_ask)

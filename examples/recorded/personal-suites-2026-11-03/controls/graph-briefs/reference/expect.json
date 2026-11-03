@@ -1,0 +1,4 @@
+{
+ "role": "reference",
+ "note": "A clean run, written by hand: it searches, reads the two pages the brief needs, then writes. Every test should pass it."
+}

@@ -1,9 +1,10 @@
 {
  "role": "fault",
- "note": "The committee's shorthand (Q1, cttee) planted in the reference. The shorthand test should fail it; the facts are unchanged.",
+ "varies": "reference",
+ "note": "The committee's shorthand (Q1, cttee) planted in the reference. The shorthand test should fail it. Its facts are the reference's, so the facts test should do what it does on the reference.",
  "expect": {
   "no-shorthand": "fail",
-  "facts-match-the-source": "pass",
+  "facts-match-the-source": "same",
   "sendable": "any"
  }
 }

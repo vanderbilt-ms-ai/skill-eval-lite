@@ -11,6 +11,7 @@ and "## Right". No model is called.
 
 Its behavior is set by environment variables:
   FAKE_CLAUDE_LOGGED_OUT=1   not logged in (auth status and -p say so)
+  FAKE_CLAUDE_AUTH=<method>  the login method auth status reports (default claude.ai; api_key for a key)
   FAKE_CLAUDE_CONNECTOR=1    a claude.ai connector loads, as if not isolated
   FAKE_CLAUDE_HANG=<text>    hang when the prompt contains <text> (a timeout)
   FAKE_CLAUDE_FAIL=<text>    fail when the prompt contains <text>
@@ -50,7 +51,8 @@ def main(args):
         return 0
     if args[:2] == ["auth", "status"]:
         out = ENV.get("FAKE_CLAUDE_LOGGED_OUT")
-        print(json.dumps({"loggedIn": not out, "authMethod": "none" if out else "claude.ai", "apiProvider": "firstParty"}, indent=2))
+        print(json.dumps({"loggedIn": not out, "authMethod": "none" if out else ENV.get("FAKE_CLAUDE_AUTH", "claude.ai"),
+                          "apiProvider": "firstParty"}, indent=2))
         return 1 if out else 0
     if "-p" not in args:
         print("fake claude: only -p, --version and auth status", file=sys.stderr)

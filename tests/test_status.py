@@ -7,12 +7,17 @@ import json
 import os
 import shutil
 import sys
+import tempfile
+import time
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from helpers import EXAMPLES, FAKE, FAKE_CODEX, REPO, class_assistant, fake_codex_env, fake_run, run_ab, tmpdir
+
+sys.path.insert(0, str(REPO))
+import run_ab as R  # noqa: E402
 
 POSIX = os.name == "posix"
 
@@ -111,6 +116,115 @@ class Status(unittest.TestCase):
         self.assertFalse((self.work / "experiments" / "mine").exists())
         bad = run_ab("new", "My Experiment", "--from", "class", "--root", self.work, cwd=self.work)
         self.assertEqual(bad.returncode, 2)
+
+
+@unittest.skipUnless(POSIX, "the fakes are POSIX scripts")
+class Projects(unittest.TestCase):
+    """0.1.3: status follows a Personal I packet (fix 1), and says who pays for a run (fix 2)."""
+
+    @classmethod
+    def setUpClass(cls):
+        os.chmod(FAKE, 0o755)
+        cls.base = tmpdir()
+        cls.assistant = class_assistant(cls.base)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.base, ignore_errors=True)
+
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp(dir=self.base))
+        self.work = self.root / "sel"
+        self.work.mkdir()
+
+    def packet(self) -> Path:
+        shutil.copytree(EXAMPLES / "personal-suites", self.root / "my-suites")
+        return self.root / "my-suites" / "suites.yaml"
+
+    def status(self, *extra, assistant=None, env=None, text=False):
+        r = run_ab("status", "--claude", FAKE, "--codex", self.root / "no-codex", "--root", self.work,
+                   "--assistant", assistant or self.root / "no-wren", *extra, *([] if text else ["--json"]),
+                   env=env, cwd=self.work)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        return r.stdout if text else json.loads(r.stdout)
+
+    def test_a_packet_not_run_yet(self):
+        self.packet()
+        st = self.status()
+        self.assertEqual(st["next"]["command"], "python3 run_ab.py suite ../my-suites/suites.yaml")
+        self.assertEqual(st["next"]["project"], "personal")
+        self.assertIn("each LLM test run uses a little of your plan", st["next"]["what"])
+        self.assertEqual([s["project"] for s in st["next_steps"]], ["personal"], "Wren is not asked for")
+        text = self.status(text=True)
+        self.assertIn("no-wren: not set up yet (Shared I and the demonstrations need it; Personal I's suites don't)", text)
+        self.assertNotIn("run_ab.py setup", text)
+
+    def test_a_broken_packet(self):
+        f = self.packet()
+        shutil.rmtree(f.parent / "product" / "note-2")
+        st = self.status()
+        self.assertEqual(st["next"]["command"], "python3 run_ab.py suite ../my-suites/suites.yaml --check")
+        self.assertIn("has 1 thing(s) to fix", st["next"]["what"])
+        self.assertIn("1 thing(s) to fix", self.status(text=True))
+
+    def test_a_packet_run_then_judged_then_changed(self):
+        f = self.packet()
+        r = run_ab("suite", f, "--claude", FAKE)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        st = self.status()
+        self.assertEqual(st["next"]["command"], R.OPEN_WIZARD)
+        self.assertIn("load ../my-suites/bundle.json in step 1. Judge each LLM test's criterion yourself (Reference)", st["next"]["what"])
+        with open(f.parent / "judgments.csv", "a", encoding="utf-8") as fh:
+            fh.write("reference,,product,facts-match-the-source-reference,human,SL,x,pass,mine,,2030-01-01T00:00:00Z\n")
+        st = self.status()
+        self.assertIn("In the wizard's Report step, export judgments.csv into ../my-suites/", st["next"]["what"])
+        time.sleep(0.05)
+        p = f.parent / "tests" / "facts-match-the-source" / "prompt.md"
+        p.write_text(p.read_text() + "\nOne more rule.\n")
+        st = self.status()
+        self.assertEqual(st["next"]["command"], "python3 run_ab.py suite ../my-suites/suites.yaml")
+        self.assertIn("1 test(s) have changed since the last run", st["next"]["what"])
+
+    def test_a_packet_and_an_experiment(self):
+        self.packet()
+        self.assertEqual(run_ab("new", "mine", "--from", "class", "--root", self.work, cwd=self.work).returncode, 0)
+        st = self.status(assistant=self.assistant)
+        self.assertEqual([s["project"] for s in st["next_steps"]], ["shared", "personal"])
+        self.assertEqual(st["next"], st["next_steps"][0], "next is still the first step, for ask and scripts")
+        self.assertIn("freeze", st["next_steps"][0]["what"].lower())
+        self.assertEqual(st["next_steps"][1]["command"], "python3 run_ab.py suite ../my-suites/suites.yaml")
+        text = self.status(assistant=self.assistant, text=True)
+        self.assertIn("Next step, Shared I", text)
+        self.assertIn("Next step, Personal I", text)
+
+    def test_neither(self):
+        st = self.status()
+        self.assertEqual(st["next"]["command"], "python3 run_ab.py setup ../class-assistant")
+        self.assertIn("On Personal I? You don't need Wren. Copy the worked example, `cp -r examples/personal-suites ../my-suites`",
+                      self.status(text=True))
+
+    def test_the_project_forced(self):
+        self.packet()
+        st = self.status("--project", "shared")
+        self.assertEqual(st["next"]["command"], "python3 run_ab.py setup ../class-assistant")
+        self.assertEqual([s["project"] for s in st["next_steps"]], ["shared"])
+        shutil.rmtree(self.root / "my-suites")
+        st = self.status("--project", "personal")
+        self.assertEqual(st["next"]["command"], "cp -r examples/personal-suites ../my-suites")
+        ask = run_ab("ask", "--claude", FAKE, "--root", self.work, "--assistant", self.root / "no-wren", "--project", "personal",
+                     "--show-command", cwd=self.work)
+        self.assertEqual(ask.returncode, 0, ask.stdout + ask.stderr)
+        self.assertIn("cp -r examples/personal-suites ../my-suites", ask.stdout, "ask passes the project on to the status it gives")
+
+    def test_who_pays(self):
+        plan = self.status(assistant=self.assistant)
+        self.assertIn("about half a minute; each run uses a little of your plan", plan["next"]["what"])
+        key = self.status(assistant=self.assistant, env={"FAKE_CLAUDE_AUTH": "api_key"})
+        self.assertIn("about half a minute; each run is billed to your API key", key["next"]["what"])
+        text = self.status(assistant=self.assistant, env={"FAKE_CLAUDE_AUTH": "api_key"}, text=True)
+        self.assertIn("logged in (api_key): runs are billed to the key", text)
+        self.packet()
+        self.assertIn("each LLM test run is billed to your API key", self.status(env={"FAKE_CLAUDE_AUTH": "api_key"})["next"]["what"])
 
 
 @unittest.skipUnless(POSIX, "the fakes are POSIX scripts")

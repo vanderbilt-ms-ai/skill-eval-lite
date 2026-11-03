@@ -1,0 +1,4 @@
+{
+ "role": "reference",
+ "note": "The class intake's reference output for summarize-committee-notes, with three facts repaired in 0.1.3 to say what the notes say (\"Ellis\"; Tom's suggestion, for the full board to decide; the camp supplies' timing for Ellis to confirm): every test should pass it."
+}

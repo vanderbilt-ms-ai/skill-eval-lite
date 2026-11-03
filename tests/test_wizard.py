@@ -282,6 +282,16 @@ class Journey(unittest.TestCase):
         text = b.js("document.getElementById('stage').innerText")
         self.assertIn("Suite report: graph-briefs", text)
         self.assertIn("MISSED", text, "the recorded run's findings show")
+        # The 0.1.3 recording, after the board reference was repaired: every control does what it expects.
+        b.js("__click('Reset')")
+        b.set_files("#bundle-file", [EXAMPLES / "recorded" / "personal-suites-2026-11-03" / "bundle.json"])
+        b.until("S.mode === 'suites'")
+        report = b.js("sReport(sSuite('board-drafts'), SB().rows, 'WHEN')")
+        line = next(l for l in report.splitlines() if l.startswith("| facts-match-the-source |"))
+        self.assertIn("ok (same as reference, got pass)", line)
+        self.assertIn("ok (fail, got fail)", line)
+        self.assertNotIn("MISSED", line)
+        self.assertNotIn("shows nothing", report)
 
     def test_practice_pack(self):
         b = self.b
@@ -419,6 +429,31 @@ class ChecksOnlyJourney(unittest.TestCase):
             norm = lambda t: re.sub(r"Written \S+ by [^.]+(\.\d+\.\d+)*[^.]*\.", "Written.", t)
             self.assertEqual(norm(mine), norm(want), f"the wizard's report for {s['id']} differs from run_ab.py's")
         self.assertIn("SL's reference judgments agree on", mine)
+
+    def test_controls_that_show_nothing(self):
+        """0.1.3, fix 4: a reference that fails a test makes the controls made from it
+        show nothing; the wizard's report says so word for word as run_ab.py's."""
+        b = self.b
+        copy = self.root / "refails"
+        shutil.copytree(self.out, copy)
+        ref = copy / "controls" / "board-drafts" / "reference" / "output.md"
+        ref.write_text(ref.read_text().replace("Next meeting: Thursday 3 December.", "Next meeting: Thursday 10 December."))
+        r = run_ab("suite", copy / "suites.yaml", "--claude", FAKE, "--again")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        b.set_files("#bundle-file", [copy / "bundle.json"])
+        b.until("S.mode === 'suites'")
+        mine = b.js("sReport(sSuite('board-drafts'), SB().rows, 'WHEN')")
+        s = next(s for s in self.R.Suites(copy / "suites.yaml").suites if s["id"] == "board-drafts")
+        want = self.R.suite_report(s, self.R.read_rows(copy / "judgments.csv"), "WHEN")
+        norm = lambda t: re.sub(r"Written \S+ by [^.]+(\.\d+\.\d+)*[^.]*\.", "Written.", t)  # noqa: E731
+        self.assertEqual(norm(mine), norm(want), "the wizard's report differs from run_ab.py's")
+        line = next(l for l in want.splitlines() if l.startswith("| facts-match-the-source |"))
+        self.assertIn("MISSED (pass, got fail)", line)
+        self.assertIn("shows nothing: the test fails reference too (got pass)", line)
+        self.assertIn("shows nothing: the test fails reference too (got fail)", line)
+        self.assertIn("- `facts-match-the-source` fails the reference", want)
+        self.step(4)
+        self.assertIn("facts-match-the-source fails the reference", b.js("document.getElementById('reference-notes-board-drafts').innerText"))
 
     def test_comparison_records_the_side(self):
         copy = self.root / "compare"

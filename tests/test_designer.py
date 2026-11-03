@@ -597,6 +597,8 @@ class SuiteJourney(Page):
         self.assertIn("run_ab.py suite ../my-packet/suites.yaml --check", self.js("__text()"))
         self.assertIn("controls/lookups/fault/trace.jsonl", files)
         self.assertNotIn("kb/kb search", files["controls/lookups/fault/trace.jsonl"], "the planted fault has no search")
+        self.assertEqual(json.loads(files["controls/lookups/fault/expect.json"]).get("varies"), "reference",
+                         "a fault made from a case names it (0.1.3), so the report can tell when it shows nothing")
         self.assertIn("{{case}}", files["tests/reads-well/prompt.md"])
         r = self.sel(copy, "suite", "../my-packet/suites.yaml", "--check")
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
