@@ -26,7 +26,7 @@ It was made for AI 5500 (Vanderbilt, Fall 2026), for Shared I and Personal I. Th
 assistant is Wren, the AI 5100 assistant template's fictional example: Wren
 works for Morgan Reyes, and nobody in it is real.
 
-Version 0.1.3 (the version is in `VERSION`). On an earlier version? In this folder, type `git pull`:
+Version 0.1.4 (the version is in `VERSION`). On an earlier version? In this folder, type `git pull`:
 [RELEASE.md](RELEASE.md) says what changed. `doctor` and `status` say when a newer
 version is out.
 
@@ -1001,6 +1001,32 @@ This copies the class experiment, with its round and prompt files, into
 For your group's own assistant, use the intake instead (`/experiment-intake`
 in Claude Code). A helper session and each answer use a little of your plan.
 
+### Doing it all in Claude Code
+
+You don't have to type the commands yourself. Start Claude Code in this
+folder (`claude`, or `python3 run_ab.py ask` for the helper), say what you
+want in your own words, and it runs the commands for you: "Please check our
+experiment", "Please run it", "Please run the AI judge". Name your
+assistant's folder when you ask (`../class-assistant`, or your own).
+
+This folder's `.claude/settings.json` lets Claude Code run the commands that
+only read or check without asking you first: `status`, `check`, `plan`,
+`doctor`, `suite ... --check`, and `--help`. Every command that uses your
+plan or changes something (`run`, `judge`, `suite`, `setup`, `score`) still
+asks: Claude Code shows the command, and you choose Yes or No. The file
+changes nothing in a run, which never reads it.
+
+Claude Code follows these rules only once you trust this folder. The first
+time you start it here, it lists them, says they "will apply without
+asking", and asks whether you trust the folder. "No, exit" is chosen to
+begin with: press the down arrow, then Enter, for "Yes, I trust this
+folder". Until you do, every command asks, as before.
+
+Two steps stay in the wizard, because they are yours to do: freezing your
+experiment (step 2), and your own judgments (step 4, or Reference and Human
+tests for Personal I). Claude Code can open the wizard for you, and put the
+frozen file back from your Downloads folder.
+
 ## Commands
 
     python3 run_ab.py setup FOLDER [--from URL] [--commit SHA]
@@ -1177,7 +1203,7 @@ asked; that a global `AGENTS.md`, a personal skill, an MCP tool or an MCP
 call stops the run; that runners are not mixed; and the import inlining,
 the trace names and the check before each run on their own.
 
-## Limits in 0.1.3
+## Limits in 0.1.4
 
 - The runner runs Claude Code or Codex. A Codex run reads the assistant
   through a generated `AGENTS.md` (see "With Codex"), so its results are not

@@ -2,7 +2,7 @@
      The same text as .claude/skills/skill-eval-helper/SKILL.md, without its front matter.
      Skill Eval Lite's runner leaves this file out of every run of an assistant. -->
 
-<!-- skill-eval-lite helper, version 2 (Skill Eval Lite 0.1.2) -->
+<!-- skill-eval-lite helper, version 3 (Skill Eval Lite 0.1.4) -->
 
 # Helping a student use Skill Eval Lite
 
@@ -27,6 +27,17 @@ the one after, without losing them.
 - Keep each message short: a few lines, not a page.
 - Point to pictures when they help: the Getting started screen in
   `wizard.html`, and the diagrams in `docs/diagrams/`.
+- Many students would rather not type commands. Offer to run each one for
+  them. The commands that only read or check (`status`, `check`, `plan`,
+  `doctor`, `suite ... --check`) run without a permission prompt (this
+  folder's `.claude/settings.json`). `run`, `judge`, `suite`, `setup` and
+  `score` bring up Claude Code's prompt: say before one that it will appear,
+  and that choosing Yes runs the command you just described.
+- Run each command on its own, as it is written in this skill. Don't chain
+  extra commands onto it (`| tail`, `&& git ...`): a chain brings up a
+  prompt, and the runner already prints what matters.
+- Always give the assistant's folder as a path from this folder:
+  `../class-assistant`, or `../<their folder>`. Ask for it if you don't know.
 
 ## What you never do
 
@@ -84,8 +95,12 @@ to you below the line "Where the student is now".
    Fix every "must fix" line with them.
 6. **Freeze it** in the wizard: load it in step 1, press *Freeze* in step 2,
    then press *Export the frozen experiment* (also in step 2) and save the
-   file over `experiments/<name>/experiment.toml`. Freezing records the
-   experiment before any results, so nobody can change it after seeing them.
+   file over `experiments/<name>/experiment.toml`. Offer to open the wizard
+   for them (see "Opening the wizard"), and, once they have exported it, to
+   move the frozen file from their Downloads folder over the old one. The
+   Downloads folder is outside this folder, so Claude Code asks first.
+   Freezing records the experiment before any results, so nobody can change
+   it after seeing them.
    `check` should then say `Frozen: yes`. If it says the file has changed
    since it was frozen, it must be frozen again (keep the earlier file,
    dated). `run` won't run an experiment that isn't frozen. `--unfrozen`

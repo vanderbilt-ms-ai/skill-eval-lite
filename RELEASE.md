@@ -1,9 +1,64 @@
 Skill Eval Lite is published as a public repository,
 https://github.com/vanderbilt-ms-ai/skill-eval-lite. Version 0.1.0 was
-released on 27 October 2026, and versions 0.1.1, 0.1.2 and 0.1.3 on
-3 November 2026. Each release is one commit on the public `main`, made from
-the course's private development history and tagged (`v0.1.0` to
-`v0.1.3`).
+released on 27 October 2026, versions 0.1.1, 0.1.2 and 0.1.3 on
+3 November 2026, and version 0.1.4 on 4 November 2026. Each release is one
+commit on the public `main`, made from the course's private development
+history and tagged (`v0.1.0` to `v0.1.4`).
+
+## 0.1.4, 4 November 2026
+
+Doing it all in Claude Code. Many students would rather not type commands,
+so Claude Code can run them, and this folder now tells it which ones it may
+run without asking. Requested for AI 5500's week 4 tutorials, which run
+Skill Eval Lite entirely through Claude Code (Simon, 4 November: "I'm not
+sure a lot of students will know how to use the terminal commands").
+
+### If you are on 0.1.3 or earlier
+
+1. In your `skill-eval-lite` folder, type `git pull`.
+2. Nothing else. No result, file or command changes. Claude Code asks you
+   less often: see below.
+
+### What changed
+
+| # | Before | In 0.1.4 |
+| --- | --- | --- |
+| 1 | In Claude Code in this folder (or `ask`), every command asked for permission, `status` and `check` included | `.claude/settings.json` lets Claude Code run, without asking, only the commands that read or check: `status`, `check`, `plan`, `doctor`, `suite ... --check`, `--help` and `--version`, with `python3` or `py`. `run`, `judge`, `suite`, `setup`, `score`, `new` and `ask` still ask, so each prompt a student sees is for a command that uses their plan or changes something. A command chained onto an allowed one still asks. The file sets nothing else: no hooks, no environment, no permission mode. A run never reads it: the runner runs the assistant in a copy of its own folder, with `--setting-sources project` there |
+| 2 | The helper ran commands only after asking, but said nothing about Claude Code's own prompts, chained extra commands onto them, and could guess the assistant's folder | The helper (version 3, in `HELPER.md` too) offers to run each command, says before `run`, `judge`, `suite`, `setup` or `score` that Claude Code's prompt will appear, runs each command on its own as written, always gives the assistant's folder as `../<folder>`, and offers to open the wizard and to move the frozen experiment back from the Downloads folder |
+| 3 | The README told students to type each command | A new section, "Doing it all in Claude Code", under "Stuck? Ask for help": what to say, what runs without asking and what asks, and the two steps that stay in the wizard (freezing, and your own judgments) |
+
+### What was verified for 0.1.4
+
+- `python3 -m unittest`: all 158 tests pass. New: `tests/test_settings.py`
+  (five tests: the file sets only `permissions.allow`; every rule is a
+  read-only runner command; nothing that spends or changes is allowed;
+  `python3` and `py` have the same rules; the README names the file).
+- `dev/embed_examples.py --check`, `node dev/diagrams.mjs --check` and
+  `tutorial/build.py --check`: all up to date.
+- With Claude Code 2.1.318, in a copy of this folder, `claude -p
+  --setting-sources project`, asked to run ten commands exactly as written:
+  `status`, `check`, `plan`, `suite ... --check` and `run --help` ran;
+  `run`, `judge`, `suite`, `setup`, and a `check` with `; touch ...`
+  chained on, were refused (in an interactive session, each would ask).
+  The same with `--permission-mode manual`, as `ask` starts Claude Code.
+- A whole Shared I experiment done in Claude Code from one request in a
+  student's words (check, run in the background, judge), on 0.1.3, before
+  these changes: it worked, with the two stumbles that fix 2 addresses.
+- **Trust comes first.** Claude Code applies a folder's allow rules only
+  after its trust question is answered Yes, and asks it per git project: in
+  a fresh clone, every command asked until then. Its question lists the
+  rules, says they "will apply without asking", and starts on "No, exit"
+  (down arrow, then Enter, for Yes). The README says so.
+- The helper's new text, in a whole session on a fresh clone of 0.1.4 in a
+  trusted folder, on the class assistant with an experiment frozen as the
+  wizard freezes it: `check` ran without a prompt; it opened the wizard,
+  explained the freeze, read and moved the exported file back (each with a
+  prompt, since Downloads is outside the folder), ran `check` again
+  (`Frozen: yes`), and ran rounds A and B, then C and D, then `judge`, each
+  after a yes, in the background, one command at a time, with
+  `../class-assistant` each time. 32 runs and 24 pairs, $2.07; the helper
+  about $0.45.
+- Not yet: a `dev/fresh-trial.sh` of 0.1.4.
 
 ## 0.1.3, 3 November 2026
 
