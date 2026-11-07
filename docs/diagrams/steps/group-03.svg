@@ -1,30 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 194" width="400" height="194" role="img" aria-labelledby="steps-group-03-t steps-group-03-d"><title id="steps-group-03-t">Claude Code: Start the intake</title><desc id="steps-group-03-d">Type: /experiment-intake ../your-assistant.  You should see: A list of the assistant’s parts, then a first question.</desc><style>
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 243" width="400" height="243" role="img" aria-labelledby="steps-group-03-t steps-group-03-d"><title id="steps-group-03-t">Claude: Answer its questions, together</title><desc id="steps-group-03-d">Answer in your own words. It suggests the versions to compare, the requests and the checks: correct anything that is wrong. At the end it writes experiments/&lt;name&gt;/experiment.toml. Note the name it gives: it is &lt;name&gt; in the steps below. You should see: “I wrote experiments/…/experiment.toml” and a checklist.</desc><style>
 .dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
 .dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
 .dg .b{font-weight:600}
 .dg .it{font-style:italic}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
 .dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
-.dg .tw{fill:#1E2A33;stroke:#13202A}
-.dg .twbar{fill:#2B3945}
-.dg .twdot{fill:#5B6B78}
-.dg .tw-t{fill:#E6EDF3}
-.dg .tw-o{fill:#A9B8C4}
-.dg .tw-ag{fill:#CDB4F2}
-.dg .tw-box{fill:none;stroke:#6C7C89}
-.dg .tw-cur{fill:#E6EDF3}
+.dg .pl{fill:#F8F8F4;stroke:#D9DAD2}
+.dg .wh{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .ed{fill:#FFFFFF;stroke:#5F6A73}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .h-rule2{fill:#E9EAE3}
+.dg .f-agent{fill:rgba(122,79,168,.12);stroke:#7A4FA8}
+.dg .t-agent{fill:#7A4FA8}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+.dg .t-file{fill:#85590A}
+.dg .f-n{fill:rgba(122,135,145,.16);stroke:#7A8791}
+.dg .t-n{fill:#45515B}
 @media (prefers-color-scheme: dark) {
 .dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
 .dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
 .dg .b{font-weight:600}
 .dg .it{font-style:italic}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
 .dg .bg{fill:#141C23;stroke:#2A3640}
-.dg .tw{fill:#0A0F13;stroke:#2A3640}
-.dg .twbar{fill:#18222A}
-.dg .twdot{fill:#5B6B78}
-.dg .tw-t{fill:#E6EDF3}
-.dg .tw-o{fill:#A9B8C4}
-.dg .tw-ag{fill:#CDB4F2}
-.dg .tw-box{fill:none;stroke:#6C7C89}
-.dg .tw-cur{fill:#E6EDF3}
+.dg .pl{fill:#18222A;stroke:#2A3640}
+.dg .wh{fill:#141C23;stroke:#2A3640}
+.dg .ed{fill:#141C23;stroke:#8593A0}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .h-rule2{fill:#1F2A33}
+.dg .f-agent{fill:rgba(180,148,222,.15);stroke:#B494DE}
+.dg .t-agent{fill:#B494DE}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+.dg .t-file{fill:#E2AE4A}
+.dg .f-n{fill:rgba(142,155,165,.18);stroke:#8E9BA5}
+.dg .t-n{fill:#A7B4BF}
 }
-</style><rect class="bg" x="0.5" y="0.5" width="399" height="193" rx="12"/><rect x="8" y="8" width="384" height="178" rx="10" class="tw"/><path d="M8 18 Q8 8 18 8 H382 Q392 8 392 18 V32 H8 Z" class="twbar"/><circle cx="22" cy="20" r="3.6" class="twdot"/><circle cx="35" cy="20" r="3.6" class="twdot"/><circle cx="48" cy="20" r="3.6" class="twdot"/><text x="200" y="24.5" font-size="11" class="tw-o" text-anchor="middle">Claude Code</text><text x="22" y="60" font-size="12.5" class="m"><tspan class="tw-ag b">Claude Code</tspan><tspan class="tw-o">  in skill-eval-lite</tspan></text><rect x="16" y="71" width="368" height="27" rx="6" class="tw-box"/><text x="26.7" y="91" font-size="12.5" class="m"><tspan class="tw-ag">&gt; </tspan><tspan class="tw-t">/experiment-intake ../your-assistant</tspan></text><text x="22" y="118" font-size="12"><tspan class="tw-o it">(Claude reads the assistant, then asks your group</tspan></text><text x="22" y="137" font-size="12"><tspan class="tw-o it">its first question)</tspan></text><rect x="16" y="144" width="368" height="26" rx="6" class="tw-box"/><text x="24" y="161.5" font-size="12.5" class="m tw-ag">&gt;</text><rect x="36.4" y="151" width="7.4" height="14" rx="1" class="tw-cur"/></svg>
+</style><rect class="bg" x="0.5" y="0.5" width="399" height="242" rx="12"/><rect x="8" y="8" width="384" height="227" rx="10" class="wh"/><path d="M8 18 Q8 8 18 8 H382 Q392 8 392 18 V30 H8 Z" class="h-rule2"/><text x="200" y="23" font-size="10" class="t3" text-anchor="middle">Claude</text><text x="380" y="23" font-size="10" class="m t3" text-anchor="end">&gt;_</text><path d="M38 30 L38 235" class="ln s-rule thin"/><rect x="16" y="39" width="15" height="11" rx="3" class="ed"/><rect x="13" y="57" width="21" height="16" rx="4" class="f-agent"/><text x="23.5" y="68.5" font-size="8.5" class="m b t-agent" text-anchor="middle">&lt;/&gt;</text><rect x="100.5" y="44" width="279.5" height="44" rx="10" class="pl"/><text x="111.5" y="62" font-size="12">Our assistant drafts replies. We want</text><text x="111.5" y="79" font-size="12">to improve its voice file.</text><text x="50" y="110" font-size="11.5" class="it t3">(it asks up to five questions, then writes the</text><text x="50" y="126" font-size="11.5" class="it t3">file)</text><text x="50" y="147" font-size="12">I wrote experiments/&lt;name&gt;/experiment.toml.</text><rect x="50" y="167" width="330" height="30" rx="8" class="ed"/><text x="61" y="186.5" font-size="11" class="t3">Describe a task or ask a question</text><rect x="50" y="205" width="95.2" height="20" rx="6" class="f-n"/><text x="58" y="218.8" font-size="10.5" class="t-n">This computer</text><rect x="151.2" y="205" width="113.7" height="20" rx="6" class="f-file"/><text x="159.2" y="218.8" font-size="10.5" class="m t-file">skill-eval-lite</text><text x="380" y="219" font-size="10.5" class="t2" text-anchor="end">Manual</text></svg>

@@ -4,18 +4,27 @@
 
 # Writing a program check
 
-<!-- skill-eval-lite check-authoring, version 1 (Skill Eval Lite 0.1.2) -->
+<!-- skill-eval-lite check-authoring, version 2 (Skill Eval Lite 0.2.0) -->
 
-You are helping a group of two or three students add one check to their
-experiment in Skill Eval Lite: a *program check*, a short Python program of
-their own that looks at one thing in each output, or in the steps a run
-took, that none of the built-in checks can see. You write the program, its
-fixtures and its entry in `experiment.toml` with the group, and you test it.
+You are helping students add one check of their own in Skill Eval Lite: a
+*program check*, a short Python program that looks at one thing in each
+output, or in the steps a run took, that none of the built-in checks can
+see. There are two places it can go:
 
-You may run `python3 run_ab.py check` (it calls no model). Don't run `run`
-or `judge`: they use the group's plan, and the group runs them. Run `score`
-only when the group asks you to: it writes into their run folder. Never
-change the assistant's own files.
+- **Shared I**: a group of two or three adds it to their experiment, as a
+  `[[checks]]` entry in `experiment.toml`. Sections 2 to 8.
+- **Personal I**: one student makes it a mechanical test in `suites.yaml`.
+  Section 9.
+
+Section 1, choosing the tool, is the same for both. You write the program
+with the students, then you test it.
+
+You may run `python3 run_ab.py check` and `python3 run_ab.py suite ... --check`
+and, for Personal I, `python3 run_ab.py suite ... --tests <id>` on a
+mechanical test: none of them calls a model. Don't run `run` or `judge` here:
+they use the group's plan, and `/run-experiment` runs them with the group.
+Run `score` only when the group asks you to: it writes into their run
+folder. Never change the assistant's own files.
 
 `examples/demo-program-check.toml` is a complete example, with two program
 checks in `examples/class-assistant/checks/`: `looked-up-first` (on the
@@ -24,7 +33,7 @@ their shape.
 
 ## How to talk with the group
 
-The group may be new to the terminal and to Python. Write to them that way:
+The students may be new to Python. Write to them that way:
 
 - Short sentences and plain words. One question, or one thing to do, at a
   time.
@@ -38,29 +47,37 @@ The group may be new to the terminal and to Python. Write to them that way:
 - Before you write anything, say in two or three sentences what the program
   will check, and what a pass will and will not show. Ask whether that is
   what they want. Change it until it is.
-- When you ask them to type something, give the exact command on its own
-  line, say where to type it, and say what they should see when it works.
+- They type no commands. Run each command yourself: say first in a line
+  what it does, then run it, on its own, as written here. On Windows, use
+  `py` where this says `python3`. The app asks them before anything that
+  changes a file: that is their yes.
+- The brief lets them have you write the program, and asks them to "read
+  the code, and explain in your own words what property it tests and what
+  passing it does not show". So read it through with them when it is
+  written, and ask them to say both back. Note in the brief folder's
+  `ai-use-log.md` that you wrote it.
 
 ## 1. Is a program the right tool?
 
 Choose the simplest tool that answers the group's question.
 
-1. **A built-in check**, when one fits. The wizard runs these itself:
+1. **A built-in check**, when one fits. The wizard runs these itself on
+   Shared I's runs, and `suite` on Personal I's cases:
    `contains` (every text appears), `not-contains` (none does), `matches` (a
    regular expression matches), `word-count` (`min`, `max`), `json-parses`,
    `trace-ran-command` (a shell command in the trace matches a pattern) and
    `trace-no-tool-outside` (every step is on an allowed list). The README's
    "The experiment file" says how each works.
-2. **A program check**, when the answer is yes or no, and code can decide it
+2. **A program check**, when the answer is yes or no and code can decide it
    the same way every time from what the run left: its output, its trace,
    the files it wrote, the request, the starting files, the reference. For
    example: the order of the steps (it looked something up before it wrote);
    "only these amounts" (every number in the brief is one the graph holds);
    every date in the reply is a date in the e-mail it answers; a table has
    the columns asked for; the JSON output has the fields a program needs.
-3. **The judge, or people**, when it takes judgment: whether a reply sounds
-   like the owner, whether an argument holds, whether a fact is right in
-   meaning. A program that tries to judge meaning with a list of words is a
+3. **The judge, or people** (for Personal I, an LLM test or a human test),
+   when it takes judgment: whether a reply sounds like the owner, whether
+   an argument holds, whether a fact is right in meaning. A program that tries to judge meaning with a list of words is a
    weak check. Say so, and suggest the judging question instead.
 
 A program check never calls a model, an API or the internet. A check that
@@ -212,7 +229,7 @@ all). Nothing private goes in a fixture: make it up.
 
 ## 7. Test it
 
-In the terminal, in Skill Eval Lite's folder:
+Run, in Skill Eval Lite's folder (no prompt, no model):
 
     python3 run_ab.py check experiments/<name>/experiment.toml
 
@@ -233,7 +250,7 @@ Fix each line, and check again, until no `must fix` line is left. Then tell
 the group what the check does, in two sentences, and show them its
 `program:` line.
 
-## 8. After the freeze, and after the runs
+## 8. After the freeze and after the runs
 
 - `run` tests the programs before it starts, and runs them on every output
   at the end. Their results are in the run folder's `bundle.json`, and the
@@ -252,21 +269,87 @@ the group what the check does, in two sentences, and show them its
   exploratory. They were not part of the test they froze, and their report
   must say so.
 
-## 9. Before you finish
+## 9. Personal I: a mechanical test's program
 
-Check, and tell the group:
+For Personal I the program is one of a suite's mechanical tests. It goes in
+the packet, `../my-suites/tests/<id>/check.py`, and its entry in
+`suites.yaml` names it, with the path from the suites file's folder:
+
+```yaml
+      - id: search-before-write
+        kind: mechanical
+        question: Did the run look something up in the knowledge graph before it wrote the brief?
+        criterion: >
+          Passes when a step that searched or read the graph comes before the
+          first step that wrote a file.
+        why: The order of steps in a record is something a program can check exactly.
+        program: tests/search-before-write/check.py
+```
+
+`examples/personal-suites/tests/search-before-write/check.py` is a complete
+one, on a process. Follow its shape.
+
+**How it runs.** `suite` runs it once for each case of the suite, instances
+and controls alike, as
+
+    python3 tests/<id>/check.py CASE_FOLDER
+
+with the runner's own Python (a program that doesn't end in `.py` runs as
+it is), with the packet's folder as its working folder and a limit of 120
+seconds. It is given the case's own folder, not a copy, so it must only
+read. Use the standard library only, in one file, and call no model or
+network, as in section 1.
+
+**What CASE_FOLDER holds**: the case's own files, as the student made them.
+The product's file (`output.md` unless the suite says `file:`), `context.md`,
+anything else they put there (`files/`), and for a process its record:
+`transcript.jsonl` (the session's events) or `trace.jsonl` (one step a line,
+`{"tool", "detail", "error"}`). Read the record in the runner's order:
+`transcript.jsonl` if it is there, else `trace.jsonl`. The example shows how
+to read both. There is no `context.json` and no `reference.md`.
+
+**What it prints**: as in section 4, a first line of `pass`, `fail` or `n/a`
+and a reason. Print `n/a` when the case has nothing to test (a case with no
+record), so that it isn't counted as a failure.
+
+**No sha256 and no fixtures folder.** A test's version is a fingerprint of
+its entry and its program, so a changed program is a new version, with new
+results and a new report. The suite's control cases are its fixtures: the
+brief asks that "each mechanical test should meet at least one planted
+fault that it is meant to catch". If none is aimed at this test yet, say so
+and hand over to `/control-cases`.
+
+**Test it**, on every case of its suite, with no model:
+
+    python3 run_ab.py suite ../my-suites/suites.yaml --tests <id>
+
+It runs only this test, adds its rows to `judgments.csv` and writes the
+reports. Read its column with the student, then its row in the report's
+controls table (`../my-suites/reports/<suite>-<version>.md`): `ok` on the
+reference, on each fault aimed at it and on each variation. A `MISSED` is a
+finding: is it the program, the control or the criterion? Ask them.
+
+## 10. Before you finish
+
+Check, and tell the students:
 
 - [ ] a built-in check couldn't do this, and it doesn't need judgment;
 - [ ] the program reads only the case folder, uses the standard library,
       and calls no model or network;
 - [ ] its first line is `pass`, `fail` or `n/a` and a reason, and it says
       `n/a` only when there is nothing to check;
-- [ ] it has a fixture it should fail and one it should pass;
-- [ ] `check` shows no `must fix` line, and the `sha256` line is in the check;
-- [ ] `shows` and `does_not_show` say honestly what a pass means;
+- [ ] Shared I: it has a fixture it should fail and one it should pass;
+      `check` shows no `must fix` line, and the `sha256` line is in the
+      check; `shows` and `does_not_show` say honestly what a pass means;
+- [ ] Personal I: it meets a planted fault it should catch, and its row in
+      the controls table reads `ok`; its docstring says what a pass does not
+      show;
+- [ ] they have read the program and said in their own words what it
+      tests and what a pass does not show;
 - [ ] nothing private is in a fixture.
 
-Then say what comes next: if the experiment isn't frozen yet, freeze it in
-the wizard (step 2) and put the exported file back; if it was frozen
-already, it must be frozen again, and if the runs are made, `score` runs the
-new check on them.
+Then say what comes next. Shared I: if the experiment isn't frozen yet,
+freeze it in the wizard (step 2) and put the exported file back (`/wizard`);
+if it was frozen already, it must be frozen again, and if the runs are made,
+`score` runs the new check on them. Personal I: the other tests, or
+`/run-suites`.

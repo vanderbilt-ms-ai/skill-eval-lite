@@ -46,14 +46,19 @@ function stepsMarkdown(key) {
   // `code` stays as it is; elsewhere < and > are escaped, so that <name> shows.
   const md = t => DG.F(t || '', ctx).split(/(`[^`]*`)/).map((x, i) => i % 2 ? x : x.replace(/</g, '&lt;').replace(/>/g, '&gt;')).join('');
   const code = c => '       ' + c;
-  const where = { term: 'In the terminal', agent: 'In Claude Code', web: 'In the wizard', file: 'In your files' };
+  const where = { term: 'In the terminal', agent: 'In Claude', web: 'In the wizard', file: 'In your files', app: 'On your computer' };
   return steps.map((st, i) => {
     const n = String(i + 1).padStart(2, '0'), out = [];
     out.push(`${i + 1}. **${md(st.title)}** *${where[st.where]}.*${st.body ? ' ' + md(st.body) : ''}`);
     if (st.how) out.push(`   On a Mac: ${st.how.mac} On Windows: ${st.how.win} On Linux: ${st.how.linux}`);
+    if (st.say) {
+      out.push('   Type this in Claude, then press Enter:');
+      out.push(code(DG.F(st.say, ctx)));
+    }
     if (st.cmd) {
       const mac = DG.F(st.cmd, Object.assign({}, ctx, { os: 'mac' })), win = DG.F(st.cmd, Object.assign({}, ctx, { os: 'win' })), lin = DG.F(st.cmd, Object.assign({}, ctx, { os: 'linux' }));
-      if (st.where !== 'file') out.push(st.where === 'agent' ? '   Type this in Claude Code, then press Enter:' : '   Type this, then press Enter:');
+      if (st.say) out.push('   In a terminal instead' + (st.cmd.startsWith('git clone') ? ', in the `ai5500` folder:' : ', in the `skill-eval-lite` folder:'));
+      else if (st.where !== 'file') out.push('   Type this, then press Enter:');
       out.push(code(mac));
       if (lin !== mac) out.push('   On Linux:\n\n' + code(lin));
       if (win.replace(/^py /, 'python3 ') !== mac) out.push('   On Windows (PowerShell):\n\n' + code(win));

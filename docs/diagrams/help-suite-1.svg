@@ -1,48 +1,56 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 286" width="300" height="286" role="img" aria-labelledby="help-suite-1-t help-suite-1-d"><title id="help-suite-1-t">Checks-only step 1: where the bundle comes from</title><desc id="help-suite-1-d">python3 run_ab.py suite ../my-suites/suites.yaml writes my-suites/bundle.json. Choose it in step 1.</desc><style>
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 300 385" width="300" height="385" role="img" aria-labelledby="help-suite-1-t help-suite-1-d"><title id="help-suite-1-t">Checks-only step 1: where the bundle comes from</title><desc id="help-suite-1-d">In Claude, /run-suites runs the suites, which write my-suites/bundle.json. Choose it in step 1.</desc><style>
 .dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
 .dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
 .dg .b{font-weight:600}
 .dg .it{font-style:italic}
+.dg .t2{fill:#45515B}
 .dg .t3{fill:#5F6A73}
 .dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .pl{fill:#F8F8F4;stroke:#D9DAD2}
+.dg .wh{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .ed{fill:#FFFFFF;stroke:#5F6A73}
 .dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .dg .thin{stroke-width:1.1}
 .dg .dash{stroke-dasharray:5 4}
-.dg .s-term{stroke:#1C7C6E}
-.dg .h-term{fill:#1C7C6E}
+.dg .h-rule2{fill:#E9EAE3}
 .dg .f-web{fill:rgba(29,108,176,.12);stroke:#1D6CB0}
 .dg .s-web{stroke:#1D6CB0}
 .dg .h-web{fill:#1D6CB0}
 .dg .t-web{fill:#1D6CB0}
+.dg .f-agent{fill:rgba(122,79,168,.12);stroke:#7A4FA8}
+.dg .s-agent{stroke:#7A4FA8}
+.dg .h-agent{fill:#7A4FA8}
+.dg .t-agent{fill:#7A4FA8}
 .dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
-.dg .tw{fill:#1E2A33;stroke:#13202A}
-.dg .twbar{fill:#2B3945}
-.dg .twdot{fill:#5B6B78}
-.dg .tw-t{fill:#E6EDF3}
-.dg .tw-p{fill:#62D2C0}
-.dg .tw-o{fill:#A9B8C4}
+.dg .t-file{fill:#85590A}
+.dg .f-n{fill:rgba(122,135,145,.16);stroke:#7A8791}
+.dg .t-n{fill:#45515B}
 @media (prefers-color-scheme: dark) {
 .dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
 .dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
 .dg .b{font-weight:600}
 .dg .it{font-style:italic}
+.dg .t2{fill:#A7B4BF}
 .dg .t3{fill:#8593A0}
 .dg .bg{fill:#141C23;stroke:#2A3640}
+.dg .pl{fill:#18222A;stroke:#2A3640}
+.dg .wh{fill:#141C23;stroke:#2A3640}
+.dg .ed{fill:#141C23;stroke:#8593A0}
 .dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .dg .thin{stroke-width:1.1}
 .dg .dash{stroke-dasharray:5 4}
-.dg .s-term{stroke:#4CC0AE}
-.dg .h-term{fill:#4CC0AE}
+.dg .h-rule2{fill:#1F2A33}
 .dg .f-web{fill:rgba(91,166,232,.16);stroke:#5BA6E8}
 .dg .s-web{stroke:#5BA6E8}
 .dg .h-web{fill:#5BA6E8}
 .dg .t-web{fill:#5BA6E8}
+.dg .f-agent{fill:rgba(180,148,222,.15);stroke:#B494DE}
+.dg .s-agent{stroke:#B494DE}
+.dg .h-agent{fill:#B494DE}
+.dg .t-agent{fill:#B494DE}
 .dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
-.dg .tw{fill:#0A0F13;stroke:#2A3640}
-.dg .twbar{fill:#18222A}
-.dg .twdot{fill:#5B6B78}
-.dg .tw-t{fill:#E6EDF3}
-.dg .tw-p{fill:#62D2C0}
-.dg .tw-o{fill:#A9B8C4}
+.dg .t-file{fill:#E2AE4A}
+.dg .f-n{fill:rgba(142,155,165,.18);stroke:#8E9BA5}
+.dg .t-n{fill:#A7B4BF}
 }
-</style><rect class="bg" x="0.5" y="0.5" width="299" height="285" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Where the bundle comes from</text><g transform="translate(0 34)"><rect x="8" y="8" width="284" height="86" rx="10" class="tw"/><path d="M8 18 Q8 8 18 8 H282 Q292 8 292 18 V32 H8 Z" class="twbar"/><circle cx="22" cy="20" r="3.6" class="twdot"/><circle cx="35" cy="20" r="3.6" class="twdot"/><circle cx="48" cy="20" r="3.6" class="twdot"/><text x="150" y="24.5" font-size="11" class="tw-o" text-anchor="middle">Terminal</text><text x="22" y="60" font-size="12.5" class="m"><tspan class="tw-p">$ </tspan><tspan class="tw-t">python3 run_ab.py suite</tspan></text><text x="37.5" y="79" font-size="12.5" class="m"><tspan class="tw-t">../my-suites/suites.yaml</tspan></text></g><path d="M30 140 L30 155" class="ln s-term"/><path d="M30 162 L25.2 153 L34.8 153 Z" class="h-term"/><text x="42" y="155" font-size="10.5" class="t3 it">it writes</text><path transform="translate(12 165) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="32" y="176.5" font-size="11.5" class="m">my-suites/</text><path d="M18 185 V198 H25" class="ln thin s-rule"/><g transform="translate(28 186) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="48" y="198.5" font-size="11.5" class="m b t-web">bundle.json</text><text x="288" y="198.5" font-size="10.5" class="t3 it" text-anchor="end">your packet</text><path d="M30 206 L30 221" class="ln s-web"/><path d="M30 228 L25.2 219 L34.8 219 Z" class="h-web"/><text x="42" y="221" font-size="10.5" class="t3 it">choose it</text><rect x="12" y="234" width="276" height="40" rx="8" class="f-web dash"/><rect x="22" y="246" width="17" height="14" rx="3" class="f-web"/><path d="M22 250.5 L39 250.5" class="ln s-web thin"/><circle cx="25" cy="248.3" r="0.9" class="h-web"/><circle cx="27.6" cy="248.3" r="0.9" class="h-web"/><text x="46" y="258.5" font-size="12" class="b t-web">Step 1: choose it here</text></svg>
+</style><rect class="bg" x="0.5" y="0.5" width="299" height="384" rx="12"/><text x="12" y="22" font-size="12.5" class="b">Where the bundle comes from</text><g transform="translate(0 34)"><rect x="8" y="8" width="284" height="185" rx="10" class="wh"/><path d="M8 18 Q8 8 18 8 H282 Q292 8 292 18 V30 H8 Z" class="h-rule2"/><text x="150" y="23" font-size="10" class="t3" text-anchor="middle">Claude</text><text x="280" y="23" font-size="10" class="m t3" text-anchor="end">&gt;_</text><path d="M38 30 L38 193" class="ln s-rule thin"/><rect x="16" y="39" width="15" height="11" rx="3" class="ed"/><rect x="13" y="57" width="21" height="16" rx="4" class="f-agent"/><text x="23.5" y="68.5" font-size="8.5" class="m b t-agent" text-anchor="middle">&lt;/&gt;</text><rect x="104.9" y="44" width="175.1" height="61" rx="10" class="pl"/><text x="115.9" y="62" font-size="12">/run-suites Please run</text><text x="115.9" y="79" font-size="12">the mechanical tests</text><text x="115.9" y="96" font-size="12">in my suites.</text><rect x="50" y="125" width="230" height="30" rx="8" class="ed"/><text x="61" y="144.5" font-size="11" class="t3">Describe a task or ask a question</text><rect x="50" y="163" width="95.2" height="20" rx="6" class="f-n"/><text x="58" y="176.8" font-size="10.5" class="t-n">This computer</text><rect x="151.2" y="163" width="113.7" height="20" rx="6" class="f-file"/><text x="159.2" y="176.8" font-size="10.5" class="m t-file">skill-eval-lite</text><text x="280" y="177" font-size="10.5" class="t2" text-anchor="end">Manual</text></g><path d="M30 239 L30 254" class="ln s-agent"/><path d="M30 261 L25.2 252 L34.8 252 Z" class="h-agent"/><text x="42" y="254" font-size="10.5" class="t3 it">it writes</text><path transform="translate(12 264) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="32" y="275.5" font-size="11.5" class="m">my-suites/</text><path d="M18 284 V297 H25" class="ln thin s-rule"/><g transform="translate(28 285) scale(1)"><path d="M2.5 0.5 H9.5 L13.5 4.5 V14.5 Q13.5 15.5 12.5 15.5 H2.5 Q1.5 15.5 1.5 14.5 V1.5 Q1.5 0.5 2.5 0.5 Z" class="f-web"/><path d="M9.5 0.5 V4.5 H13.5" class="ln thin s-web"/></g><text x="48" y="297.5" font-size="11.5" class="m b t-web">bundle.json</text><text x="288" y="297.5" font-size="10.5" class="t3 it" text-anchor="end">your packet</text><path d="M30 305 L30 320" class="ln s-web"/><path d="M30 327 L25.2 318 L34.8 318 Z" class="h-web"/><text x="42" y="320" font-size="10.5" class="t3 it">choose it</text><rect x="12" y="333" width="276" height="40" rx="8" class="f-web dash"/><rect x="22" y="345" width="17" height="14" rx="3" class="f-web"/><path d="M22 349.5 L39 349.5" class="ln s-web thin"/><circle cx="25" cy="347.3" r="0.9" class="h-web"/><circle cx="27.6" cy="347.3" r="0.9" class="h-web"/><text x="46" y="357.5" font-size="12" class="b t-web">Step 1: choose it here</text></svg>

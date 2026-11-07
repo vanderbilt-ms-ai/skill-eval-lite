@@ -1,9 +1,101 @@
 Skill Eval Lite is published as a public repository,
 https://github.com/vanderbilt-ms-ai/skill-eval-lite. Version 0.1.0 was
 released on 27 October 2026, versions 0.1.1, 0.1.2 and 0.1.3 on
-3 November 2026, and version 0.1.4 on 4 November 2026. Each release is one
-commit on the public `main`, made from the course's private development
-history and tagged (`v0.1.0` to `v0.1.4`).
+3 November 2026, version 0.1.4 on 4 November 2026 and version 0.2.0 on
+7 November 2026. Each release is one commit on the public `main`, made from
+the course's private development history and tagged (`v0.1.0` to
+`v0.2.0`).
+
+## 0.2.0, 7 November 2026
+
+Doing it all in Claude. Students open this folder in the Claude desktop
+app's Code tab and type messages, never commands. Fifteen skills take them
+through Shared I and Personal I, from getting the computer ready to the ZIP
+they submit. Claude runs every command (Simon, 7 November: "I think we
+should focus wholly on doing all of the work through Claude, not through
+the terminal"; "I'd also like to author skills in Skill Eval Lite to help
+students do their entire Personal I and Shared I projects"; "add skills to
+check whether the Shared I and Personal I folders are up to date (and that
+skill-eval-lite is up to date) ... so if we push further changes, students
+can pull them in and keep running"). Cowork can't
+run the runner. Since 6 October 2026 its tasks run their code in a sandbox
+on Anthropic's computers; the runner has to start `claude` on the
+student's own.
+
+### If you are on 0.1.4 or earlier
+
+1. Open your `skill-eval-lite` folder in the desktop app's Code tab and ask
+   Claude: "Please update Skill Eval Lite to the newest version without
+   losing any of my work." (In a terminal: `git pull` in this folder.)
+2. Then type `/get-ready`. Your experiments, runs and packets carry over as
+   they are. From now on `/check-updates` brings in each new version.
+
+### What changed
+
+| # | Before | In 0.2.0 |
+| --- | --- | --- |
+| 1 | Three skills: the intake, the helper and check-authoring | Fifteen. New: `get-ready` (Python, git, the `claude` command and its login, `doctor`, the class assistant, Claude's reach over the workspace), `wizard` (opens it, says what to click, brings the exports back from Downloads), `critique` (a design of tests against the brief and rubric), `packet` (the submission folder and its ZIP), `shared-i` and `personal-i` (each project's guide, keeping `progress.md` and `ai-use-log.md` in its brief folder), `run-experiment`, `read-results` (the results, failures traced to a part, the next round, the held-out prompts), `suites-intake`, `control-cases`, `llm-test` and `run-suites` |
+| 2 | The intake told students to type `setup` in a terminal and to type `/exit`, `check` and the move of the frozen file | The intake (version 4, `AGENTS.md` too) runs `setup` after a yes and hands over to `/critique`, `/wizard` and `/run-experiment`; the student types nothing |
+| 3 | The helper offered to run each command, or to let the student type it | The helper (version 4, `HELPER.md` too) runs every command and names the skill for each step; check-authoring (version 2, `CHECKS.md` too) also writes Personal I's mechanical tests |
+| 4 | The runner left three of Skill Eval Lite's skills out of a run, by their folder names | It leaves out every skill whose `SKILL.md` carries Skill Eval Lite's mark (`<!-- skill-eval-lite <name>, version N ... -->`), under any folder name, as well as the three by name; an assistant's own skills stay |
+| 5 | The README's "Doing it all in Claude Code" | "Doing it all in Claude": where to open the folder, why not Cowork and a table of every skill; pointed to from the top and from "Getting started" |
+| 6 | `status` gave Personal I's first run as every mechanical and LLM test together | `status` gives the mechanical tests first (`suite --no-llm`), then the student's own reference judgments in the wizard, then the LLM tests: `suite` prints each LLM verdict as it runs, so the student would see them before judging. The README's "Personal I: suites" steps follow the same order |
+| 7 | `main()` built the argument parser | `parser()` builds it and `main()` uses it, so that the tests can check that every command and option a skill names exists |
+| 8 | Only `doctor` and `status` said when a newer Skill Eval Lite was out. Nothing checked the brief folders | `run_ab.py updates` checks Skill Eval Lite against GitHub and each brief folder beside it against the course site's manifest (`<project>-for-ai.json`, which the course now publishes beside each ZIP, with a `pack.json` in the ZIP): newer, a new revision, the same revision with files changed, an older folder with no `pack.json`, up to date or couldn't check. It remembers its answer for a day in `.state/` (which git ignores) and sends nothing of the student's. `run_ab.py update --self` brings in a newer Skill Eval Lite (`git pull`, or the newest ZIP for a copy downloaded as a ZIP, keeping `experiments/`, `runs/` and `.claude/settings.local.json`); `update --brief <folder>` brings in a brief folder's newer copy, keeping the student's files and putting each replaced course file in its `previous/`. A new skill, `check-updates`, does both with a yes, then says what changed and records the revision the student goes by. `get-ready`, `shared-i`, `personal-i` and the helper check first |
+| 9 | `.claude/settings.json` set permissions only: "no hooks" | It also sets one SessionStart hook, `run_ab.py updates --hook` (tried with `python3`, then `py`, then `python`, then nothing), which puts a line at the top of a session when something is newer and stays silent otherwise. It checks at most once a day, gives up after a few seconds and always exits 0. `updates` is allowed without a prompt; `update` asks |
+| 10 | The wizard built its blind pairs and results from the development prompts only, so the held-out prompts could be run (`--held-out`) but not judged blind in it | Once the bundle has runs on the held-out prompts, step 3 shows them and step 4 adds their pairs as a set of their own, *Held out: the confirmation*: the baseline (A) against each round run on them, judged blind as before; the development pairs are unchanged. Step 5 reports the confirmation beside the development result (the people's share with its interval, resampling the held-out prompts; the judge's; each check's difference) and `results.json` gains `held_out`; the development result stays as it was. In `judgments.csv` their rows say `blind-preference-held-out` and `llm-judge-held-out` (no new column; an older wizard leaves them out on import). `judge --held-out` judges the same pairs, so the frozen file needs no A-to-final comparison |
+| 11 | The wizard's *Getting started*, its guided tour and the README told students to type each command in a terminal, and Personal I's path ran the LLM tests before the student's reference | Each step is a message to Claude in the desktop app's Code tab, with the terminal's command folded under it. The first-time path installs the app, opens the course folder in the Code tab and types `/get-ready`. Personal I's path runs the mechanical tests, then the reference, then the LLM tests; the group path ends with the held-out confirmation. The step pictures show the Code tab. The README's ", and" joins are gone |
+| 12 | The runner's next steps and fixes gave a command to type ("Next, run the LLM judge:  python3 run_ab.py judge runs/x"; "Fix the lines marked FIX, then run this again:  python3 run_ab.py doctor"); `claude_version` said "type `claude --version` in a terminal"; `status` gave each step as a command, its login step `claude` then `/exit`; `doctor` and `status` said "run git pull" for a newer version | Every message that says what to do next or how to fix something has one form: what to do, then the skill that does it, then the command for a terminal ("Next, run the LLM judge. In Claude, type /run-experiment (in a terminal: python3 run_ab.py judge runs/x).", `run_ab.py`'s `in_claude`). Each names the skill whose text covers the step: `/get-ready` for setup, `doctor` and the login, `/wizard` for the wizard, `/run-experiment` for a group's runs, judge and `score`, `/skill-eval-helper` for the demonstrations (which aren't frozen) and for an experiment's "must fix" lines, `/run-suites` for the suites, `/shared-i`, `/experiment-intake` and `/personal-i` for a new experiment or packet, `/check-updates` for updates (`update --self`, which works for a ZIP copy too). `status` shows the skill first with the command under it; `status --json` gives each step a `skill` ("/run-suites") beside `command`. The login step is `claude auth login`. With Codex the messages give their own commands alone and `skill` is null. A new test reads every message in `run_ab.py`'s source and what the commands print |
+
+### What was verified for 0.2.0
+
+- `tests/test_updates.py`: every state of `updates` against a stand-in for
+  GitHub and the course site on this computer (no network), what it sends
+  (the two addresses and nothing else), offline, the hook once a day and
+  again after a folder changes, the hook never failing (an address that
+  refuses, a state folder it can't write, a workspace that isn't there) and
+  the settings' hook command run in `sh`, with and without Python on the
+  PATH; `update --brief` on a new revision (the student's files kept, a
+  course file it no longer has set aside, `--dry-run` changing nothing) and
+  on an older folder with no `pack.json`; a ZIP with a path outside its
+  folder refused; `update --self` on a ZIP copy (`experiments/`, `runs/` and
+  the local settings kept, the replaced files kept in `.state/`) and on a
+  git copy (refused while an own file has changes, then pulled).
+- `tests/test_messages.py` (M4): every message in `run_ab.py`'s source that gives a command (each `say`,
+  `Fail`, step text, constant and returned string, each branch of a condition on its own) names a real
+  skill before it, except Codex's; every `status` step has a `skill`; and `setup`, `doctor` (ready,
+  logged out, an API key, no `claude`), `new`, `check`, `plan`, `run`, `judge`, `score`, `suite` and
+  `status` print it so, with the stand-in for `claude`. `tests/test_status.py` checks the `skill` field;
+  its login step is now `claude auth login`.
+- `python3 -m unittest`: all 207 tests pass. New: `tests/test_case_helper.py`
+  (the suites-intake skill's `case.py`: saved sessions listed, a session
+  copied with only its user and assistant lines and the same steps, a
+  case's steps and text, what may be private found and masked, all in a
+  home folder of the test's own); a test in `tests/test_status.py` for the
+  new order; and `tests/test_skills.py`
+  (every skill's front matter, its version mark, every `run_ab.py` command
+  and option it names against the parser, no sentence asking the student to
+  type a command in a terminal except signing `claude` in, the three guides
+  in step with their skills, the README's table and copies of every skill
+  left out of a run under any name while an assistant's own skill stays).
+- Every command the Shared I skills name was run in a scratch workspace,
+  with the stand-in for `claude` for those that call a model: `doctor
+  --no-probe` (ok; without `claude`; logged out), `status`, `new --from
+  class`, `check` (not frozen; frozen; changed since frozen), `plan --rounds
+  A,B --jobs 4`, `run --rounds A,B`, then `C,D`, a run made again (nothing
+  run twice), a failed run kept, `judge`, `score` (no program checks), a
+  round E added and frozen again (`run --rounds E`, `judge --comparisons
+  B-E`), a changed judging prompt (`run` refreshes the run folder's copy;
+  `judge --again` uses it) and the held-out prompts (`run --rounds A,B
+  --held-out`, `judge --held-out --comparisons A-B`).
+- Not verified: anything in the desktop app itself (its Code tab, its
+  prompts, `claude auth login` run from a session, whether the app and the
+  `claude` command share a login), on macOS or Windows. A rehearsal on each
+  is needed before release.
+- **Held-out pairs can't be judged blind in the wizard yet.** The wizard
+  builds its blind pairs and its results from the development prompts
+  only, so the held-out runs and the AI judge's verdicts on them are made,
+  but the members can't judge them in step 4. `read-results` says so.
 
 ## 0.1.4, 4 November 2026
 

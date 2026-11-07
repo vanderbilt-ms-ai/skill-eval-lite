@@ -1,28 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 140" width="400" height="140" role="img" aria-labelledby="steps-first-03-t steps-first-03-d"><title id="steps-first-03-t">Terminal: Log in to Claude Code, once</title><desc id="steps-first-03-d">Type: claude.  You should see: Claude Code’s welcome. After /exit, the terminal’s prompt again.</desc><style>
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 166" width="400" height="166" role="img" aria-labelledby="steps-first-03-t steps-first-03-d"><title id="steps-first-03-t">Your computer: Open the folder in the Code tab</title><desc id="steps-first-03-d">In Claude, click the Code button, &lt;/&gt;, at the top of the sidebar. In the row under the message box, choose This computer, then the folder control, Open folder… and ai5500. Choose Manual in the mode menu: Claude then asks before it changes a file or runs a command. You should see: ai5500 under the message box, which reads “Describe a task or ask a question”.</desc><style>
 .dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
 .dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
 .dg .it{font-style:italic}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
 .dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
-.dg .tw{fill:#1E2A33;stroke:#13202A}
-.dg .twbar{fill:#2B3945}
-.dg .twdot{fill:#5B6B78}
-.dg .tw-t{fill:#E6EDF3}
-.dg .tw-p{fill:#62D2C0}
-.dg .tw-o{fill:#A9B8C4}
-.dg .tw-ag{fill:#CDB4F2}
-.dg .tw-cur{fill:#E6EDF3}
+.dg .wh{fill:#FFFFFF;stroke:#D9DAD2}
+.dg .ed{fill:#FFFFFF;stroke:#5F6A73}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .h-rule2{fill:#E9EAE3}
+.dg .f-agent{fill:rgba(122,79,168,.12);stroke:#7A4FA8}
+.dg .t-agent{fill:#7A4FA8}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+.dg .t-file{fill:#85590A}
+.dg .f-n{fill:rgba(122,135,145,.16);stroke:#7A8791}
+.dg .t-n{fill:#45515B}
 @media (prefers-color-scheme: dark) {
 .dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
 .dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
+.dg .b{font-weight:600}
 .dg .it{font-style:italic}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
 .dg .bg{fill:#141C23;stroke:#2A3640}
-.dg .tw{fill:#0A0F13;stroke:#2A3640}
-.dg .twbar{fill:#18222A}
-.dg .twdot{fill:#5B6B78}
-.dg .tw-t{fill:#E6EDF3}
-.dg .tw-p{fill:#62D2C0}
-.dg .tw-o{fill:#A9B8C4}
-.dg .tw-ag{fill:#CDB4F2}
-.dg .tw-cur{fill:#E6EDF3}
+.dg .wh{fill:#141C23;stroke:#2A3640}
+.dg .ed{fill:#141C23;stroke:#8593A0}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .thin{stroke-width:1.1}
+.dg .h-rule2{fill:#1F2A33}
+.dg .f-agent{fill:rgba(180,148,222,.15);stroke:#B494DE}
+.dg .t-agent{fill:#B494DE}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+.dg .t-file{fill:#E2AE4A}
+.dg .f-n{fill:rgba(142,155,165,.18);stroke:#8E9BA5}
+.dg .t-n{fill:#A7B4BF}
 }
-</style><rect class="bg" x="0.5" y="0.5" width="399" height="139" rx="12"/><rect x="8" y="8" width="384" height="124" rx="10" class="tw"/><path d="M8 18 Q8 8 18 8 H382 Q392 8 392 18 V32 H8 Z" class="twbar"/><circle cx="22" cy="20" r="3.6" class="twdot"/><circle cx="35" cy="20" r="3.6" class="twdot"/><circle cx="48" cy="20" r="3.6" class="twdot"/><text x="200" y="24.5" font-size="11" class="tw-o" text-anchor="middle">Terminal</text><text x="22" y="60" font-size="12.5" class="m"><tspan class="tw-p">~ $ </tspan><tspan class="tw-t">claude</tspan></text><text x="22" y="79" font-size="12"><tspan class="tw-o it">(your browser opens: log in, then come back here)</tspan></text><text x="22" y="98" font-size="12.5" class="m"><tspan class="tw-ag">/exit</tspan></text><text x="22" y="117" font-size="12.5" class="m"><tspan class="tw-p">~ $ </tspan></text><rect x="53" y="106" width="7.4" height="14" rx="1" class="tw-cur"/></svg>
+</style><rect class="bg" x="0.5" y="0.5" width="399" height="165" rx="12"/><rect x="8" y="8" width="384" height="150" rx="10" class="wh"/><path d="M8 18 Q8 8 18 8 H382 Q392 8 392 18 V30 H8 Z" class="h-rule2"/><text x="200" y="23" font-size="10" class="t3" text-anchor="middle">Claude</text><text x="380" y="23" font-size="10" class="m t3" text-anchor="end">&gt;_</text><path d="M38 30 L38 158" class="ln s-rule thin"/><rect x="16" y="39" width="15" height="11" rx="3" class="ed"/><rect x="13" y="57" width="21" height="16" rx="4" class="f-agent"/><text x="23.5" y="68.5" font-size="8.5" class="m b t-agent" text-anchor="middle">&lt;/&gt;</text><text x="50" y="56" font-size="11.5" class="it t3">(Code chosen, with This computer and the ai5500</text><text x="50" y="72" font-size="11.5" class="it t3">folder under the message box)</text><rect x="50" y="90" width="330" height="30" rx="8" class="ed"/><text x="61" y="109.5" font-size="11" class="t3">Describe a task or ask a question</text><rect x="50" y="128" width="95.2" height="20" rx="6" class="f-n"/><text x="58" y="141.8" font-size="10.5" class="t-n">This computer</text><rect x="151.2" y="128" width="55.1" height="20" rx="6" class="f-file"/><text x="159.2" y="141.8" font-size="10.5" class="m t-file">ai5500</text><text x="380" y="142" font-size="10.5" class="t2" text-anchor="end">Manual</text></svg>

@@ -115,3 +115,28 @@ def fake_codex_env(root: Path, **more) -> dict:
 
 # doctor and status never ask GitHub for the latest version in the tests.
 os.environ.setdefault("SKILL_EVAL_LITE_UPDATE_URL", "off")
+
+
+def held_out_experiment(root: Path, comparisons=(("A", "B"),), drop_rounds=("C", "D")) -> Path:
+    """A small demonstration on the class assistant with held-out prompts:
+    the class experiment's rounds less drop_rounds, only the given
+    comparisons, two development prompts, the class's two held-out prompts
+    and one repeat. Its round and prompt files are examples/class-assistant's.
+    Written to root/experiments/held/experiment.toml."""
+    import re
+    text = (EXAMPLES / "class-assistant" / "experiment.toml").read_text(encoding="utf-8")
+    text = re.sub(r"(?ms)^\[frozen\].*?(?=^\[|\Z)", "", text)
+    for rid in drop_rounds:
+        text = re.sub(rf'(?ms)^\[\[rounds\]\]\nid = "{rid}"\n.*?(?=^\[\[)', "", text)
+    text = re.sub(r'\[\[comparisons\]\]\nbaseline = "\w+"\nnew = "\w+"\n\n?', "", text)
+    mine = "".join(f'[[comparisons]]\nbaseline = "{b}"\nnew = "{n}"\n\n' for b, n in comparisons)
+    text = text.replace("# How far a source may move", mine + "# How far a source may move", 1)
+    text = text.replace('schema = "skill-eval-lite/experiment@1"\n',
+                        'schema = "skill-eval-lite/experiment@1"\ndemo = true\n'
+                        f'files_from = "{(EXAMPLES / "class-assistant").as_posix()}"\n', 1)
+    text = re.sub(r"(?m)^repeats = \d+$", "repeats = 1", text, count=1)
+    text = re.sub(r"(?m)^development = \[.*\]$", 'development = ["reply-to-priya", "summarize-committee-notes"]', text, count=1)
+    path = root / "experiments" / "held" / "experiment.toml"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return path

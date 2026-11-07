@@ -1,5 +1,6 @@
 """`status`, `new` and `ask`, offline: status reads the setup, the assistant,
-the experiments and the runs and names the one next step; `new` copies the
+the experiments and the runs and names the one next step, with the skill that
+does it in Claude (`skill`, 0.2.0) beside its command; `new` copies the
 class experiment for a group; `ask` builds the right command for Claude Code
 and Codex (nothing is launched), with the helper's instructions and the
 status, permission prompts left on, and nothing of the person's loaded."""
@@ -51,22 +52,28 @@ class Status(unittest.TestCase):
         self.assertEqual(st["setup"]["runner"], "claude-code")
         self.assertFalse(st["assistant"]["exists"])
         self.assertIn("run_ab.py setup ../class-assistant", st["next"]["command"])
+        self.assertEqual(st["next"]["skill"], "/get-ready", "0.2.0: the skill that does it in Claude, beside the command")
         self.assertIn("OPENAI_API_KEY", st["setup"]["api_keys_set"], "names only")
         self.assertNotIn("fake-openai-key", json.dumps(st))
 
     def test_2_not_logged_in(self):
         st = self.status("--assistant", self.assistant, env={"FAKE_CLAUDE_LOGGED_OUT": "1", "FAKE_CODEX_LOGGED_OUT": "1"})
-        self.assertEqual(st["next"]["command"], "claude")
+        self.assertEqual(st["next"]["command"], "claude auth login", "0.2.0: signing in, not a session to exit")
+        self.assertEqual(st["next"]["skill"], "/get-ready")
         st = self.status("--assistant", self.assistant, "--runner", "codex", env={"FAKE_CODEX_LOGGED_OUT": "1"})
         self.assertEqual(st["next"]["command"], "codex login")
+        self.assertIsNone(st["next"]["skill"], "the skills are Claude's: with Codex, the command alone")
 
     def test_3_first_demonstration_then_judge_then_wizard(self):
         st = self.status("--assistant", self.assistant)
         self.assertTrue(st["assistant"]["claude_md"] and st["assistant"]["git"])
         self.assertEqual(st["runs"], [])
         self.assertIn("run examples/demo-one-line.toml --assistant", st["next"]["command"])
+        self.assertEqual(st["next"]["skill"], "/skill-eval-helper", "the helper's steps run the demonstrations, which aren't frozen")
         self.assertNotIn("--runner codex", st["next"]["command"])
-        self.assertIn("--runner codex", self.status("--assistant", self.assistant, "--runner", "codex")["next"]["command"])
+        codex = self.status("--assistant", self.assistant, "--runner", "codex")["next"]
+        self.assertIn("--runner codex", codex["command"])
+        self.assertIsNone(codex["skill"])
         names = {e["file"]: e for e in st["experiments"]}
         self.assertEqual(names["examples/demo-graph-removed.toml"]["kind"], "demonstration")
         self.assertEqual(names["examples/class-assistant/experiment.toml"]["errors"], [])
@@ -77,13 +84,17 @@ class Status(unittest.TestCase):
         self.assertEqual((run["runner"], run["ok"], run["runs"], run["pairs"], run["judged"]), ("claude-code", 4, 4, 2, 0))
         self.assertIn("judge", st["next"]["command"])
         self.assertIn("runs/demo-graph-removed", st["next"]["command"])
+        self.assertEqual(st["next"]["skill"], "/skill-eval-helper")
         run_ab("judge", self.work / "runs" / "demo-graph-removed", "--claude", FAKE)
         st = self.status("--assistant", self.assistant)
         self.assertEqual(st["runs"][0]["judged"], 2)
         self.assertIn("wizard.html", st["next"]["command"])
+        self.assertEqual(st["next"]["skill"], "/wizard")
         self.assertIn("new <name> --from class", st["next"]["what"])
+        self.assertIn("In Claude, type /shared-i (in a terminal: python3 run_ab.py new <name> --from class)", st["next"]["what"])
         text = self.status("--assistant", self.assistant, json_out=False)
-        for line in ("Your setup", "The assistant", "Experiments", "Runs", "Next step", "4 of 4 finished; judge: 2 of 2 pairs"):
+        for line in ("Your setup", "The assistant", "Experiments", "Runs", "Next step", "4 of 4 finished; judge: 2 of 2 pairs",
+                     "      In Claude, type /wizard\n      (in a terminal: " + R.OPEN_WIZARD + ")"):
             self.assertIn(line, text)
 
     def test_4_new_from_class_and_freeze(self):
@@ -100,6 +111,7 @@ class Status(unittest.TestCase):
         self.assertEqual(len(mine), 1)
         self.assertIn("Freeze it in the wizard: load it in step 1, press Freeze in step 2, then press 'Export the frozen "
                       "experiment' (now in step 2) and save the file over experiments/board-memo/experiment.toml.", st["next"]["what"])
+        self.assertEqual(st["next"]["skill"], "/wizard")
         again = run_ab("new", "board-memo", "--from", "class", "--root", self.work, cwd=self.work)
         self.assertEqual(again.returncode, 2)
         self.assertIn("not empty", again.stderr)
@@ -151,9 +163,11 @@ class Projects(unittest.TestCase):
     def test_a_packet_not_run_yet(self):
         self.packet()
         st = self.status()
-        self.assertEqual(st["next"]["command"], "python3 run_ab.py suite ../my-suites/suites.yaml")
+        self.assertEqual(st["next"]["command"], "python3 run_ab.py suite ../my-suites/suites.yaml --no-llm",
+                         "0.2.0: the mechanical tests first, then the student's reference, then the LLM tests")
+        self.assertEqual(st["next"]["skill"], "/run-suites")
         self.assertEqual(st["next"]["project"], "personal")
-        self.assertIn("each LLM test run uses a little of your plan", st["next"]["what"])
+        self.assertIn("they call no model", st["next"]["what"])
         self.assertEqual([s["project"] for s in st["next_steps"]], ["personal"], "Wren is not asked for")
         text = self.status(text=True)
         self.assertIn("no-wren: not set up yet (Shared I and the demonstrations need it; Personal I's suites don't)", text)
@@ -185,6 +199,26 @@ class Projects(unittest.TestCase):
         self.assertEqual(st["next"]["command"], "python3 run_ab.py suite ../my-suites/suites.yaml")
         self.assertIn("1 test(s) have changed since the last run", st["next"]["what"])
 
+    def test_the_reference_comes_before_the_llm_tests(self):
+        """0.2.0: `suite` prints each LLM test's verdict as it runs, so status
+        puts the mechanical tests first, then the student's own reference in
+        the wizard, then the LLM tests."""
+        f = self.packet()
+        r = run_ab("suite", f, "--no-llm", "--claude", FAKE)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        st = self.status()
+        self.assertEqual(st["next"]["command"], R.OPEN_WIZARD)
+        self.assertEqual(st["next"]["skill"], "/wizard")
+        self.assertIn("Before the LLM tests run, open the wizard and load ../my-suites/bundle.json in step 1", st["next"]["what"])
+        self.assertIn("each LLM test run uses a little of your plan", st["next"]["what"])
+        with open(f.parent / "judgments.csv", "a", encoding="utf-8") as fh:
+            fh.write("reference,,product,facts-match-the-source-reference,human,SL,x,pass,mine,,2030-01-01T00:00:00Z\n")
+        st = self.status()
+        self.assertEqual(st["next"]["command"], "python3 run_ab.py suite ../my-suites/suites.yaml")
+        self.assertIn("have no results yet", st["next"]["what"])
+        self.assertEqual(run_ab("suite", f, "--claude", FAKE).returncode, 0)
+        self.assertIn("In the wizard's Report step, export judgments.csv into ../my-suites/", self.status()["next"]["what"])
+
     def test_a_packet_and_an_experiment(self):
         self.packet()
         self.assertEqual(run_ab("new", "mine", "--from", "class", "--root", self.work, cwd=self.work).returncode, 0)
@@ -192,7 +226,7 @@ class Projects(unittest.TestCase):
         self.assertEqual([s["project"] for s in st["next_steps"]], ["shared", "personal"])
         self.assertEqual(st["next"], st["next_steps"][0], "next is still the first step, for ask and scripts")
         self.assertIn("freeze", st["next_steps"][0]["what"].lower())
-        self.assertEqual(st["next_steps"][1]["command"], "python3 run_ab.py suite ../my-suites/suites.yaml")
+        self.assertEqual(st["next_steps"][1]["command"], "python3 run_ab.py suite ../my-suites/suites.yaml --no-llm")
         text = self.status(assistant=self.assistant, text=True)
         self.assertIn("Next step, Shared I", text)
         self.assertIn("Next step, Personal I", text)
@@ -200,7 +234,8 @@ class Projects(unittest.TestCase):
     def test_neither(self):
         st = self.status()
         self.assertEqual(st["next"]["command"], "python3 run_ab.py setup ../class-assistant")
-        self.assertIn("On Personal I? You don't need Wren. Copy the worked example, `cp -r examples/personal-suites ../my-suites`",
+        self.assertIn("On Personal I? You don't need Wren. Make your packet, or start from a copy of the worked example. "
+                      "In Claude, type /personal-i (in a terminal: cp -r examples/personal-suites ../my-suites).",
                       self.status(text=True))
 
     def test_the_project_forced(self):
@@ -211,6 +246,7 @@ class Projects(unittest.TestCase):
         shutil.rmtree(self.root / "my-suites")
         st = self.status("--project", "personal")
         self.assertEqual(st["next"]["command"], "cp -r examples/personal-suites ../my-suites")
+        self.assertEqual(st["next"]["skill"], "/personal-i")
         ask = run_ab("ask", "--claude", FAKE, "--root", self.work, "--assistant", self.root / "no-wren", "--project", "personal",
                      "--show-command", cwd=self.work)
         self.assertEqual(ask.returncode, 0, ask.stdout + ask.stderr)
@@ -223,7 +259,8 @@ class Projects(unittest.TestCase):
         self.assertIn("about half a minute; each run is billed to your API key", key["next"]["what"])
         text = self.status(assistant=self.assistant, env={"FAKE_CLAUDE_AUTH": "api_key"}, text=True)
         self.assertIn("logged in (api_key): runs are billed to the key", text)
-        self.packet()
+        f = self.packet()
+        self.assertEqual(run_ab("suite", f, "--no-llm", "--claude", FAKE).returncode, 0, "the first step calls no model")
         self.assertIn("each LLM test run is billed to your API key", self.status(env={"FAKE_CLAUDE_AUTH": "api_key"})["next"]["what"])
 
 

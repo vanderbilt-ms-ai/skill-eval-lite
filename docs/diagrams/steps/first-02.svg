@@ -1,26 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 140" width="400" height="140" role="img" aria-labelledby="steps-first-02-t steps-first-02-d"><title id="steps-first-02-t">Terminal: Install Claude Code</title><desc id="steps-first-02-d">Type: curl -fsSL https://claude.ai/install.sh | bash.  You should see: A message saying that Claude Code is installed.</desc><style>
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 400 116" width="400" height="116" role="img" aria-labelledby="steps-first-02-t steps-first-02-d"><title id="steps-first-02-t">Your computer: Make a folder for the course</title><desc id="steps-first-02-d">In Finder or File Explorer, make a folder called ai5500 in your home folder. Please keep it out of OneDrive, iCloud Drive and your Desktop, which copy files while programs write them. You should see: An empty folder, ai5500, in your home folder.</desc><style>
 .dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#16212B}
 .dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
-.dg .it{font-style:italic}
+.dg .b{font-weight:600}
+.dg .t2{fill:#45515B}
+.dg .t3{fill:#5F6A73}
 .dg .bg{fill:#FFFFFF;stroke:#D9DAD2}
-.dg .tw{fill:#1E2A33;stroke:#13202A}
-.dg .twbar{fill:#2B3945}
-.dg .twdot{fill:#5B6B78}
-.dg .tw-t{fill:#E6EDF3}
-.dg .tw-p{fill:#62D2C0}
-.dg .tw-o{fill:#A9B8C4}
-.dg .tw-cur{fill:#E6EDF3}
+.dg .pl{fill:#F8F8F4;stroke:#D9DAD2}
+.dg .ln{fill:none;stroke:#5F6A73;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .f-file{fill:rgba(154,106,12,.13);stroke:#9A6A0C}
+.dg .f-n{fill:rgba(122,135,145,.16);stroke:#7A8791}
 @media (prefers-color-scheme: dark) {
 .dg text{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;fill:#E2E8EE}
 .dg .m{font-family:ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace}
-.dg .it{font-style:italic}
+.dg .b{font-weight:600}
+.dg .t2{fill:#A7B4BF}
+.dg .t3{fill:#8593A0}
 .dg .bg{fill:#141C23;stroke:#2A3640}
-.dg .tw{fill:#0A0F13;stroke:#2A3640}
-.dg .twbar{fill:#18222A}
-.dg .twdot{fill:#5B6B78}
-.dg .tw-t{fill:#E6EDF3}
-.dg .tw-p{fill:#62D2C0}
-.dg .tw-o{fill:#A9B8C4}
-.dg .tw-cur{fill:#E6EDF3}
+.dg .pl{fill:#18222A;stroke:#2A3640}
+.dg .ln{fill:none;stroke:#8593A0;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dg .f-file{fill:rgba(226,174,74,.14);stroke:#E2AE4A}
+.dg .f-n{fill:rgba(142,155,165,.18);stroke:#8E9BA5}
 }
-</style><rect class="bg" x="0.5" y="0.5" width="399" height="139" rx="12"/><rect x="8" y="8" width="384" height="124" rx="10" class="tw"/><path d="M8 18 Q8 8 18 8 H382 Q392 8 392 18 V32 H8 Z" class="twbar"/><circle cx="22" cy="20" r="3.6" class="twdot"/><circle cx="35" cy="20" r="3.6" class="twdot"/><circle cx="48" cy="20" r="3.6" class="twdot"/><text x="200" y="24.5" font-size="11" class="tw-o" text-anchor="middle">Terminal</text><text x="22" y="60" font-size="12.5" class="m"><tspan class="tw-p">~ $ </tspan><tspan class="tw-t">curl -fsSL https://claude.ai/install.sh |</tspan></text><text x="37.5" y="79" font-size="12.5" class="m"><tspan class="tw-t">bash</tspan></text><text x="22" y="98" font-size="12"><tspan class="tw-o it">(a message saying that Claude Code is installed)</tspan></text><text x="22" y="117" font-size="12.5" class="m"><tspan class="tw-p">~ $ </tspan></text><rect x="53" y="106" width="7.4" height="14" rx="1" class="tw-cur"/></svg>
+</style><rect class="bg" x="0.5" y="0.5" width="399" height="115" rx="12"/><rect x="8" y="8" width="384" height="100" rx="10" class="pl"/><path transform="translate(22 20) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-n"/><text x="44" y="32" font-size="12.5" class="b t2">your home folder</text><path d="M30 40 L30 62" class="ln s-rule"/><path d="M30 62 L44 62" class="ln s-rule"/><path transform="translate(50 54) scale(1)" d="M0.5 3.5 Q0.5 2 2 2 H6 L8 4 H14.5 Q16 4 16 5.5 V12.5 Q16 14 14.5 14 H2 Q0.5 14 0.5 12.5 Z" class="f-file"/><text x="72" y="66" font-size="12.5" class="m b">ai5500</text><text x="140" y="66" font-size="11.5" class="t3">new, empty</text><text x="22" y="92" font-size="11.5" class="t3">Not in OneDrive, iCloud Drive or Desktop.</text></svg>

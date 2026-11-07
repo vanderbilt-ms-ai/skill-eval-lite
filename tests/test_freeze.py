@@ -195,7 +195,8 @@ class NewerVersion(unittest.TestCase):
             (root / "VERSION").write_text("9.0.0\n")
             env = {"SKILL_EVAL_LITE_UPDATE_URL": (root / "VERSION").as_uri()}
             r = run_ab("doctor", "--claude", FAKE, "--no-probe", env=env)
-            self.assertIn(f"Skill Eval Lite 9.0.0 is out; you have {R.VERSION}. In this folder, run git pull.", r.stdout)
+            self.assertIn(f"Skill Eval Lite 9.0.0 is out; you have {R.VERSION}. In Claude, type /check-updates "
+                          "(in a terminal: python3 run_ab.py update --self).", r.stdout, "0.2.0: the skill first, then the command")
             r = run_ab("status", "--claude", FAKE, "--root", root, env=env, cwd=root)
             self.assertIn("Skill Eval Lite 9.0.0 is out", r.stdout)
             r = run_ab("status", "--claude", FAKE, "--root", root, "--json", env=env, cwd=root)

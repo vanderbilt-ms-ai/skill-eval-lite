@@ -24,7 +24,7 @@ from pathlib import Path as _Path
 _sys.path.insert(0, str(_Path(__file__).resolve().parent))
 
 from cdp import Browser, find_chrome
-from helpers import EXAMPLES, FAKE, REPO, class_assistant, fake_run, run_ab, tmpdir
+from helpers import EXAMPLES, FAKE, REPO, class_assistant, fake_run, held_out_experiment, run_ab, tmpdir
 
 _sys.path.insert(0, str(REPO))
 import run_ab as R  # noqa: E402
@@ -131,6 +131,7 @@ window.__judgeAll = async (pick) => {
   }
   throw new Error('too many pairs');
 };
+window.__clickStart = text => { const b = [...document.querySelectorAll('button')].find(b => b.textContent.trim().startsWith(text) && !b.disabled); if (!b) return false; b.click(); return true; };
 true
 """
 
@@ -341,6 +342,131 @@ window.__suiteAll = async (choice) => {
 };
 true
 """
+
+
+@unittest.skipUnless(CHROME, "headless Chrome is not available")
+class HeldOutJourney(unittest.TestCase):
+    """The held-out confirmation: sealed until rounds have run on the held-out
+    prompts; then their pairs as a set of their own in step 4, judged blind;
+    step 5 and results.json report them apart, leaving the development result
+    as it was; judgments.csv marks their rows and imports them again."""
+    @classmethod
+    def setUpClass(cls):
+        os.chmod(FAKE, 0o755)
+        cls.root = tmpdir()
+        assistant = class_assistant(cls.root)
+        exp = held_out_experiment(cls.root)        # rounds A and B, compared; two prompts each side
+        cls.out = cls.root / "runs" / "held"
+        r = fake_run(exp, assistant, cls.out, None, "--rounds", "A,B")
+        assert r.returncode == 0, r.stdout + r.stderr
+        j = run_ab("judge", cls.out, "--claude", FAKE)
+        assert j.returncode == 0, j.stdout + j.stderr
+        cls.sealed = cls.root / "sealed-bundle.json"
+        shutil.copy(cls.out / "bundle.json", cls.sealed)
+        r = fake_run(exp, assistant, cls.out, None, "--rounds", "A,B", "--held-out")
+        assert r.returncode == 0, r.stdout + r.stderr
+        j = run_ab("judge", cls.out, "--held-out", "--claude", FAKE)
+        assert j.returncode == 0, j.stdout + j.stderr
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.root, ignore_errors=True)
+
+    setUp = Journey.setUp
+    tearDown = Journey.tearDown
+    step = Journey.step
+    downloaded = Journey.downloaded
+
+    def load(self, bundle):
+        b = self.b
+        b.set_files("#bundle-file", [bundle])
+        b.until("document.querySelector('main').innerText.includes('board memo section')")
+        self.step(2)
+        self.assertTrue(b.js("__click('Freeze this demonstration')"))
+        b.until("document.querySelector('main').innerText.includes('The record')")
+
+    def test_sealed_before_the_runs(self):
+        b = self.b
+        self.load(self.sealed)
+        self.step(3)
+        main = b.js("document.querySelector('main').innerText")
+        self.assertIn("held out, sealed until your development decisions are final", main)
+        self.assertNotIn("unsealed", main)
+        self.step(4)
+        b.js("document.getElementById('initials').value = 'SL'; __click('Start')")
+        b.js(JS_HELPERS)
+        self.assertFalse(b.js("[...document.querySelectorAll('button')].some(x => x.textContent.startsWith('Held out'))"),
+                         "no held-out set while the prompts are sealed")
+        self.assertEqual(b.js("__judgeAll(() => 'About the same')"), 2)
+        self.step(5)
+        self.assertIn("held-out prompts are still sealed", b.js("document.getElementById('stage').innerText"))
+        res = json.loads(self.downloaded("Export results.json", "results.json"))
+        self.assertIsNone(res["held_out"])
+
+    def test_confirmation(self):
+        b = self.b
+        self.load(self.out / "bundle.json")
+        self.step(3)
+        main = b.js("document.querySelector('main').innerText")
+        self.assertIn("4 ok · 0 failed or timed out · 0 still to come", main, "the development runs, counted as before")
+        self.assertIn("The held-out prompts are unsealed: rounds A and B have run on them.", main)
+        self.assertNotIn("sealed until", main)
+        self.step(4)
+        b.js("document.getElementById('initials').value = 'SL'; __click('Start')")
+        b.js(JS_HELPERS)
+        self.assertIn("Development pairs · 0 of 2", b.js("document.getElementById('stage').innerText"))
+        self.assertEqual(b.js("__judgeAll(() => 'About the same')"), 2, "the development pairs first")
+        self.step(5)
+        before = json.loads(self.downloaded("Export results.json", "results.json"))
+        self.assertIsNone(before["held_out"]["comparisons"][0]["people"], "not judged yet")
+        self.assertIn("Not judged yet", b.js("document.getElementById('held-out').innerText"))
+        os.remove(Path(self.b.downloads) / "results.json")
+        self.step(4)
+        b.js(JS_HELPERS)
+        self.assertTrue(b.js("__clickStart('Held out: the confirmation')"))
+        self.assertIn("The held-out prompts, unsealed", b.js("document.getElementById('stage').innerText"))
+        self.assertEqual(b.js("__judgeAll(() => 'Left is better')"), 2, "one pair a held-out prompt and repeat")
+        held_rows = json.loads(b.js("JSON.stringify(S.judgments.filter(j => j.check === 'blind-preference-held-out'))"))
+        self.assertEqual(sorted(j["prompt"] for j in held_rows), ["ellis-board-note", "reply-to-school"])
+        self.step(5)
+        text = b.js("document.getElementById('held-out').innerText")
+        self.assertIn("Held out: the confirmation", text)
+        self.assertIn("on the 2 held-out prompts", text)
+        self.assertIn("On the development prompts, the same comparison gave 50%", text)
+        self.assertIn("the held-out confirmation is below", b.js("document.getElementById('stage').innerText"))
+        res = json.loads(self.downloaded("Export results.json", "results.json"))
+        self.assertEqual(res["improvement"], before["improvement"], "held-out judgments leave the development result as it was")
+        self.assertEqual(res["agreement"], before["agreement"])
+        ho = res["held_out"]
+        self.assertEqual(ho["prompts"], ["ellis-board-note", "reply-to-school"])
+        (c,) = ho["comparisons"]
+        self.assertEqual((c["comparison"], c["runs"], c["judges"]), ("A|B", 4, ["SL"]))
+        self.assertEqual((c["people"]["n"], c["people"]["prompts"]), (2, 2))
+        self.assertEqual((c["judge"]["n"], c["judge"]["prompts"]), (2, 2), "the LLM judge's held-out verdicts")
+        self.assertEqual(c["development"]["comparison"], "A|B")
+        groups = [[1.0 if j["result"] == "B" else 0.5 if j["result"] == "tie" else 0.0]
+                  for j in sorted(held_rows, key=lambda j: j["prompt"])]
+        self.assertAlmostEqual(c["people"]["estimate"], sum(g[0] for g in groups) / 2)
+        self.assertEqual(c["people"]["interval_95"], bootstrap(groups, 5502), "the same bootstrap, resampling prompts")
+        csv_text = self.downloaded("Export judgments.csv", "judgments.csv")
+        rows = list(csv.DictReader(io.StringIO(csv_text)))
+        checks = [r["check"] for r in rows]
+        self.assertEqual((checks.count("blind-preference"), checks.count("blind-preference-held-out")), (2, 2))
+        self.assertEqual((checks.count("llm-judge"), checks.count("llm-judge-held-out")), (2, 2))
+        self.assertTrue(all(r["config"] == "A|B" for r in rows if r["check"].endswith("held-out")))
+        self.assertTrue(any(r["route"] == "mechanical" and r["item"] == "ellis-board-note/1" for r in rows),
+                        "the checks on the held-out runs too")
+        # A teammate's copy: the file imports again, held-out rows included.
+        b.js("__click('Reset')")
+        self.load(self.out / "bundle.json")
+        self.step(5)
+        b.set_files("input[type=file][accept='.csv,text/csv']", [Path(self.b.downloads) / "judgments.csv"])
+        b.until("S.judgments.length === 4")
+        self.assertEqual(b.js("S.judgments.filter(j => j.check === 'blind-preference-held-out').length"), 2)
+        os.remove(Path(self.b.downloads) / "results.json")
+        again = json.loads(self.downloaded("Export results.json", "results.json"))
+        self.assertEqual(again["improvement"], res["improvement"])
+        self.assertEqual(again["held_out"]["comparisons"][0]["people"], c["people"])
 
 
 @unittest.skipUnless(CHROME and os.name == "posix", "headless Chrome is not available")

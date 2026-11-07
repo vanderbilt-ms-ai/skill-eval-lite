@@ -36,7 +36,8 @@ from __future__ import annotations
 import sys
 
 if sys.version_info < (3, 11):
-    sys.exit("Skill Eval Lite needs Python 3.11 or later (for tomllib); this is " + sys.version.split()[0] + ".")
+    sys.exit("Skill Eval Lite needs Python 3.11 or later (for tomllib); this is " + sys.version.split()[0] + ".\n"
+             "In Claude, type /get-ready (in a terminal: install it from https://www.python.org/downloads/).")
 
 import argparse
 import datetime as dt
@@ -267,12 +268,50 @@ class Fail(Exception):
     """A problem the person can fix; the message says how."""
 
 
+# --- Next steps and fixes: Claude's way first -----------------------------
+#
+# Students work in Claude (the desktop app's Code tab), where Claude runs
+# every command through the skills in .claude/skills/. So every message that
+# says what to do next, or how to fix something, has one form: what to do,
+# then the skill that does it, then the same for someone in a terminal:
+#
+#     Next, run the LLM judge. In Claude, type /run-experiment (in a terminal: python3 run_ab.py judge runs/x).
+#
+# status sets the two halves on two lines. The skills are Claude's, so a
+# message for Codex (--runner codex) gives its own command alone.
+# tests/test_messages.py holds every message to this.
+
+PY = "py" if os.name == "nt" else "python3"
+OPEN_WIZARD = {"nt": "start wizard.html"}.get(os.name, "open wizard.html" if sys.platform == "darwin" else "xdg-open wizard.html")
+INSTALL_CLAUDE = ('powershell -NoProfile -Command "irm https://claude.ai/install.ps1 | iex"' if os.name == "nt"
+                  else "curl -fsSL https://claude.ai/install.sh | bash")
+
+
+def in_claude(skill: str | tuple, terminal: str | None = None) -> str:
+    """The one form of a next step or a fix: "In Claude, type /skill (in a
+    terminal: command)". `skill` is a skill's name, with any words typed after
+    it ("experiment-intake ../<your assistant>"), or a tuple of names, one for
+    each project ("shared-i", "personal-i")."""
+    names = [skill] if isinstance(skill, str) else list(skill)
+    text = "In Claude, type " + " or ".join("/" + n.lstrip("/") for n in names)
+    return text + (f" (in a terminal: {terminal})" if terminal else "")
+
+
+def installed_claude() -> str | None:
+    """Where Anthropic's installer puts `claude` (~/.local/bin, on Windows
+    %USERPROFILE%\\.local\\bin\\claude.exe). A desktop app or terminal opened
+    before the install doesn't have that folder on its PATH until it is
+    restarted, so the runner looks there too."""
+    p = Path.home() / ".local" / "bin" / ("claude.exe" if os.name == "nt" else "claude")
+    return str(p) if p.is_file() else None
+
+
 def find_claude(explicit: str | None = None) -> str:
-    exe = explicit or os.environ.get("SKILL_EVAL_LITE_CLAUDE") or shutil.which("claude")
+    exe = explicit or os.environ.get("SKILL_EVAL_LITE_CLAUDE") or shutil.which("claude") or installed_claude()
     if not exe:
-        raise Fail("Claude Code is not installed, or `claude` is not on your PATH.\n"
-                   "Install it (https://docs.claude.com/en/docs/claude-code/setup), run `claude` once to log in, "
-                   "type /exit, and try again.")
+        raise Fail("Claude Code's `claude` command isn't installed or isn't on your PATH.\n"
+                   + in_claude("get-ready", "install it as https://code.claude.com/docs/en/setup shows, "
+                                            "sign in once with `claude auth login`, then try again") + ".")
     return exe
 
 
@@ -281,7 +320,7 @@ def claude_version(exe: str) -> str:
         out = subprocess.run([exe, "--version"], capture_output=True, text=True, timeout=60, env=child_env())
     except (OSError, subprocess.TimeoutExpired) as e:
         raise Fail(f"Claude Code didn't answer `claude --version` ({e}).\n"
-                   "Check that it is installed: type `claude --version` in a terminal.")
+                   "Check that it is installed. " + in_claude("get-ready", "claude --version") + ".")
     m = re.search(r"\d+\.\d+\.\d+", out.stdout + out.stderr)
     return m.group(0) if m else (out.stdout.strip() or "unknown")
 
@@ -295,9 +334,8 @@ def login_state(exe: str) -> dict:
         return {}
 
 
-NOT_LOGGED_IN = ("Claude Code is not logged in on this computer.\n"
-                 "Run `claude` in a terminal, log in with your Claude account when it asks, type /exit,\n"
-                 "and then run this command again.")
+NOT_LOGGED_IN = ("Claude Code is not logged in on this computer. The `claude` command signs in once, with your Claude account.\n"
+                 + in_claude("get-ready", "claude auth login") + ". Then run this command again.")
 
 
 def require_login(exe: str) -> dict:
@@ -549,6 +587,20 @@ EXCLUDE_TREES = {".claude/skills/experiment-intake", ".claude/skills/skill-eval-
 INTAKE_MARK = "skill-eval-lite experiment-intake"
 HELPER_MARK = "skill-eval-lite helper"
 CHECKS_MARK = "skill-eval-lite check-authoring"
+# Every one of Skill Eval Lite's own skills carries this mark near the top of
+# its SKILL.md ("<!-- skill-eval-lite get-ready, version 1 ... -->"), so a copy
+# of one in an assistant's .claude/skills/, under any folder name, is left out
+# of every run, as the three above are by name.
+SKILL_MARK = "<!-- skill-eval-lite "
+
+
+def is_tool_skill(folder: Path) -> bool:
+    """A skill folder that is one of Skill Eval Lite's own skills, by its mark."""
+    try:
+        with open(folder / "SKILL.md", encoding="utf-8", errors="replace") as f:
+            return SKILL_MARK in f.read(4000)
+    except OSError:
+        return False
 
 
 def copy_assistant(src: Path, dst: Path, skip: set[Path] = frozenset()) -> None:
@@ -559,6 +611,8 @@ def copy_assistant(src: Path, dst: Path, skip: set[Path] = frozenset()) -> None:
         for d in dirs:
             r = (rel / d).as_posix()
             if d in EXCLUDE_DIRS and rel == Path(".") or d == ".git" or r in EXCLUDE_TREES or (Path(root) / d).resolve() in skip:
+                continue
+            if rel.as_posix() == ".claude/skills" and is_tool_skill(Path(root) / d):
                 continue
             if (Path(root) / d).is_symlink():
                 continue
@@ -638,8 +692,8 @@ def safe_temp_parent() -> Path:
             if (d / name).exists():
                 raise Fail(f"There is a {name} file at {d / name}, in a folder above your temporary folder ({base}).\n"
                            "Claude Code and Codex would read it in every run, so the runs wouldn't be clean.\n"
-                           "Move or rename that file, or use another temporary folder, for example:\n"
-                           "    mkdir -p ~/skill-eval-tmp && export TMPDIR=~/skill-eval-tmp")
+                           "Move or rename that file, or use another temporary folder.\n"
+                           + in_claude("get-ready", "mkdir -p ~/skill-eval-tmp && export TMPDIR=~/skill-eval-tmp") + ".")
     return base
 
 
@@ -1763,7 +1817,8 @@ def cmd_setup(a) -> int:
         raise Fail(f"{dest} already exists and is not empty, so setup won't write over it.\n"
                    "Choose a new folder name, or delete that folder first.")
     if not shutil.which("git"):
-        raise Fail("git is not installed. Install it (https://git-scm.com/downloads) and run this again.")
+        raise Fail("git is not installed. " + in_claude("get-ready", "install it from https://git-scm.com/downloads, "
+                                                                 "then run this again") + ".")
     m = tomllib.loads((OVERLAY / "overlay.toml").read_text(encoding="utf-8"))
     source = a.source or m["template"]
     commit = a.commit or m["commit"]
@@ -1805,9 +1860,9 @@ def cmd_setup(a) -> int:
     head = git("rev-parse", "--short", "HEAD", cwd=dest).stdout.strip()
     say(f"\nThe class assistant is ready in {dest} (commit {head}).")
     say("Wren and Morgan Reyes are the template's fictional example; nobody in it is real.")
-    say("Next, check your setup (if you haven't yet), then run the first demonstration:")
-    say("    python3 run_ab.py doctor")
-    say(f"    python3 run_ab.py run examples/demo-one-line.toml --assistant {a.folder} --jobs 6")
+    say("Next, check your setup if you haven't yet. " + in_claude("get-ready", f"{PY} run_ab.py doctor") + ".")
+    say("Then see the whole cycle once, with the first demonstration. "
+        + in_claude("skill-eval-helper", f"{PY} run_ab.py run examples/demo-one-line.toml --assistant {a.folder} --jobs 6") + ".")
     return 0
 
 
@@ -1816,8 +1871,14 @@ def cmd_setup(a) -> int:
 def load(path: str) -> Experiment:
     p = Path(path)
     if not p.is_file():
-        raise Fail(f"There is no experiment file at {path}. Check the path; `python3 run_ab.py status` lists the ones there are.")
+        raise Fail(f"There is no experiment file at {path}. Check the path: status lists the experiments there are.\n"
+                   + in_claude("shared-i", f"{PY} run_ab.py status") + ".")
     return Experiment(p)
+
+
+def fix_then_check(path, what: str = "these") -> str:
+    """After an experiment's problems: fix them, then check it again."""
+    return f"Fix {what}, then check it again. " + in_claude("skill-eval-helper", f"{PY} run_ab.py check {path}") + "."
 
 
 def changed_since_frozen(date: str) -> str:
@@ -1854,13 +1915,38 @@ def cmd_check(a) -> int:
     frozen = state in ("frozen", "old")
     say("  Frozen: " + FROZEN_LINE[state].format(date=date))
     if errors:
-        say(f"\nFix the lines marked \"must fix\", save the file, and check it again:\n    python3 run_ab.py check {a.experiment}")
+        say("\n" + fix_then_check(a.experiment, 'the lines marked "must fix"'))
     elif exp.data.get("demo") or frozen:
-        say(f"\nNext, run it:\n    python3 run_ab.py run {a.experiment} --assistant ../class-assistant --jobs 4")
+        say("\nNext, run it. " + in_claude("skill-eval-helper" if exp.data.get("demo") else "run-experiment",
+                                           f"{PY} run_ab.py run {a.experiment} --assistant ../class-assistant --jobs 4") + ".")
     else:
         say("\nNext, freeze it in the wizard: load it in step 1, press Freeze in step 2, then press 'Export the frozen "
-            f"experiment' (now in step 2) and save the file over {a.experiment}.")
+            f"experiment' (now in step 2) and save the file over {a.experiment}. " + in_claude("wizard", OPEN_WIZARD) + ".")
     return 1 if errors else 0
+
+
+def baseline_round(exp: Experiment) -> str | None:
+    """The experiment's baseline: the round whose role is baseline, else the
+    first comparison's baseline, else the first round."""
+    for rid, r in exp.rounds.items():
+        if r.get("role") == "baseline":
+            return rid
+    comps = [c for c in exp.data.get("comparisons", []) if isinstance(c, dict)]
+    return comps[0].get("baseline") if comps else next(iter(exp.rounds), None)
+
+
+def held_out_comparisons(exp: Experiment, outputs) -> list[dict]:
+    """The held-out confirmation (Shared I's fourth step: "run A and your
+    final version on them, judge them blind as before"): the baseline round
+    against each other round that has run on a held-out prompt, in the
+    experiment's order. It needs no comparison in the experiment file, which
+    is frozen by then. Empty until the baseline itself has run on one.
+    outputs: keys (prompt, round, repeat), as in a bundle."""
+    held = {r for (p, r, _k) in outputs if p in exp.held_out}
+    base = baseline_round(exp)
+    if base not in held:
+        return []
+    return [{"baseline": base, "new": rid} for rid in exp.rounds if rid in held and rid != base]
 
 
 def select_runs(exp: Experiment, a) -> list[tuple[str, str, int]]:
@@ -1905,7 +1991,7 @@ def cmd_plan(a) -> int:
         say("Each run: claude " + " ".join(shown(f) for f in isolation_flags(exp.model.get("model"), tools, allowed,
                                                                              exp.model.get("max_budget_usd"))) + "  < prompt")
     if errors:
-        say("\nFix these first, then check again with: python3 run_ab.py check " + a.experiment)
+        say("\n" + fix_then_check(a.experiment, "these first"))
         for e in errors:
             say("  " + e)
         return 1
@@ -2146,24 +2232,26 @@ def cmd_run(a) -> int:
         say("This experiment can't be run yet:")
         for e in errors:
             say("  " + e)
-        say(f"Fix these, then check again with: python3 run_ab.py check {a.experiment}")
+        say(fix_then_check(a.experiment))
         return 1
     state, date = exp.freeze_state()
     unfrozen = not exp.data.get("demo") and state not in ("frozen", "old")
     if unfrozen and not a.unfrozen:
         anyway = ("To run it as it is anyway, add --unfrozen: the runs are then marked as made before the experiment was frozen,\n"
-                  "and the wizard shows that mark.")
+                  "which the wizard shows.")
         if state == "changed":
             raise Fail(f"{a.experiment} has changed since it was frozen on {date}, so it can't be run as the frozen experiment.\n"
                        "Freeze it again in the wizard (load it in step 1, press Freeze in step 2, then 'Export the frozen experiment'),\n"
-                       "save it over the old file, and keep the earlier file, dated, for your report.\n" + anyway)
+                       "save it over the old file and keep the earlier file, dated, for your report.\n"
+                       + in_claude("wizard", OPEN_WIZARD) + ".\n" + anyway)
         raise Fail(f"{a.experiment} isn't frozen yet, so it can't be run: an experiment is frozen before anyone sees an output.\n"
                    "Freeze it in the wizard: load it in step 1, press Freeze in step 2, then press 'Export the frozen experiment'\n"
-                   f"(now in step 2) and save the file over {a.experiment}. Then run this again.\n" + anyway)
+                   f"(now in step 2) and save the file over {a.experiment}.\n"
+                   + in_claude("wizard", OPEN_WIZARD) + ". Then run this again.\n" + anyway)
     assistant = Path(a.assistant).expanduser()
     if not assistant.is_dir():
-        raise Fail(f"There is no assistant folder at {a.assistant}.\n"
-                   f"For the class assistant, set it up first with: python3 run_ab.py setup {a.assistant}")
+        raise Fail(f"There is no assistant folder at {a.assistant}. For the class assistant, set it up first.\n"
+                   + in_claude("get-ready", f"{PY} run_ab.py setup {a.assistant}") + ".")
     if not (assistant / "CLAUDE.md").exists():
         say(f"Note: {assistant} has no CLAUDE.md. Is it the assistant's folder?")
     safe_temp_parent()
@@ -2324,8 +2412,13 @@ def cmd_run(a) -> int:
         say(f"Ran the program checks (CHECKS.md): {results_text(done)}.")
         say_program_results(exp, out)
     say(f"The bundle for the wizard: {out.bundle_path}")
-    say(f"Next, run the LLM judge:  python3 run_ab.py judge {out.path}")
-    say("Then open wizard.html and load the bundle in step 1.")
+    if name == "codex":
+        say(f"Next, run the LLM judge:  {PY} run_ab.py judge {out.path}")
+        say("Then open wizard.html and load the bundle in step 1.")
+    else:
+        say("Next, run the LLM judge. " + in_claude("skill-eval-helper" if exp.data.get("demo") else "run-experiment",
+                                                    f"{PY} run_ab.py judge {out.path}") + ".")
+        say("Then load the bundle in the wizard's step 1. " + in_claude("wizard", OPEN_WIZARD) + ".")
     return 0
 
 
@@ -2651,7 +2744,7 @@ def cmd_score(a) -> int:
         say("This experiment's checks can't be run yet:")
         for e in errors:
             say("  " + e)
-        say(f"Fix these, then check again with: {PY} run_ab.py check {a.experiment}")
+        say(fix_then_check(a.experiment))
         return 1
     if not exp.program_checks():
         say(f"{exp.path.name} has no program checks (kind = \"program\"), so there is nothing to score here.\n"
@@ -2668,13 +2761,14 @@ def cmd_score(a) -> int:
     out = Out(folder)
     if not out.bundle:
         raise Fail(f"There is no bundle.json in {folder}, so there are no outputs to score yet.\n"
-                   f"Run the experiment first, or name its run folder: {PY} run_ab.py score {a.experiment} --out runs/<name>")
+                   "Run the experiment first, or name its run folder. "
+                   + in_claude("run-experiment", f"{PY} run_ab.py score {a.experiment} --out runs/<name>") + ".")
     st_errors, _ = program_selftest(exp)
     if st_errors:
         say("A program check doesn't pass its own tests, so its results on the outputs couldn't be trusted:")
         for e in st_errors:
             say("  " + e)
-        say(f"Fix it, then check again with: {PY} run_ab.py check {a.experiment}")
+        say("Fix it, then check it again. " + in_claude("check-authoring", f"{PY} run_ab.py check {a.experiment}") + ".")
         return 1
     done = score_programs(exp, out, again=a.again, only=only, jobs=a.jobs)
     if done["outputs"] or done["references"]:
@@ -2687,14 +2781,14 @@ def cmd_score(a) -> int:
     added = sorted({r["check"] for r in out.bundle.get("program_results", []) if r.get("added_after_run") and v.get(r["check"]) == r.get("version")})
     if added:
         say(f"\nThe runs were made without {', '.join(added)} as it is now: it was added or changed after the runs. "
-            "The wizard marks its results, and your report should call them exploratory: they were not part of the test "
+            "The wizard marks its results. Your report should call them exploratory: they were not part of the test "
             "you froze.")
     as_run = (out.bundle.get("experiment") or {}).get("text")
     if as_run is not None and design_text(as_run) != design_text(exp.text):
         say(f"\n{a.experiment} is not the experiment file these runs were made with. In the wizard, load {a.experiment} "
-            f"in step 1 (freeze it again if it asks), then {out.bundle_path} in step 3.")
+            f"in step 1 (freeze it again if it asks), then {out.bundle_path} in step 3. " + in_claude("wizard", OPEN_WIZARD) + ".")
     else:
-        say(f"\nNext: open wizard.html and load {out.bundle_path} in step 1.")
+        say(f"\nNext, load {out.bundle_path} in the wizard's step 1. " + in_claude("wizard", OPEN_WIZARD) + ".")
     return 0
 
 
@@ -2768,7 +2862,8 @@ def cmd_judge(a) -> int:
     out = Out(folder)
     if not out.bundle:
         raise Fail(f"There is no bundle.json in {folder}, so there is nothing to judge yet.\n"
-                   "Run the experiment first: python3 run_ab.py run <experiment file> --assistant <folder>")
+                   "Run the experiment first. "
+                   + in_claude("run-experiment", f"{PY} run_ab.py run <experiment file> --assistant <folder>") + ".")
     exp = Experiment(Path(out.bundle["experiment"]["name"]), out.bundle["experiment"]["text"])
     if not exp.judge.get("prompt"):
         raise Fail("The experiment has no [judge] prompt, so the LLM judge has nothing to ask.\n"
@@ -2784,12 +2879,19 @@ def cmd_judge(a) -> int:
         outputs = {(o["prompt"], o["round"], o["repeat"]): o for o in out.bundle["outputs"]}
         have = {(j["comparison"], j["prompt"], j["repeat"], j.get("requested_model", j.get("model"))): j for j in out.bundle.get("judge", [])}
         pairs = []
-        for c in exp.data.get("comparisons", []):
+        wanted = a.comparisons.split(",") if a.comparisons else None
+        # The development prompts are judged on the experiment's comparisons;
+        # the held-out prompts, with --held-out, on the confirmation (the
+        # baseline against each round run on them), as the wizard pairs them.
+        sets = [(c, exp.development) for c in exp.data.get("comparisons", [])]
+        if a.held_out:
+            sets += [(c, exp.held_out) for c in held_out_comparisons(exp, outputs)]
+        for c, prompts in sets:
             cfg = f"{c['baseline']}|{c['new']}"
-            if a.comparisons and cfg.replace("|", "-") not in a.comparisons.split(",") and cfg not in a.comparisons.split(","):
+            if wanted and cfg.replace("|", "-") not in wanted and cfg not in wanted:
                 continue
             for (p, r, k), o in sorted(outputs.items()):
-                if r != c["baseline"] or (p, c["new"], k) not in outputs or p in exp.held_out and not a.held_out:
+                if r != c["baseline"] or (p, c["new"], k) not in outputs or p not in prompts:
                     continue
                 if (cfg, p, k, model) in have and not a.again:
                     continue
@@ -2865,7 +2967,8 @@ def cmd_judge(a) -> int:
         say("\n" + problems[0], err=True)
         return 3
     say(f"\nThe judge's verdicts are saved in {out.bundle_path} (and one file per pair in {folder / 'judge'}).")
-    say("Next: open wizard.html and load the bundle in step 1.")
+    say("Next: open wizard.html and load the bundle in step 1." if name == "codex" else
+        "Next, load the bundle in the wizard's step 1. " + in_claude("wizard", OPEN_WIZARD) + ".")
     return 0
 
 
@@ -2882,36 +2985,455 @@ def _version_key(v: str):
     return tuple(int(x) for x in m.groups()) if m else None
 
 
-def newer_version(timeout: float = 3.0) -> str | None:
-    """The public repository's version when it is newer than this one; None
-    when it isn't, or when it can't be read (offline, say). One small request,
-    which sends nothing but the version asked for."""
-    url = os.environ.get("SKILL_EVAL_LITE_UPDATE_URL", UPDATE_URL)
-    if url.strip().lower() in ("", "off"):
-        return None
+def fetch(url: str, timeout: float = 3.0, limit: int = 64) -> tuple[int | None, bytes | None]:
+    """GET one address: (status, body), (404, None) when it isn't there, and
+    (None, None) offline or past the time-out. In a thread of its own, so that
+    a slow name lookup can't hold anything up. It sends nothing but the
+    request itself."""
+    import urllib.error
     import urllib.request
-    got: list[str] = []
+    got: list[tuple[int | None, bytes | None]] = []
 
-    def fetch():
+    def go():
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "skill-eval-lite/" + VERSION})
             with urllib.request.urlopen(req, timeout=timeout) as r:
-                got.append(r.read(64).decode("utf-8", "replace").strip())
+                got.append((getattr(r, "status", None) or 200, r.read(limit)))
+        except urllib.error.HTTPError as e:
+            got.append((e.code, None))
         except Exception:
-            pass
-    # In a thread of its own, so that a slow name lookup can't hold up status.
-    th = threading.Thread(target=fetch, daemon=True)
+            got.append((None, None))
+    th = threading.Thread(target=go, daemon=True)
     th.start()
-    th.join(timeout)
-    if not got:
+    th.join(timeout + 1)
+    return got[0] if got else (None, None)
+
+
+def remote_version(timeout: float = 3.0) -> str | None:
+    """The public repository's VERSION; None when it can't be read (offline,
+    say) or the check is turned off. One small request, which sends nothing
+    but the version asked for."""
+    url = os.environ.get("SKILL_EVAL_LITE_UPDATE_URL", UPDATE_URL)
+    if url.strip().lower() in ("", "off"):
         return None
-    mine, theirs = _version_key(VERSION), _version_key(got[0])
-    remote = got[0]
+    code, body = fetch(url, timeout)
+    text = (body or b"").decode("utf-8", "replace").strip()
+    return text if code == 200 and _version_key(text) else None
+
+
+def newer_version(timeout: float = 3.0) -> str | None:
+    """The public repository's version when it is newer than this one; None
+    when it isn't, or when it can't be read."""
+    remote = remote_version(timeout)
+    mine, theirs = _version_key(VERSION), _version_key(remote or "")
     return remote if mine and theirs and theirs > mine else None
 
 
-def update_text(remote: str) -> str:
-    return f"Skill Eval Lite {remote} is out; you have {VERSION}. In this folder, run git pull."
+# --- updates --------------------------------------------------------------
+#
+# Skill Eval Lite and the course's brief folders beside it, against what is
+# published (Simon, 2026-11-07: "check whether the Shared I and Personal I
+# folders are up to date (and that skill-eval-lite is up to date) ... so if
+# we push further changes, students can pull them in and keep running").
+# A brief folder made since 0.2.0 holds pack.json, which the course site
+# also publishes beside its ZIP as <id>-for-ai.json (the course's
+# tools/project_pack.py); an older one is known by its SKILL.md.
+
+PACK_SCHEMA = "ai5500-project-pack/1"
+ZIP_URL = "https://github.com/vanderbilt-ms-ai/skill-eval-lite/archive/refs/heads/main.zip"
+OLD_REVISION = re.compile(r"This copy holds revision (\d+)")
+OLD_PAGE = re.compile(r"The project's page: (https?://\S+?\.html)")
+# What an update never touches: the student's work in Skill Eval Lite's
+# folder or in a brief folder.
+SELF_KEEP = ("experiments/", "runs/", ".state/", ".git/", ".git", ".claude/settings.local.json")
+BRIEF_KEEP = ("progress.md", "ai-use-log.md", "notes.md", "notes/", "previous/")
+ONE_DAY = 24 * 3600
+NEWER = ("newer", "changed", "old-copy")
+
+
+def state_dir() -> Path:
+    """Where Skill Eval Lite keeps its own small state (git ignores it)."""
+    return Path(os.environ.get("SKILL_EVAL_LITE_STATE") or HERE / ".state")
+
+
+def workspace_dir(given: str | None = None) -> Path:
+    """The folder that holds Skill Eval Lite and the brief folders."""
+    return Path(given or os.environ.get("SKILL_EVAL_LITE_WORKSPACE") or HERE.parent).resolve()
+
+
+def _beside(url: str, ext: str) -> str:
+    """A project page's address -> its pack's ZIP or manifest beside it."""
+    base, name = url.rsplit("/", 1)
+    return f"{base}/{name.rsplit('.', 1)[0]}-for-ai{ext}"
+
+
+def brief_folders(workspace: Path) -> list[dict]:
+    """The course's brief folders beside Skill Eval Lite."""
+    out = []
+    try:
+        kids = sorted(d for d in workspace.iterdir() if d.is_dir())
+    except OSError:
+        return out
+    for d in kids:
+        if d.resolve() == HERE:
+            continue
+        try:
+            pack = json.loads((d / "pack.json").read_text(encoding="utf-8")) if (d / "pack.json").is_file() else None
+        except (OSError, ValueError):
+            pack = None
+        if isinstance(pack, dict) and pack.get("schema") == PACK_SCHEMA:
+            urls = pack.get("urls") or {}
+            out.append({"folder": d, "pack": pack, "name": pack.get("name") or d.name,
+                        "revision": (pack.get("revision") or {}).get("n"), "made": pack.get("made"),
+                        "manifest": urls.get("manifest"), "zip": urls.get("zip"), "page": urls.get("page")})
+            continue
+        skill = d / "SKILL.md"
+        try:
+            text = skill.read_text(encoding="utf-8", errors="replace") if skill.is_file() else ""
+        except OSError:
+            text = ""
+        rev, page = OLD_REVISION.search(text), OLD_PAGE.search(text)
+        if rev and page and re.search(r"^name: ai5500-", text[:400], re.M):
+            title = re.search(r"^# ([^:\n]+)", text, re.M)
+            url = page.group(1)
+            out.append({"folder": d, "pack": None, "name": title.group(1).strip() if title else d.name,
+                        "revision": int(rev.group(1)), "made": None,
+                        "manifest": _beside(url, ".json"), "zip": _beside(url, ".zip"), "page": url})
+    return out
+
+
+def check_brief(b: dict, timeout: float = 3.0) -> dict:
+    """One brief folder against the course site's manifest."""
+    res = {"folder": b["folder"].name, "name": b["name"], "revision": b["revision"], "made": b["made"],
+           "pack": b["pack"] is not None, "page": b["page"], "zip": b["zip"]}
+    if not b["manifest"]:
+        return {**res, "status": "unknown", "reason": "its pack.json names no manifest"}
+    code, body = fetch(b["manifest"], timeout, limit=4_000_000)
+    if code == 404:
+        return {**res, "status": "unknown", "reason": "the course site publishes no manifest for it yet"}
+    try:
+        pub = json.loads(body or b"")
+        if not isinstance(pub, dict) or pub.get("schema") != PACK_SCHEMA:
+            raise ValueError
+    except ValueError:
+        why = "couldn't reach the course site" if code is None else f"the course site answered {code}"
+        return {**res, "status": "unknown", "reason": why}
+    rev = pub.get("revision") or {}
+    res["published"] = {"revision": rev.get("n"), "date": rev.get("date"), "made": pub.get("made")}
+    res["zip"] = (pub.get("urls") or {}).get("zip") or b["zip"]
+    have, now = int(b["revision"] or 0), int(rev.get("n") or 0)
+    if now > have:
+        return {**res, "status": "newer"}
+    if b["pack"] is None:
+        return {**res, "status": "old-copy"}
+    mine, theirs = b["pack"].get("files") or {}, pub.get("files") or {}
+    changed = sorted(f for f in set(mine) | set(theirs) if mine.get(f) != theirs.get(f))
+    if changed:
+        return {**res, "status": "changed", "changed": changed}
+    return {**res, "status": "current"}
+
+
+def check_self(timeout: float = 3.0) -> dict:
+    """Skill Eval Lite against GitHub's VERSION."""
+    res = {"version": VERSION, "kind": "git" if (HERE / ".git").exists() else "zip"}
+    if os.environ.get("SKILL_EVAL_LITE_UPDATE_URL", UPDATE_URL).strip().lower() in ("", "off"):
+        return {**res, "status": "unknown", "reason": "the check is turned off"}
+    remote = remote_version(timeout)
+    if remote is None:
+        return {**res, "status": "unknown", "reason": "couldn't reach GitHub"}
+    mine, theirs = _version_key(VERSION), _version_key(remote)
+    return {**res, "published": remote, "status": "newer" if mine and theirs > mine else "current"}
+
+
+def local_key(workspace: Path) -> dict:
+    """What a cached check depends on: this version and the brief folders as
+    they are, so that a check made before an update isn't reused after it."""
+    return {"workspace": str(workspace), "version": VERSION,
+            "briefs": {b["folder"].name: [b["revision"], (b["pack"] or {}).get("sha256")] for b in brief_folders(workspace)}}
+
+
+def check_updates(workspace: Path, timeout: float = 3.0) -> dict:
+    briefs = brief_folders(workspace)
+    with ThreadPoolExecutor(max_workers=1 + len(briefs)) as pool:
+        me = pool.submit(check_self, timeout)
+        theirs = [pool.submit(check_brief, b, timeout) for b in briefs]
+        report = {"checked": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
+                  "skill_eval_lite": me.result(), "briefs": [f.result() for f in theirs]}
+    report["key"] = local_key(workspace)
+    return report
+
+
+def cached_updates(workspace: Path) -> dict | None:
+    """The last check, if it was made in the last day for things as they are."""
+    try:
+        r = json.loads((state_dir() / "updates.json").read_text(encoding="utf-8"))
+        when = dt.datetime.fromisoformat(r["checked"])
+        age = (dt.datetime.now().astimezone() - when).total_seconds()
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    return r if 0 <= age < ONE_DAY and r.get("key") == local_key(workspace) else None
+
+
+def save_updates(report: dict) -> None:
+    try:
+        state_dir().mkdir(parents=True, exist_ok=True)
+        (state_dir() / "updates.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    except OSError:
+        pass
+
+
+def update_lines(r: dict) -> list[str]:
+    me = r["skill_eval_lite"]
+    lines = []
+    if me["status"] == "newer":
+        lines.append(f"Skill Eval Lite: {me['published']} is out. This copy is {me['version']}.")
+    elif me["status"] == "current":
+        lines.append(f"Skill Eval Lite {me['version']}: up to date.")
+    else:
+        lines.append(f"Skill Eval Lite {me['version']}: couldn't check ({me.get('reason')}).")
+    for b in r["briefs"]:
+        label, pub = f"{b['folder']} ({b['name']})", b.get("published") or {}
+        if b["status"] == "newer":
+            lines.append(f"{label}: revision {pub.get('revision')} ({pub.get('date')}) is out. This copy is revision {b['revision']}.")
+        elif b["status"] == "changed":
+            few = ", ".join(b["changed"][:4]) + (f" and {len(b['changed']) - 4} more" if len(b["changed"]) > 4 else "")
+            lines.append(f"{label}: revision {b['revision']}, with {len(b['changed'])} of the course's files changed "
+                         f"since this copy ({few}).")
+        elif b["status"] == "old-copy":
+            lines.append(f"{label}: revision {b['revision']}, in the older form of the folder with no pack.json, so its "
+                         "files can't be compared. Bringing in the course site's copy is safe: your own files stay.")
+        elif b["status"] == "current":
+            lines.append(f"{label}: up to date (revision {b['revision']}).")
+        else:
+            lines.append(f"{label}: couldn't check ({b.get('reason')}).")
+    if not r["briefs"]:
+        lines.append(f"No brief folders beside Skill Eval Lite (it looked in {r['key']['workspace']}).")
+    return lines
+
+
+def update_needed(r: dict) -> list[str]:
+    """What is newer, in a few words each."""
+    out = []
+    me = r["skill_eval_lite"]
+    if me["status"] == "newer":
+        out.append(f"Skill Eval Lite {me['published']} is out (this copy is {me['version']})")
+    for b in r["briefs"]:
+        if b["status"] == "newer":
+            out.append(f"{b['folder']} ({b['name']}) has revision {(b.get('published') or {}).get('revision')}")
+        elif b["status"] in ("changed", "old-copy"):
+            out.append(f"{b['folder']} ({b['name']}) has a newer copy")
+    return out
+
+
+def cmd_updates(a) -> int:
+    workspace = workspace_dir(a.workspace)
+    if a.hook:
+        # For Claude Code's SessionStart hook: at most one check a day, a line
+        # for Claude when something is newer, nothing otherwise, and never a
+        # failure that could get in the way of a session.
+        try:
+            r = None if a.again else cached_updates(workspace)
+            if r is None:
+                r = check_updates(workspace, timeout=2.5)
+                save_updates(r)
+            needed = update_needed(r)
+            if needed:
+                print("Skill Eval Lite's update check: " + "; ".join(needed) + ". Before anything else, tell the "
+                      "student this in a line and offer /check-updates, which brings it in and keeps their own work.")
+        except Exception:
+            pass
+        return 0
+    r = None if a.again else cached_updates(workspace)
+    fresh = r is None
+    if fresh:
+        r = check_updates(workspace)
+        save_updates(r)
+    if a.json:
+        print(json.dumps(r, indent=2))
+        return 0
+    for line in update_lines(r):
+        say(line)
+    if update_needed(r):
+        say("Bringing them in keeps your own work. "
+            + in_claude("check-updates", f"{PY} run_ab.py update --self for Skill Eval Lite, "
+                                         f"{PY} run_ab.py update --brief ../<folder> for a brief folder") + ".")
+    if not fresh:
+        say(f"(Checked {r['checked'][:16].replace('T', ' ')}. --again checks now.)")
+    return 0
+
+
+def _zip_files(body: bytes, where: str) -> tuple[str, dict[str, bytes]]:
+    """A downloaded ZIP's files under its one top folder: (top, {path: bytes})."""
+    import io
+    import zipfile
+    try:
+        z = zipfile.ZipFile(io.BytesIO(body))
+    except zipfile.BadZipFile:
+        raise Fail(f"What came from {where} isn't a ZIP file.")
+    names = [n for n in z.namelist() if not n.endswith("/")]
+    tops = {n.split("/", 1)[0] for n in names}
+    if len(tops) != 1 or any("/" not in n for n in names):
+        raise Fail(f"The ZIP from {where} doesn't hold one folder.")
+    top = tops.pop()
+    files = {}
+    for n in names:
+        rel = n.split("/", 1)[1]
+        parts = PurePosixPath(rel).parts
+        if not rel or rel.startswith("/") or ".." in parts or ":" in rel or "\\" in rel:
+            raise Fail(f"The ZIP from {where} has a file outside its folder: {n}")
+        files[rel] = z.read(n)
+    return top, files
+
+
+def _kept(rel: str, keep: tuple[str, ...]) -> bool:
+    return any(rel == k.rstrip("/") or (k.endswith("/") and rel.startswith(k)) for k in keep)
+
+
+def _apply(root: Path, files: dict[str, bytes], keep: tuple[str, ...], backup: Path, dry: bool,
+           gone: list[str] = ()) -> dict[str, list[str]]:
+    """Write `files` into root, never touching what `keep` names; each file it
+    replaces or takes away is copied into `backup` first. Nothing is deleted
+    without a copy kept."""
+    done = {"replaced": [], "added": [], "same": [], "kept": [], "moved": []}
+    for rel in sorted(files):
+        if _kept(rel, keep):
+            done["kept"].append(rel)
+            continue
+        target = root / rel
+        if target.is_file() and target.read_bytes() == files[rel]:
+            done["same"].append(rel)
+            continue
+        done["replaced" if target.exists() else "added"].append(rel)
+        if dry:
+            continue
+        if target.exists():
+            (backup / rel).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(target, backup / rel)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(files[rel])
+    for rel in gone:
+        target = root / rel
+        if _kept(rel, keep) or rel in files or not target.is_file():
+            continue
+        done["moved"].append(rel)
+        if not dry:
+            (backup / rel).parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(target), str(backup / rel))
+    return done
+
+
+def _few(names: list[str], n: int = 5) -> str:
+    return ", ".join(names[:n]) + (f" and {len(names) - n} more" if len(names) > n else "")
+
+
+def update_self(dry: bool) -> None:
+    if (HERE / ".git").exists():
+        if not shutil.which("git"):
+            raise Fail("This copy of Skill Eval Lite is a git copy, but git isn't installed. "
+                       + in_claude("get-ready", "install it from https://git-scm.com/downloads") + ".")
+        dirty = subprocess.run(["git", "-C", str(HERE), "status", "--porcelain", "--untracked-files=no"],
+                               capture_output=True, text=True).stdout.strip()
+        if dirty:
+            raise Fail("Skill Eval Lite's own files have changes in this copy, so `git pull` would stop:\n" + dirty
+                       + "\nKeep a copy of anything you changed, then put each file back and update again. "
+                       + in_claude("check-updates", f"git checkout -- <file> for each file, then {PY} run_ab.py update --self") + ".")
+        if dry:
+            say("Would run `git pull --ff-only` in this folder. Your experiments/ and runs/ aren't in git, so they stay.")
+            return
+        r = subprocess.run(["git", "-C", str(HERE), "pull", "--ff-only"], capture_output=True, text=True)
+        say((r.stdout + r.stderr).strip())
+        if r.returncode:
+            raise Fail("`git pull` didn't finish. Its message is above.")
+        new = (HERE / "VERSION").read_text(encoding="utf-8").strip() if (HERE / "VERSION").is_file() else "?"
+        say(f"Skill Eval Lite is now {new}. RELEASE.md says what changed.")
+        return
+    url = os.environ.get("SKILL_EVAL_LITE_ZIP_URL", ZIP_URL)
+    code, body = fetch(url, timeout=60, limit=200_000_000)
+    if code != 200 or not body:
+        raise Fail(f"Couldn't download Skill Eval Lite from {url}"
+                   + (" (offline?)." if code is None else f" (the site answered {code})."))
+    _, files = _zip_files(body, url)
+    if "run_ab.py" not in files or "VERSION" not in files:
+        raise Fail(f"The ZIP from {url} isn't Skill Eval Lite: it has no run_ab.py or VERSION.")
+    new = files["VERSION"].decode("utf-8", "replace").strip()
+    backup = state_dir() / f"before-update-{VERSION}"
+    done = _apply(HERE, files, SELF_KEEP, backup, dry)
+    head = f"Skill Eval Lite {VERSION} -> {new}"
+    if dry:
+        say(f"{head}: would replace {len(done['replaced'])} files and add {len(done['added'])}. "
+            "experiments/, runs/ and .claude/settings.local.json would stay as they are.")
+        return
+    say(f"{head}: replaced {len(done['replaced'])} files and added {len(done['added'])}. Your experiments/, runs/ "
+        "and .claude/settings.local.json are as they were.")
+    if done["replaced"]:
+        say(f"The files it replaced are kept in {backup}.")
+    say("RELEASE.md says what changed.")
+
+
+def update_brief(folder: Path, dry: bool) -> None:
+    folder = folder.resolve()
+    found = [b for b in brief_folders(folder.parent) if b["folder"].resolve() == folder]
+    if not found:
+        raise Fail(f"{folder} isn't one of the course's brief folders: it has no pack.json, and no SKILL.md naming "
+                   "its revision and its page.")
+    b = found[0]
+    st = check_brief(b, timeout=10)
+    if st["status"] == "current":
+        say(f"{folder.name} is up to date (revision {b['revision']}). Nothing to do.")
+        return
+    url = st.get("zip") or b["zip"]
+    code, body = fetch(url, timeout=60, limit=200_000_000)
+    if code != 200 or not body:
+        raise Fail(f"Couldn't download {url}" + (" (offline?)." if code is None else f" (the course site answered {code})."))
+    _, files = _zip_files(body, url)
+    try:
+        pack = json.loads(files["pack.json"]) if "pack.json" in files else None
+    except ValueError:
+        pack = None
+    old_rev = b["revision"]
+    new_rev = ((pack or {}).get("revision") or {}).get("n") or (st.get("published") or {}).get("revision") or old_rev
+    gone = sorted(set((b["pack"] or {}).get("files") or {}) - set(files))
+    label = f"r{old_rev}-{b['made'] or dt.date.today().isoformat()}"
+    backup = folder / "previous" / label
+    # pack.json last, so that a copy stopped halfway still says it is the old one.
+    course = {k: v for k, v in files.items() if k != "pack.json"}
+    done = _apply(folder, course, BRIEF_KEEP, backup, dry, gone)
+    if not dry and "pack.json" in files:
+        (folder / "pack.json").write_bytes(files["pack.json"])
+    tops = {n.split("/", 1)[0] for n in set(course) | set(gone) if not _kept(n, BRIEF_KEEP)}
+    theirs = sorted(p.name + ("/" if p.is_dir() else "") for p in folder.iterdir()
+                    if p.name not in tops and p.name not in ("previous", "pack.json"))
+    head = (f"{folder.name}: revision {old_rev} -> {new_rev}" if new_rev != old_rev
+            else f"{folder.name}: revision {old_rev}, brought up to date")
+    rep_, add_, set_ = ("would replace", "add", "set aside") if dry else ("replaced", "added", "set aside")
+    say(f"{head}: {rep_} {len(done['replaced'])} of the course's files, {add_} {len(done['added'])}"
+        + (f" and {set_} {len(done['moved'])} it no longer has" if done["moved"] else "") + ".")
+    if done["replaced"] or done["added"]:
+        say(f"  Changed: {_few(done['replaced'] + done['added'])}.")
+    if theirs:
+        say(f"  Your own files {'would stay' if dry else 'stay'} as they are: {_few(theirs)}.")
+    if not dry and (done["replaced"] or done["moved"]):
+        say(f"  The course's files it replaced are kept in {folder.name}/previous/{label}/.")
+    if not dry and new_rev != old_rev:
+        say(f"  What changed is in revisions.md, under \"What changed in revision {new_rev}\". The course's rule on "
+            "revisions lets you go by an earlier revision where it is better for you: say which, and for what, in "
+            "progress.md.")
+
+
+def cmd_update(a) -> int:
+    if not a.self and not a.brief:
+        raise Fail("Say what to update: --self for Skill Eval Lite, or --brief ../ai5500-shared-1 for a brief folder.")
+    if a.self:
+        update_self(a.dry_run)
+    for f in a.brief or []:
+        update_brief(Path(f), a.dry_run)
+    return 0
+
+
+def update_text(remote: str, codex: bool = False) -> str:
+    update = f"{PY} run_ab.py update --self"
+    return f"Skill Eval Lite {remote} is out; you have {VERSION}. " + (f"In this folder, run {update}." if codex else
+                                                                       in_claude("check-updates", update) + ".")
 
 
 def cmd_doctor(a) -> int:
@@ -2923,14 +3445,19 @@ def cmd_doctor(a) -> int:
         mark = {True: "ok  ", False: "FIX ", None: "--  "}[good]
         say(f"  {mark} {what}" + (f": {detail}" if detail else ""))
 
+    def fix_them() -> int:
+        say("\nFix the lines marked FIX, then run this again. " + in_claude("get-ready", f"{PY} run_ab.py doctor") + ".")
+        return 1
+
+    codex = runner_name(a, None) == "codex"
     say(f"Skill Eval Lite {VERSION}")
     remote = newer_version()
     if remote:
-        say("  NEW  " + update_text(remote))
+        say("  NEW  " + update_text(remote, codex))
     line(True, "Python", sys.version.split()[0])
     g = shutil.which("git")
     line(bool(g), "git", git("--version", check=False).stdout.strip() if g else "not found: install git")
-    if runner_name(a, None) == "codex":
+    if codex:
         ok = doctor_codex(a, line) and ok
         say("\nReady. To see where you are and what to do next:  python3 run_ab.py status" if ok else
             "\nFix the lines marked FIX, then run this again:  python3 run_ab.py doctor --runner codex")
@@ -2938,7 +3465,9 @@ def cmd_doctor(a) -> int:
     try:
         exe = find_claude(a.claude)
     except Fail as e:
-        line(False, "Claude Code", str(e).splitlines()[0])
+        first, _, rest = str(e).partition("\n")
+        line(False, "Claude Code", first)
+        say("\n" + rest)
         if shutil.which("codex"):
             say("\nIf you use Codex instead of Claude Code, run:  python3 run_ab.py doctor --runner codex")
         return 1
@@ -2953,8 +3482,9 @@ def cmd_doctor(a) -> int:
         return 1
     else:
         method = state.get("authMethod", "?")
-        line(True, "Login", f"logged in ({method})" + ("; runs are billed to that API key, not to your Claude plan "
-                                                       "(type `unset ANTHROPIC_API_KEY` to use your plan)"
+        line(True, "Login", f"logged in ({method})" + ("; runs are billed to that API key, not to your Claude plan. "
+                                                       "For your plan instead, leave the key out. "
+                                                       + in_claude("get-ready", "unset ANTHROPIC_API_KEY")
                                                        if "key" in str(method).lower() else ""))
     try:
         safe_temp_parent()
@@ -2962,7 +3492,7 @@ def cmd_doctor(a) -> int:
     except Fail as e:
         line(False, "Temporary folder", str(e))
     if a.no_probe:
-        return 0 if ok else 1
+        return 0 if ok else fix_them()
     say("  ...  a test run: one tiny run, to check that nothing of yours gets into a run (a few seconds, well under a cent)")
     tmp = Path(tempfile.mkdtemp(prefix="skill-eval-lite-doctor-", dir=safe_temp_parent()))
     try:
@@ -2995,9 +3525,10 @@ def cmd_doctor(a) -> int:
         say(f"  The probe took {run.seconds} s" + (f" and ${cost:.4f}" if isinstance(cost, (int, float)) else "") + ".")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
-    say("\nReady. To see where you are and what to do next:  python3 run_ab.py status" if ok else
-        "\nFix the lines marked FIX, then run this again:  python3 run_ab.py doctor")
-    return 0 if ok else 1
+    if not ok:
+        return fix_them()
+    say("\nReady. Next, see where you are and what to do. " + in_claude(("shared-i", "personal-i"), f"{PY} run_ab.py status") + ".")
+    return 0
 
 
 def doctor_codex(a, line) -> bool:
@@ -4100,9 +4631,11 @@ def cmd_suite(a) -> int:
     for w in [w for s in S.suites for w in s["warnings"]] + S.warnings:
         say("  note: " + w)
     if S.errors:
-        say("The suites file can't be run yet. Fix these, then run the same command again:")
+        say("The suites file can't be run yet. Fix these, then check it again:")
         for e in S.errors:
             say("  " + e)
+        check = f"{PY} run_ab.py suite {a.suites} --check"
+        say(check if (getattr(a, "runner", None) or S.data.get("runner")) == "codex" else in_claude("run-suites", check) + ".")
         return 1
     if a.check:
         say(f"{src}: {len(S.suites)} suites ({', '.join(s['id'] + ': ' + str(len(s['cases'])) + ' cases, ' + str(len(s['tests'])) + ' tests' for s in S.suites)}). Nothing to fix.")
@@ -4295,20 +4828,22 @@ def _suite_rest(a, S, src, root, chosen, only_cases, only_tests, csv_path, todo,
         for c in s["cases"]:
             say("  " + f"{c['id'][:24]:26}" + "".join(f"{(L['auto'].get((c['id'], t['id'])) or {}).get('result', '-'):24}" for t in auto))
     say(f"\n{len(new_rows)} rows added to {csv_path}. Reports in {root / 'reports'}.")
-    say(f"Next: open wizard.html and load {root / 'bundle.json'} for the human tests and your reference judgments.")
+    if runner_name(a, S.data.get("runner")) == "codex":
+        say(f"Next: open wizard.html and load {root / 'bundle.json'} for the human tests and your reference judgments.")
+    else:
+        say(f"Next, load {root / 'bundle.json'} in the wizard's step 1, for your reference judgments and the human tests. "
+            + in_claude("wizard", OPEN_WIZARD) + ".")
     return 0
 
 
 # --- status and ask ---------------------------------------------------------
 #
 # `status` says where a student is: the setup, the assistant, the
-# experiments, the runs and the suites, and the one next step with its exact
-# command. `ask` opens Claude Code or Codex in this folder as a helper
-# (HELPER.md), given that status; with a question, it answers once.
-
-PY = "py" if os.name == "nt" else "python3"
-OPEN_WIZARD = {"nt": "start wizard.html"}.get(os.name, "open wizard.html" if sys.platform == "darwin" else "xdg-open wizard.html")
-
+# experiments, the runs and the suites, and the one next step with the skill
+# that does it in Claude and its exact command for a terminal (PY and
+# OPEN_WIZARD are at the top). `ask` opens Claude Code or Codex in this
+# folder as a helper (HELPER.md), given that status; with a question, it
+# answers once.
 
 def shown_path(p: Path) -> str:
     """A path as a student would type it from Skill Eval Lite's folder."""
@@ -4390,6 +4925,7 @@ def packet_state(f: Path) -> dict:
         tests = [t for s in S.suites for t in s["tests"] if t.get("kind") in ("mechanical", "llm")]
         have = {(r.get("check"), r.get("version")) for r in rows if r.get("route") in ("mechanical", "llm")}
         x["changed"] = sum((t["id"], t["version"]) not in have for t in tests)
+        x["llm_new"] = sum(t.get("kind") == "llm" and (t["id"], t["version"]) not in have for t in tests)
         made = bundle.stat().st_mtime
         x["newer"] = any(p.stat().st_mtime > made for p in [f] + [p for t in tests for p in t["files"].values()] if p.is_file())
     return x
@@ -4508,8 +5044,11 @@ def pays(st: dict, what: str = "run") -> str:
     return f"each {what} is billed to your API key" if key else f"each {what} uses a little of your plan"
 
 
-PERSONAL_HINT = ("On Personal I? You don't need Wren. Copy the worked example, `cp -r examples/personal-suites ../my-suites`, "
-                 f"then run `{PY} run_ab.py status` again.")
+def personal_hint(codex: bool = False) -> str:
+    """The line for Personal I under Shared I's first steps."""
+    copy = "cp -r examples/personal-suites ../my-suites"
+    return ("On Personal I? You don't need Wren. Make your packet, or start from a copy of the worked example. "
+            + (f"In a terminal: {copy}" if codex else in_claude("personal-i", copy)) + ".")
 
 
 def next_steps(st: dict, project: str | None = None) -> list[dict]:
@@ -4517,7 +5056,14 @@ def next_steps(st: dict, project: str | None = None) -> list[dict]:
     `project`: "setup" (what both need), "shared" or "personal". A Personal I
     packet beside Skill Eval Lite, and no experiment of the student's own,
     means Personal I; both mean a step for each; neither, Shared I's, with a
-    line for Personal I. `project` forces one."""
+    line for Personal I. `project` forces one. Each step has `skill`, the
+    skill that does it in Claude ("/run-suites"), and `command`, the same in a
+    terminal. The skills are Claude's, so with Codex `skill` is None."""
+    codex = st["setup"].get("runner") == "codex"
+    return [dict(x, skill=None) if codex else x for x in _next_steps(st, project, codex)]
+
+
+def _next_steps(st: dict, project: str | None, codex: bool) -> list[dict]:
     s = setup_step(st)
     if s:
         return [dict(s, project="setup")]
@@ -4530,11 +5076,11 @@ def next_steps(st: dict, project: str | None = None) -> list[dict]:
         return [shared]
     if packets:
         return [shared, dict(personal_step(st, packets), project="personal")]
-    return [dict(shared, note=PERSONAL_HINT)]
+    return [dict(shared, note=personal_hint(codex))]
 
 
 def next_step(st: dict, project: str | None = None) -> dict:
-    """The one next step, in plain words, with its exact command."""
+    """The one next step, in plain words, with its skill and its exact command."""
     return next_steps(st, project)[0]
 
 
@@ -4543,30 +5089,36 @@ def personal_step(st: dict, packets: list[dict]) -> dict:
     it, run it, run it again, judge and rate in the wizard, then export."""
     rflag = " --runner codex" if st["setup"]["runner"] == "codex" else ""
     if not packets:
-        return {"what": "To start Personal I, copy the worked example into a packet of your own beside this folder, "
-                        f"then run `{PY} run_ab.py status` again.",
-                "command": "cp -r examples/personal-suites ../my-suites"}
+        return {"what": "To start Personal I, make your packet in a folder beside this one: designed with Claude, or a copy "
+                        "of the worked example to start from.",
+                "skill": "/personal-i", "command": "cp -r examples/personal-suites ../my-suites"}
     steps = []
     for x in packets:
         cmd = f"{PY} run_ab.py suite {x['file']}"
         if x.get("errors"):
             steps.append({"what": f"Your suites file {x['file']} has {x['errors']} thing(s) to fix. Check it to see them.",
-                          "command": cmd + " --check"})
+                          "skill": "/run-suites", "command": cmd + " --check"})
         elif not x["has_run"]:
-            steps.append({"what": f"Run every mechanical and LLM test on every case in {x['file']} "
-                                  f"({pays(st, 'LLM test run')}; the mechanical tests call no model).", "command": cmd + rflag})
+            steps.append({"what": f"Run the mechanical tests on every case in {x['file']}: they call no model. The LLM tests "
+                                  "come after your own reference judgments, so that their verdicts can't sway yours.",
+                          "skill": "/run-suites", "command": cmd + " --no-llm"})
+        elif x.get("llm_new") and not x.get("human"):
+            steps.append({"what": f"Before the LLM tests run, open the wizard and load {x['folder']}/bundle.json in step 1. Judge "
+                                  "each LLM test's criterion yourself (Reference), then export judgments.csv into "
+                                  f"{x['folder']}/. Then run the LLM tests ({pays(st, 'LLM test run')}).",
+                          "skill": "/wizard", "command": OPEN_WIZARD})
         elif x.get("changed") or x.get("newer"):
             steps.append({"what": f"Run {x['file']} again: " + (f"{x['changed']} test(s) have changed since the last run, or have no "
                                                                 "results yet" if x.get("changed") else
                                                                 "the suites file or a test's file has changed since the last run")
-                                  + f" ({pays(st, 'LLM test run')}).", "command": cmd + rflag})
+                                  + f" ({pays(st, 'LLM test run')}).", "skill": "/run-suites", "command": cmd + rflag})
         elif not x.get("human"):
             steps.append({"what": f"Open the wizard and load {x['folder']}/bundle.json in step 1. Judge each LLM test's criterion "
-                                  "yourself (Reference), then rate the cases (Human tests).", "command": OPEN_WIZARD})
+                                  "yourself (Reference), then rate the cases (Human tests).", "skill": "/wizard", "command": OPEN_WIZARD})
         else:
             steps.append({"what": f"In the wizard's Report step, export judgments.csv into {x['folder']}/ and each report into "
                                   f"{x['folder']}/reports/. Then ask a classmate to rate the same cases.",
-                          "command": OPEN_WIZARD, "done": True})
+                          "skill": "/wizard", "command": OPEN_WIZARD, "done": True})
     s = next((s for s in steps if not s.get("done")), steps[0])
     s.pop("done", None)
     return s
@@ -4578,90 +5130,101 @@ def setup_step(st: dict) -> dict | None:
     rn = s["runner"]
     if not s["python_ok"]:
         return {"what": "Install Python 3.11 or later (https://www.python.org/downloads/), then run this again.",
-                "command": f"{PY} run_ab.py status"}
+                "skill": "/get-ready", "command": f"{PY} run_ab.py status"}
     if not s["git"]:
-        return {"what": "Install git (https://git-scm.com/downloads), then run this again.", "command": f"{PY} run_ab.py status"}
+        return {"what": "Install git (https://git-scm.com/downloads), then run this again.",
+                "skill": "/get-ready", "command": f"{PY} run_ab.py status"}
     if rn is None:
         return {"what": "Install Claude Code, or Codex if your paid plan is ChatGPT's. You need only one. "
                         "The README's \"What you need\" shows how; then run this again.",
-                "command": "curl -fsSL https://claude.ai/install.sh | bash"}
+                "skill": "/get-ready", "command": INSTALL_CLAUDE}
     tool = s["claude_code" if rn == "claude-code" else "codex"]
     if not tool.get("installed"):
         return {"what": f"Install {RUNNER_LABEL[rn]} (the README's \"What you need\" shows how), then run this again.",
-                "command": f"{PY} run_ab.py status"}
+                "skill": "/get-ready", "command": f"{PY} run_ab.py status"}
     if tool.get("logged_in") is False:
         if rn == "codex":
             return {"what": "Log in to Codex: this opens your browser; sign in with the ChatGPT account that has your plan.",
-                    "command": "codex login"}
-        return {"what": "Log in to Claude Code: type the command, log in when it asks, then type /exit.", "command": "claude"}
+                    "skill": None, "command": "codex login"}
+        return {"what": "Sign the `claude` command in, once, with the Claude account that has your plan: a page opens in "
+                        "your browser.", "skill": "/get-ready", "command": "claude auth login"}
     return None
 
 
 def shared_step(st: dict) -> dict:
     """Shared I's next step (and the demonstrations'): the class assistant,
-    your experiments, their runs."""
+    your experiments, their runs. A group's own experiment goes through
+    /run-experiment; the demonstrations, which aren't frozen, through the
+    helper, whose steps run them."""
     s, asst = st["setup"], st["assistant"]
     rn = s["runner"]
     rflag = " --runner codex" if rn == "codex" else ""
     if not asst["exists"]:
         return {"what": "Set up the class assistant, Wren, in a folder beside this one (about a minute; it needs the internet).",
-                "command": f"{PY} run_ab.py setup ../class-assistant"}
+                "skill": "/get-ready", "command": f"{PY} run_ab.py setup ../class-assistant"}
     if not asst["claude_md"]:
         return {"what": f"{asst['folder']} has no CLAUDE.md, so it doesn't look like an assistant's folder. "
                         "Check the folder, or set up the class assistant in a new one.",
-                "command": f"{PY} run_ab.py setup ../class-assistant"}
+                "skill": "/get-ready", "command": f"{PY} run_ab.py setup ../class-assistant"}
     a_flag = "" if asst["folder"] == "../class-assistant" else f" (your assistant is in {asst['folder']})"
     mine = [e for e in st["experiments"] if e["kind"] == "yours"]
     for e in mine:
         if e["errors"]:
             return {"what": f"Your experiment {e['file']} has {len(e['errors'])} thing(s) to fix. Check it to see them.",
-                    "command": f"{PY} run_ab.py check {e['file']}"}
+                    "skill": "/skill-eval-helper", "command": f"{PY} run_ab.py check {e['file']}"}
         if e.get("freeze") == "changed":
             return {"what": f"Your experiment {e['file']} has changed since it was frozen on {e['frozen_date']}. Freeze it again in the wizard "
-                            "(step 1, then Freeze in step 2 and 'Export the frozen experiment'), save it over the old file, and keep "
+                            "(step 1, then Freeze in step 2 and 'Export the frozen experiment'), then save it over the old file. Keep "
                             "the earlier file, dated: your report says what you changed and why.",
-                    "command": OPEN_WIZARD}
+                    "skill": "/wizard", "command": OPEN_WIZARD}
         if not e["frozen"]:
             return {"what": f"Your experiment {e['file']} is ready to freeze. " + "Freeze it in the wizard: load it in step 1, press Freeze in step 2, then press 'Export the frozen experiment' "
                             f"(now in step 2) and save the file over {e['file']}.",
-                    "command": OPEN_WIZARD}
+                    "skill": "/wizard", "command": OPEN_WIZARD}
         r = run_of(e, st["runs"])
         if not r:
             return {"what": f"Run rounds A and B of your experiment{a_flag} (the controls C and D come next).",
+                    "skill": "/run-experiment",
                     "command": f"{PY} run_ab.py run {e['file']} --assistant {asst['folder']} --rounds A,B --jobs 4{rflag}"}
         if e.get("unscored"):
             return {"what": f"Run the program checks of {e['file']} on the runs in {r['folder']}: {e['unscored']} of their "
                             "results are missing or out of date. No model is called.",
-                    "command": f"{PY} run_ab.py score {e['file']} --out {r['folder']}"}
+                    "skill": "/run-experiment", "command": f"{PY} run_ab.py score {e['file']} --out {r['folder']}"}
         if r["judged"] < r["pairs"]:
             return {"what": f"Run the LLM judge on {r['folder']}: it reads each blind pair and says which is better.",
-                    "command": f"{PY} run_ab.py judge {r['folder']}"}
+                    "skill": "/run-experiment", "command": f"{PY} run_ab.py judge {r['folder']}"}
     if mine:
         return {"what": f"Open the wizard and load {st['runs'][-1]['folder'] if st['runs'] else 'your run folder'}/bundle.json "
-                        "in step 1: judge the blind pairs (step 4) and read the results (step 5).", "command": OPEN_WIZARD}
+                        "in step 1: judge the blind pairs (step 4) and read the results (step 5).",
+                "skill": "/wizard", "command": OPEN_WIZARD}
     if not st["runs"]:
         return {"what": "Try the first demonstration: six runs of the class assistant, with and without one line added "
                         f"to its voice file (about half a minute; {pays(st)}).",
+                "skill": "/skill-eval-helper",
                 "command": f"{PY} run_ab.py run examples/demo-one-line.toml --assistant {asst['folder']} --jobs 6{rflag}"}
     for r in st["runs"]:
         if r["ok"] == 0 and r["runs"]:
             return {"what": f"Every run in {r['folder']} failed. Run the setup check to see why.",
-                    "command": f"{PY} run_ab.py doctor{rflag}"}
+                    "skill": "/get-ready", "command": f"{PY} run_ab.py doctor{rflag}"}
         if r["judged"] < r["pairs"]:
             return {"what": f"Run the LLM judge on {r['folder']}: it reads each blind pair and says which is better (about a minute).",
-                    "command": f"{PY} run_ab.py judge {r['folder']}"}
-    intake = "/experiment-intake (typed inside Claude Code, started here with `claude`)" \
-        if rn == "claude-code" else "Codex (start `codex` here and ask it to follow AGENTS.md)"
-    return {"what": f"Open the wizard, load {st['runs'][0]['folder']}/bundle.json in step 1, and look at the results. Then "
-                    f"make your group's experiment: to adapt the class experiment, `{PY} run_ab.py new <name> --from class`; "
-                    f"for your own assistant, the intake: {intake}.", "command": OPEN_WIZARD}
+                    "skill": "/skill-eval-helper", "command": f"{PY} run_ab.py judge {r['folder']}"}
+    new = f"{PY} run_ab.py new <name> --from class"
+    if rn == "codex":
+        then = (f"to adapt the class experiment, `{new}`; for your own assistant, the intake: start `codex` here and ask "
+                "it to follow AGENTS.md.")
+    else:
+        then = ("copy the class experiment and change it, or write one for your own assistant with the intake. "
+                + in_claude("shared-i", new) + ".")
+    return {"what": f"Open the wizard, load {st['runs'][0]['folder']}/bundle.json in step 1 and look at the results. Then "
+                    "make your group's experiment: " + then, "skill": "/wizard", "command": OPEN_WIZARD}
 
 
 def status_text(st: dict) -> str:
     s, asst = st["setup"], st["assistant"]
     L = [f"Skill Eval Lite {VERSION}: where you are now", ""]
     if st.get("update"):
-        L += ["  NEW  " + update_text(st["update"]), ""]
+        L += ["  NEW  " + update_text(st["update"], s["runner"] == "codex"), ""]
     L.append("Your setup")
 
     def mark(good):
@@ -4721,7 +5284,11 @@ def status_text(st: dict) -> str:
     heads = {"shared": "Next step, Shared I", "personal": "Next step, Personal I"}
     for n in steps:
         L += ["", heads.get(n.get("project"), "Next step") if len(steps) > 1 else "Next step", "  " + n["what"]]
-        if n.get("command"):
+        if n.get("skill"):
+            # The one form, its two halves on two lines: the skill, then the command for a terminal.
+            way, _, terminal = in_claude(n["skill"], n.get("command")).partition(" (")
+            L += ["", "      " + way] + (["      (" + terminal] if terminal else [])
+        elif n.get("command"):
             L += ["", "      " + n["command"]]
         if n.get("note"):
             L += ["", "  " + n["note"]]
@@ -4743,15 +5310,15 @@ def cmd_new(a) -> int:
     name = a.name
     if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,40}", name or ""):
         raise Fail(f"{name!r} can't be an experiment's name. Use small letters, digits and dashes, "
-                   "for example: python3 run_ab.py new board-memo --from class")
+                   "for example board-memo.")
     dest = Path(getattr(a, "root", None) or HERE) / "experiments" / name
     if not a.source:
         say(f"To write a new experiment for your group's own assistant, use the intake. It asks your group a few\n"
-            f"questions and writes {shown_path(dest)}/experiment.toml for you:\n\n"
-            "    claude                                 then type:  /experiment-intake <your assistant's folder>\n"
-            "    codex                                  then ask it to follow AGENTS.md (Codex users)\n\n"
-            "To start from the class experiment instead (the class assistant, Wren), copy it:\n\n"
-            f"    {PY} run_ab.py new {name} --from class")
+            f"questions and writes {shown_path(dest)}/experiment.toml for you.\n"
+            + in_claude("experiment-intake ../<your assistant's folder>") + ". (With Codex, start `codex` here and ask it "
+            "to follow AGENTS.md.)\n\n"
+            "To start from the class experiment instead (the class assistant, Wren), copy it.\n"
+            + in_claude("shared-i", f"{PY} run_ab.py new {name} --from class") + ".")
         return 0
     src = HERE / "examples" / "class-assistant" / "experiment.toml" if a.source == "class" else Path(a.source).expanduser()
     if src.is_dir():
@@ -4761,7 +5328,8 @@ def cmd_new(a) -> int:
                    "or give the path of an experiment.toml.")
     if dest.exists() and any(dest.iterdir()):
         raise Fail(f"{shown_path(dest)} already exists and is not empty, so nothing was copied.\n"
-                   f"Choose another name, or work on that one:  {PY} run_ab.py check {shown_path(dest)}/experiment.toml")
+                   "Choose another name, or work on that one. "
+                   + in_claude("shared-i", f"{PY} run_ab.py check {shown_path(dest)}/experiment.toml") + ".")
     exp = Experiment(src)
     text = exp.text
     if exp.data.get("files_from") not in (None, "."):
@@ -4788,8 +5356,8 @@ def cmd_new(a) -> int:
         say("The copy has things to fix (its files may not all have come along):")
         for e in errors:
             say("  must fix:  " + e)
-    say(f"\nNext, read {shown_path(dest)}/experiment.toml and change what your group wants to test (or ask for help:\n"
-        f"{PY} run_ab.py ask). Then check it:\n\n    {PY} run_ab.py check {shown_path(dest)}/experiment.toml")
+    say(f"\nNext, read {shown_path(dest)}/experiment.toml together, change what your group wants to test, then check it.\n"
+        + in_claude("shared-i", f"{PY} run_ab.py check {shown_path(dest)}/experiment.toml; for help, {PY} run_ab.py ask") + ".")
     return 0
 
 
@@ -4856,11 +5424,13 @@ def cmd_ask(a) -> int:
     name = st["setup"]["runner"]
     if not name:
         raise Fail("Neither Claude Code nor Codex is installed, so there is nobody to ask yet.\n"
-                   "Install one of them (the README's \"What you need\" shows how), then try again.")
+                   + in_claude("get-ready", "install one of them as the README's \"What you need\" shows, then try again") + ".")
     tool = st["setup"]["claude_code" if name == "claude-code" else "codex"]
     if not tool.get("installed"):
-        raise Fail(f"{RUNNER_LABEL[name]} is not installed. Install it, or ask the other one: "
-                   f"python3 run_ab.py ask --runner {'codex' if name == 'claude-code' else 'claude-code'}")
+        if name == "codex":
+            raise Fail(f"Codex is not installed. Install it, or ask the other one: {PY} run_ab.py ask --runner claude-code")
+        raise Fail("Claude Code is not installed. "
+                   + in_claude("get-ready", f"install it, or ask the other one: {PY} run_ab.py ask --runner codex") + ".")
     if tool.get("logged_in") is False:
         raise Fail(CODEX_NOT_LOGGED_IN if name == "codex" else NOT_LOGGED_IN)
     exe = find_codex(a.codex) if name == "codex" else find_claude(a.claude)
@@ -4913,7 +5483,9 @@ def add_runner_args(s, model_help=None):
         s.add_argument("--model", help=model_help)
 
 
-def main(argv=None) -> int:
+def parser() -> argparse.ArgumentParser:
+    """Every command and option (the tests read it to check that the skills
+    name only commands and options that exist)."""
     ap = argparse.ArgumentParser(prog="run_ab.py", description="Skill Eval Lite's runner: run an assistant's rounds on an "
                                  "experiment's prompts with Claude Code or Codex, isolated, and judge blind pairs.")
     ap.add_argument("--version", action="version", version=TOOL)
@@ -4929,6 +5501,20 @@ def main(argv=None) -> int:
     add_runner_args(s, "the model for the isolation probe (default: haiku for Claude Code, " + CODEX_PROBE_MODEL + " for Codex)")
     s.add_argument("--no-probe", action="store_true", help="skip the probe run (nothing is sent to a model)")
     s.set_defaults(fn=cmd_doctor)
+
+    s = sub.add_parser("updates", help="whether Skill Eval Lite and the brief folders beside it are up to date (reads only)")
+    s.add_argument("--json", action="store_true", help="the report as JSON")
+    s.add_argument("--hook", action="store_true", help="for Claude Code's SessionStart hook: a line only when something "
+                   "is newer, at most one check a day, never a failure")
+    s.add_argument("--again", action="store_true", help="check now, even if the last check was today")
+    s.add_argument("--workspace", help="the folder that holds Skill Eval Lite and the brief folders (default: ..)")
+    s.set_defaults(fn=cmd_updates)
+
+    s = sub.add_parser("update", help="bring in a newer Skill Eval Lite or brief folder, keeping your own files")
+    s.add_argument("--self", action="store_true", help="Skill Eval Lite itself: git pull, or the newest ZIP for a ZIP copy")
+    s.add_argument("--brief", action="append", help="a brief folder, e.g. ../ai5500-shared-1 (may be given more than once)")
+    s.add_argument("--dry-run", action="store_true", help="say what it would change, and change nothing")
+    s.set_defaults(fn=cmd_update)
 
     s = sub.add_parser("status", help="where you are: the setup, the assistant, experiments, runs, and the next step")
     s.add_argument("--assistant", help="the assistant's folder (default: ../class-assistant)")
@@ -4987,7 +5573,8 @@ def main(argv=None) -> int:
     s.add_argument("--comparisons", help="only these comparisons, e.g. A-B,A-C")
     s.add_argument("--jobs", type=int, default=4, help="judgments at the same time (default 4)")
     s.add_argument("--again", action="store_true", help="judge pairs again that this model has judged")
-    s.add_argument("--held-out", action="store_true", help="include held-out prompts")
+    s.add_argument("--held-out", action="store_true", help="also judge the held-out confirmation: the baseline round against each "
+                                                           "round run on the held-out prompts")
     s.add_argument("--budget", type=float, default=0.50, help="Claude Code only: the most one judgment may cost, in dollars (default 0.50)")
     s.add_argument("--timeout", type=int, default=180, help="seconds before a judgment counts as timed out (default 180)")
     add_runner_args(s, "the judge's model (default: the experiment's [judge] model)")
@@ -5013,8 +5600,11 @@ def main(argv=None) -> int:
     s.add_argument("--jobs", type=int, default=4, help="LLM runs at the same time (default 4)")
     add_runner_args(s)
     s.set_defaults(fn=cmd_suite)
+    return ap
 
-    a = ap.parse_args(argv)
+
+def main(argv=None) -> int:
+    a = parser().parse_args(argv)
     try:
         return a.fn(a)
     except Fail as e:

@@ -8,6 +8,8 @@
       "Bash(python3 run_ab.py plan *)",
       "Bash(python3 run_ab.py doctor)",
       "Bash(python3 run_ab.py doctor *)",
+      "Bash(python3 run_ab.py updates)",
+      "Bash(python3 run_ab.py updates *)",
       "Bash(python3 run_ab.py suite * --check)",
       "Bash(python3 run_ab.py --help)",
       "Bash(python3 run_ab.py --version)",
@@ -18,10 +20,26 @@
       "Bash(py run_ab.py plan *)",
       "Bash(py run_ab.py doctor)",
       "Bash(py run_ab.py doctor *)",
+      "Bash(py run_ab.py updates)",
+      "Bash(py run_ab.py updates *)",
       "Bash(py run_ab.py suite * --check)",
       "Bash(py run_ab.py --help)",
       "Bash(py run_ab.py --version)",
       "Bash(py run_ab.py * --help)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/run_ab.py\" updates --hook 2>/dev/null || py \"$CLAUDE_PROJECT_DIR/run_ab.py\" updates --hook 2>/dev/null || python \"$CLAUDE_PROJECT_DIR/run_ab.py\" updates --hook 2>/dev/null || true",
+            "timeout": 15
+          }
+        ]
+      }
     ]
   }
 }

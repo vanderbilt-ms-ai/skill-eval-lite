@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="skill-eval-lite-version" content="0.1.4">
+<meta name="skill-eval-lite-version" content="0.2.0">
 <title>Skill Eval Lite</title>
 <!--
   Skill Eval Lite: the wizard. Five steps from an experiment file to results:
@@ -266,9 +266,15 @@ details.gs-first[open] > summary { margin-bottom: 12px; }
 ol.gs-steps { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-direction: column; gap: 14px; }
 .gs-step { display: grid; grid-template-columns: 42px minmax(0, 1fr) minmax(0, 430px); gap: 6px 18px; background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow); }
 .gs-num { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 15px; color: var(--sheet); background: var(--ink); }
-.gs-num.term { background: var(--param); } .gs-num.agent { background: var(--null); } .gs-num.web { background: var(--truth); } .gs-num.file { background: var(--warn); }
+.gs-num.term { background: var(--param); } .gs-num.agent { background: var(--null); } .gs-num.web { background: var(--truth); } .gs-num.file { background: var(--warn); } .gs-num.app { background: var(--ink-2); }
 .gs-where { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; }
-.gs-where.term { color: var(--param-text); } .gs-where.agent { color: var(--null-text); } .gs-where.web { color: var(--truth-text); } .gs-where.file { color: var(--warn-text); }
+.gs-where.term { color: var(--param-text); } .gs-where.agent { color: var(--null-text); } .gs-where.web { color: var(--truth-text); } .gs-where.file { color: var(--warn-text); } .gs-where.app { color: var(--ink-2); }
+.gs-say { display: flex; align-items: stretch; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin: 8px 0 10px; background: var(--sheet-2); }
+.gs-say code { flex: 1; padding: 10px 12px; font-family: var(--f-ui); font-size: 14px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); }
+.gs-say button { border: 0; border-left: 1px solid var(--rule); background: var(--sheet); color: var(--ink); padding: 0 14px; font-weight: 600; min-width: 76px; }
+.gs-term { margin: 4px 0 10px; font-size: 13.5px; color: var(--ink-2); }
+.gs-term summary { cursor: pointer; }
+.gs-term p { margin: 6px 0 0; }
 .gs-step h3 { font-size: 18px; line-height: 1.3; margin: 2px 0 8px; }
 .gs-body p { font-size: 15px; line-height: 1.55; }
 .gs-type { font-size: 13.5px; font-weight: 600; color: var(--ink-2); margin-top: 10px; }
@@ -656,7 +662,7 @@ function checkIcon(p, x, y, role = 'ok') {
   p.add(`<path d="M${x + 4.3} ${y + 8.3} L${x + 7} ${y + 11} L${x + 11.8} ${y + 5.6}" class="ln" style="stroke:#fff;stroke-width:2"/>`);
 }
 const ICON = { term: termIcon, web: browserIcon, agent: chatIcon, file: (p, x, y) => folderIcon(p, x, y, 'file') };
-const WHERE = { term: 'Terminal', agent: 'Claude Code', web: 'The wizard', file: 'Your files' };
+const WHERE = { term: 'Terminal', agent: 'Claude', web: 'The wizard', file: 'Your files', app: 'Your computer' };
 
 // A small labelled chip: icon (optional), text.
 function chip(p, x, y, label, role, o = {}) {
@@ -752,6 +758,89 @@ function termScene(o) {
     if (r.cursor) p.rect(X + pad + (prompt.length + 1) * cw, y + 3, cw * 0.95, 14, 'tw-cur', 1);
     y += lh;
   });
+  return p;
+}
+
+// Claude's desktop app, its Code tab, as a sketch: the student's message,
+// what Claude does and the row under the message box (This computer, the
+// folder, the mode), drawn from the app as it looked on Windows on 7 November
+// 2026. o.lines: {you} the message typed; {claude} what Claude says,
+// described; {run} a command Claude runs, once you allow it; {out} a line the
+// program prints (quoted exactly); {note} what you will see, described.
+function claudeScene(o) {
+  const W = o.w || 400, X = 8, Y = 8, WW = W - 16, rail = 30, pad = 12;
+  const mx = X + rail + pad, mw = WW - rail - 2 * pad, fs = 12, lh = 17;
+  const rows = [];
+  for (const l of o.lines || []) {
+    if (l.you != null) rows.push({ you: wrap(l.you, mw - 70, fs, false) });
+    else if (l.claude != null) rows.push({ say: wrap(l.claude, mw, fs, false) });
+    else if (l.run != null) rows.push({ run: wrap(l.run, mw - 40, 11, true) });
+    else if (l.out != null) rows.push({ out: wrap(l.out, mw - 12, 11, true), ok: l.ok });
+    else if (l.note != null) rows.push({ note: wrap('(' + l.note + ')', mw, 11.5, false) });
+    else if (l.gap) rows.push({ gap: l.gap });
+  }
+  const rowH = r => r.gap != null ? r.gap : r.you ? r.you.length * lh + 20 : r.run ? r.run.length * 15 + 18 : r.out ? r.out.length * 15 + 3 : r.say ? r.say.length * lh + 6 : r.note.length * 16 + 4;
+  const body = rows.reduce((a, r) => a + rowH(r), 0);
+  const H = 22 + 14 + body + 10 + 30 + 8 + 20 + 10;
+  const p = new Pic(W, H + 2 * Y);
+  p.rect(X, Y, WW, H, 'wh', 10);
+  p.add(`<path d="M${X} ${Y + 10} Q${X} ${Y} ${X + 10} ${Y} H${X + WW - 10} Q${X + WW} ${Y} ${X + WW} ${Y + 10} V${Y + 22} H${X} Z" class="h-rule2"/>`);
+  p.text(X + WW / 2, Y + 15, 'Claude', { size: 10, anchor: 'middle', cls: 't3' });
+  p.text(X + WW - 12, Y + 15, '>_', { size: 10, mono: true, anchor: 'end', cls: 't3' });
+  // The sidebar's top: the chat button, then Code, chosen.
+  p.line(X + rail, Y + 22, X + rail, Y + H, 's-rule thin');
+  p.rect(X + 8, Y + 31, 15, 11, 'ed', 3);
+  p.rect(X + 5, Y + 49, 21, 16, 'f-agent', 4);
+  p.text(X + 15.5, Y + 60.5, '</>', { size: 8.5, mono: true, bold: true, anchor: 'middle', cls: 't-agent' });
+  let y = Y + 22 + 14;
+  rows.forEach(r => {
+    if (r.gap != null) { y += r.gap; return; }
+    if (r.you) {
+      const bw = Math.min(mw, Math.max(...r.you.map(s => est(s, fs))) + 22), bx = X + WW - pad - bw;
+      p.rect(bx, y, bw, r.you.length * lh + 10, 'pl', 10);
+      r.you.forEach((s, i) => p.text(bx + 11, y + 5 + (i + 1) * lh - 4, s, { size: fs }));
+    } else if (r.say) r.say.forEach((s, i) => p.text(mx, y + (i + 1) * lh - 4, s, { size: fs }));
+    else if (r.run) {
+      p.rect(mx, y, mw, r.run.length * 15 + 10, 'pl', 6);
+      termIcon(p, mx + 7, y + 4 + (r.run.length * 15 - 16) / 2);
+      r.run.forEach((s, i) => p.text(mx + 32, y + 5 + (i + 1) * 15 - 3, s, { size: 11, mono: true }));
+    } else if (r.out) r.out.forEach((s, i) => p.text(mx + 10, y + (i + 1) * 15 - 2, s, { size: 11, mono: true, cls: r.ok ? 't-ok' : 't2' }));
+    else r.note.forEach((s, i) => p.text(mx, y + (i + 1) * 16 - 4, s, { size: 11.5, italic: true, cls: 't3' }));
+    y += rowH(r);
+  });
+  y += 10;
+  p.rect(mx, y, mw, 30, 'ed', 8);
+  p.text(mx + 11, y + 19.5, o.typed || 'Describe a task or ask a question', { size: 11, cls: o.typed ? '' : 't3', mono: !!o.typed });
+  y += 38;
+  let cx = mx;
+  cx += chip(p, cx, y, 'This computer', 'n', { size: 10.5, h: 20, rx: 6 }) + 6;
+  chip(p, cx, y, o.folder || 'skill-eval-lite', 'file', { size: 10.5, h: 20, rx: 6, mono: true });
+  p.text(X + WW - pad, y + 14, o.mode || 'Manual', { size: 10.5, anchor: 'end', cls: 't2' });
+  return p;
+}
+// A scene with the settings filled in.
+const C = (ctx, lines, o = {}) => claudeScene(Object.assign({ lines: lines.map(l => {
+  const m = {}; Object.keys(l).forEach(k => { m[k] = typeof l[k] === 'string' ? F(l[k], ctx) : l[k]; }); return m; }) }, o));
+// Installing the app, from Anthropic's download page.
+function installScene() {
+  const W = 400, p = new Pic(W, 120);
+  p.rect(8, 8, W - 16, 104, 'pl', 10);
+  let x = 22;
+  x += chip(p, x, 22, 'claude.com/download', 'web', { icon: true, mono: true, size: 11.5 });
+  arrow(p, [x + 6, 34], [x + 34, 34], 'n');
+  chip(p, x + 40, 22, 'the installer', 'file', { icon: true, size: 11.5 });
+  p.para(22, 72, 'Download it, open it, then open Claude and sign in with the account of your paid plan.', W - 52, { size: 12, cls: 't2' });
+  return p;
+}
+// A folder for the course, in the home folder.
+function homeFolderScene() {
+  const W = 400, p = new Pic(W, 116);
+  p.rect(8, 8, W - 16, 100, 'pl', 10);
+  folderIcon(p, 22, 20, 'n'); p.text(44, 32, 'your home folder', { size: 12.5, bold: true, cls: 't2' });
+  p.line(30, 40, 30, 62, 's-rule');  p.line(30, 62, 44, 62, 's-rule');
+  folderIcon(p, 50, 54, 'file'); p.text(72, 66, 'ai5500', { size: 12.5, mono: true, bold: true });
+  p.text(140, 66, 'new, empty', { size: 11.5, cls: 't3' });
+  p.para(22, 92, 'Not in OneDrive, iCloud Drive or Desktop.', W - 52, { size: 11.5, cls: 't3' });
   return p;
 }
 
@@ -992,87 +1081,90 @@ function flowCard(p, x, y, w, n, role, title, sub, o = {}) {
   // An icon for where it happens, not a number: the steps that follow it are numbered.
   ICON[role](p, x + 10, y + 10);
   p.text(x + 36, y + 22.5, title, { size: 13, bold: true });
-  if (role === 'agent' && o.tag !== false) p.text(x + w - 10, y + 15, 'Claude Code', { size: 10, anchor: 'end', cls: 't-agent b' });
+  if (role === 'agent' && o.tag !== false) p.text(x + w - 10, y + 15, 'Claude', { size: 10, anchor: 'end', cls: 't-agent b' });
   subLines.forEach((s, i) => p.text(x + 36, y + 41 + i * 16, s, { size: 12, cls: 't2' }));
   return h;
 }
 
-// The order of a path: the terminal on the left rail, the wizard on the
-// right, your files in the middle.
+// The order of a path: Claude on the left rail, the wizard on the right,
+// your files in the middle.
 const FLOWS = {
   demo: { title: 'A demonstration, in order', items: [
-    ['term', 'Make the class assistant', 'setup (once per computer)'],
-    ['term', 'Look at the demonstration', 'check examples/demo-graph-removed.toml'],
-    ['term', 'Run it', 'run: 4 runs, about 1 to 3 minutes'],
-    ['term', 'Ask the AI judge', 'judge runs/demo-graph-removed'],
+    ['agent', 'Make the class assistant', 'once per computer (/get-ready offers it)'],
+    ['agent', 'Look at the demonstration', 'check examples/demo-graph-removed.toml'],
+    ['agent', 'Run it', '4 runs, about 1 to 3 minutes'],
+    ['agent', 'Ask the AI judge', 'judge runs/demo-graph-removed'],
     ['web', 'Load the runs', 'Step 1: runs/demo-graph-removed/bundle.json'],
     ['web', 'Freeze it, then read and judge', 'Steps 2 to 5'],
   ], note: 'A demonstration is a small example, so it is run first and frozen afterwards. ' + FREEZE + ' No time to run? Skip 1 to 4: in step 1, load examples/recorded/demo-graph-removed/bundle.json.' },
   class: { title: 'The class experiment, in order', items: [
-    ['term', 'Make the class assistant', 'setup (once per computer)'],
-    ['term', 'Copy the class experiment', 'into experiments/class-assistant/'],
-    ['term', 'Check it', 'check: it should say “Nothing is missing.”'],
+    ['agent', 'Make the class assistant', 'once per computer (/get-ready offers it)'],
+    ['agent', 'Copy the class experiment', '/shared-i: into experiments/class-assistant/'],
     ['web', 'Load it and freeze it', 'Steps 1 and 2'],
     ['web', 'Save the frozen file', 'Step 2: Export the frozen experiment'],
-    ['file', 'Put it back', 'from Downloads into experiments/class-assistant/'],
-    ['term', 'Run every round', 'run: 32 runs'],
-    ['term', 'Ask the AI judge', 'judge runs/class-assistant'],
+    ['agent', 'Put it back', '/wizard: from Downloads, then check it'],
+    ['agent', 'Run every round', '/run-experiment: 32 runs'],
+    ['agent', 'Ask the AI judge', '/run-experiment: judge runs/class-assistant'],
     ['web', 'Load the runs', 'Step 3: runs/class-assistant/bundle.json'],
     ['web', 'Judge, then read the results', 'Steps 4 and 5'],
-    ['file', 'Keep the results', 'into runs/class-assistant/'],
+    ['agent', 'Keep the results', '/wizard: into runs/class-assistant/'],
   ], note: FREEZE },
   group: { title: 'Your group’s experiment, in order', items: [
     ['agent', 'Write the experiment', '/experiment-intake ../your-assistant'],
-    ['term', 'Check it', 'check: fix anything it lists'],
+    ['agent', 'Check it', 'check: fix anything it lists'],
     ['web', 'Load it and freeze it', 'Steps 1 and 2'],
     ['web', 'Save the frozen file', 'Step 2: Export the frozen experiment'],
-    ['file', 'Put it back', 'from Downloads into experiments/<name>/'],
-    ['term', 'Run every round', 'run'],
-    ['term', 'Ask the AI judge', 'judge runs/<name>'],
+    ['agent', 'Put it back', '/wizard: from Downloads, then check it'],
+    ['agent', 'Run every round', '/run-experiment'],
+    ['agent', 'Ask the AI judge', '/run-experiment: judge runs/<name>'],
     ['web', 'Load the runs', 'Step 3: runs/<name>/bundle.json'],
     ['web', 'Judge, then read the results', 'Steps 4 and 5'],
-    ['file', 'Keep the results', 'into runs/<name>/'],
+    ['agent', 'Keep the results', '/wizard: into runs/<name>/'],
+    ['agent', 'Run the held-out prompts', '/read-results, once your changes are final'],
+    ['web', 'Judge them, read the confirmation', 'Steps 4 and 5: Held out'],
   ], note: 'The freeze comes before the runs. ' + FREEZE },
   groupDesigner: { title: 'Your group’s experiment, in order', items: [
     ['web', 'Make the experiment', 'the experiment designer, on screen'],
-    ['file', 'Save its folder', 'into experiments/<name>/'],
-    ['term', 'Check it', 'check: fix anything it lists'],
+    ['agent', 'Save its folder', '/wizard: into experiments/<name>/'],
+    ['agent', 'Check it', 'check: fix anything it lists'],
     ['web', 'Load it and freeze it', 'Steps 1 and 2'],
     ['web', 'Save the frozen file', 'Step 2: Export the frozen experiment'],
-    ['file', 'Put it back', 'from Downloads into experiments/<name>/'],
-    ['term', 'Run every round', 'run'],
-    ['term', 'Ask the AI judge', 'judge runs/<name>'],
+    ['agent', 'Put it back', '/wizard: from Downloads, then check it'],
+    ['agent', 'Run every round', '/run-experiment'],
+    ['agent', 'Ask the AI judge', '/run-experiment: judge runs/<name>'],
     ['web', 'Load the runs', 'Step 3: runs/<name>/bundle.json'],
     ['web', 'Judge, then read the results', 'Steps 4 and 5'],
-    ['file', 'Keep the results', 'into runs/<name>/'],
+    ['agent', 'Keep the results', '/wizard: into runs/<name>/'],
+    ['agent', 'Run the held-out prompts', '/read-results, once your changes are final'],
+    ['web', 'Judge them, read the confirmation', 'Steps 4 and 5: Held out'],
   ], note: 'The freeze comes before the runs. ' + FREEZE },
   suitesDesigner: { title: 'Personal I suites, in order', items: [
     ['web', 'Make your packet', 'the suite designer, on screen'],
-    ['file', 'Save it', 'next to skill-eval-lite'],
-    ['term', 'Check it', 'suite … --check'],
-    ['term', 'Run the tests', 'suite: the program and AI tests'],
-    ['web', 'Load the bundle', 'Step 1: my-suites/bundle.json'],
-    ['web', 'Judge the AI tests yourself', 'Step 2, Reference'],
+    ['agent', 'Save it', '/wizard: next to skill-eval-lite'],
+    ['agent', 'Check it', 'suite … --check'],
+    ['agent', 'Run the mechanical tests', '/run-suites: suite --no-llm'],
+    ['web', 'Judge the LLM tests yourself', 'Step 2, Reference'],
+    ['agent', 'Run the LLM tests', '/run-suites, once your reference is in'],
     ['web', 'Rate the cases', 'Step 3, Human tests'],
     ['web', 'Save the reports', 'Step 4, Report'],
-    ['file', 'Keep them in your packet', 'judgments.csv and reports/'],
+    ['agent', 'Keep them in your packet', '/wizard: judgments.csv and reports/'],
   ], note: 'The packet is the folder for Personal I. The suite designer makes it on screen; the worked example is examples/personal-suites/.' },
   suites: { title: 'Personal I suites, in order', items: [
-    ['term', 'Make your packet', 'copy examples/personal-suites'],
-    ['term', 'Check it', 'suite … --check'],
-    ['term', 'Run the tests', 'suite: the program and AI tests'],
-    ['web', 'Load the bundle', 'Step 1: my-suites/bundle.json'],
-    ['web', 'Judge the AI tests yourself', 'Step 2, Reference'],
+    ['agent', 'Make your packet', 'copy examples/personal-suites'],
+    ['agent', 'Check it', 'suite … --check'],
+    ['agent', 'Run the mechanical tests', '/run-suites: suite --no-llm'],
+    ['web', 'Judge the LLM tests yourself', 'Step 2, Reference'],
+    ['agent', 'Run the LLM tests', '/run-suites, once your reference is in'],
     ['web', 'Rate the cases', 'Step 3, Human tests'],
     ['web', 'Save the reports', 'Step 4, Report'],
-    ['file', 'Keep them in your packet', 'judgments.csv and reports/'],
+    ['agent', 'Keep them in your packet', '/wizard: judgments.csv and reports/'],
   ], note: 'The packet is the folder for Personal I. A recorded one, ready to load: examples/recorded/personal-suites/bundle.json.' },
 };
 function orderDiagram(key) {
   const F = FLOWS[key], W = 400, cw = 280, xt = 22, xw = W - 22;
   const p = new Pic(W, 0);
   p.text(16, 28, F.title, { size: 15, bold: true });
-  termIcon(p, 12, 42); p.text(34, 55, 'Terminal', { size: 12, bold: true, cls: 't-term' });
+  chatIcon(p, 12, 42); p.text(34, 55, 'Claude', { size: 12, bold: true, cls: 't-agent' });
   browserIcon(p, W - 29, 42); p.text(W - 36, 55, 'The wizard (browser)', { size: 12, bold: true, cls: 't-web', anchor: 'end' });
   let y = 78;
   const boxes = [], railAt = p.o.length;
@@ -1084,7 +1176,7 @@ function orderDiagram(key) {
   });
   const top = 66, bottom = y - 24;
   // The rails, drawn under the connectors.
-  const rails = [`<path d="M${xt} ${top} V${bottom}" class="ln thin dash s-term"/>`, `<path d="M${xw} ${top} V${bottom}" class="ln thin dash s-web"/>`];
+  const rails = [`<path d="M${xt} ${top} V${bottom}" class="ln thin dash s-agent"/>`, `<path d="M${xw} ${top} V${bottom}" class="ln thin dash s-web"/>`];
   p.o.splice(railAt, 0, ...rails);
   boxes.forEach((b, i) => {
     const my = b.y + 18;
@@ -1104,10 +1196,10 @@ function orderDiagram(key) {
 
 // Which path are you on?
 const PATH_CHIPS = {
-  demo: ['A demonstration', 'See the whole cycle on a small, ready-made example.', [['term', 'setup'], ['term', 'run'], ['term', 'judge'], ['web', 'steps 1–5']]],
-  class: ['The class experiment', 'Shared I, on the class assistant, with the class’s experiment file.', [['term', 'setup'], ['term', 'copy'], ['term', 'check'], ['web', 'freeze'], ['file', 'put back'], ['term', 'run'], ['term', 'judge'], ['web', 'steps 3–5']]],
-  group: ['Your group’s experiment', 'Shared I, with an experiment your group writes.', [['agent', 'intake'], ['term', 'check'], ['web', 'freeze'], ['file', 'put back'], ['term', 'run'], ['term', 'judge'], ['web', 'steps 3–5']]],
-  suites: ['Personal I: suites', 'Your own suites of tests, run on every case.', [['term', 'copy'], ['term', 'suite'], ['web', 'checks-only mode']]],
+  demo: ['A demonstration', 'See the whole cycle on a small, ready-made example.', [['agent', 'setup'], ['agent', 'run'], ['agent', 'judge'], ['web', 'steps 1–5']]],
+  class: ['The class experiment', 'Shared I, on the class assistant, with the class’s experiment file.', [['agent', 'setup'], ['agent', '/shared-i'], ['web', 'freeze'], ['agent', '/wizard'], ['agent', '/run-experiment'], ['web', 'steps 3–5']]],
+  group: ['Your group’s experiment', 'Shared I, with an experiment your group writes.', [['agent', '/experiment-intake'], ['agent', 'check'], ['web', 'freeze'], ['agent', '/wizard'], ['agent', '/run-experiment'], ['web', 'steps 3–5'], ['agent', 'held out'], ['web', 'confirm']]],
+  suites: ['Personal I: suites', 'Your own suites of tests, run on every case.', [['agent', 'copy'], ['agent', '/run-suites'], ['web', 'reference'], ['agent', '/run-suites'], ['web', 'checks-only mode']]],
 };
 function chipRow(p, x0, y, items, maxW) {
   let x = x0;
@@ -1146,7 +1238,7 @@ function whichPath() {
     p.add(`<g transform="translate(0 ${y})">${body.o.join('')}</g>`);
     y += end + 14 + 10;
   });
-  y = legend(p, 16, y + 4, W - 32, [['term', 'Terminal'], ['agent', 'Claude Code'], ['web', 'The wizard'], ['file', 'Your files']]);
+  y = legend(p, 16, y + 4, W - 32, [['agent', 'Claude'], ['web', 'The wizard']]);
   p.h = y + 12;
   return p;
 }
@@ -1155,7 +1247,7 @@ function whichPath() {
 function intakeDecision() {
   const W = 440, p = new Pic(W, 0), L = 16, R = W - 16, sideX = 104;
   p.text(L, 28, 'Do I need to run the intake skill first?', { size: 15, bold: true });
-  let y = p.para(L, 50, 'The intake skill is a set of instructions for Claude Code. It writes your experiment file with your group, after asking you a few questions.', W - 32, { size: 12, cls: 't2' }) + 18;
+  let y = p.para(L, 50, 'The intake skill is a set of instructions for Claude. It writes your experiment file with your group, after asking you a few questions.', W - 32, { size: 12, cls: 't2' }) + 18;
   const qbox = (yy, q, small) => {
     const ls = wrap(small, R - L - 52, 11.5), h = 34 + ls.length * 15;
     p.rect(L, yy, R - L, h, 'wh', 10);
@@ -1189,12 +1281,12 @@ function intakeDecision() {
   arrow(p, [44, q1 + h1], [44, q2], 'n'); label(52, q1 + h1 + 17, 'No');
   y += h2 + 26;
   const no2 = y, hn2 = sideBox(no2, 'file', 'Not yet: get it ready first.', [
-    ['The class assistant? Type:', false], ['python3 run_ab.py setup ../class-assistant', true],
+    ['The class assistant? In Claude, type:', false], ['Please set up the class assistant in ../class-assistant.', true],
     ['Your own folder? The intake offers to make it a git project (git init and a first commit). It asks you first. It never writes CLAUDE.md for you.', false]]);
   curve(p, [R - 70, q2 + h2], [R - 70, no2], 'file', { k: 8 }); label(R - 62, q2 + h2 + 17, 'No');
   y += hn2 + 30;
   // The intake
-  const ib = y, ilines = [['In the skill-eval-lite folder, type', false], ['claude', true], ['then, in Claude Code, type', false], ['/experiment-intake ../your-assistant', true], ['With Codex: type codex, then ask it to follow AGENTS.md.', false]];
+  const ib = y, ilines = [['In Claude, in your session on skill-eval-lite, type', false], ['/experiment-intake ../your-assistant', true], ['With Codex: ask it to follow AGENTS.md.', false]];
   let ih = 34; ilines.forEach(([s, m]) => { ih += wrap(s, R - L - 60, 12, m).length * 15.5 + 3; });
   p.rect(L, ib, R - L, ih + 4, 'f-agent', 10);
   chatIcon(p, L + 12, ib + 9);
@@ -1252,7 +1344,7 @@ const SEL_ROWS = [
   [1, 'file', 'wizard.html', 'the wizard: it opens in your browser'],
   [1, 'file', 'AGENTS.md', 'the intake, for Codex'],
   [1, 'folder', '.claude/skills/', ''],
-  [2, 'file', 'experiment-intake/SKILL.md', 'the intake, for Claude Code'],
+  [2, 'file', 'experiment-intake/SKILL.md', 'the intake, for Claude'],
   [1, 'folder', 'examples/', 'demonstrations, the class experiment'],
   [2, 'folder', 'recorded/', 'real runs, ready to load'],
   'gap',
@@ -1285,11 +1377,11 @@ function folderMapWide() {
   folderIcon(p, 30, 76, 'n'); p.text(52, 88, 'your workspace', { size: 12.5, bold: true, cls: 't2' });
   const rows = [
     [0, 'folder', 'skill-eval-lite/', 'you downloaded it', 'sel'],
-    [1, 'file', 'run_ab.py', 'the runner (terminal)'],
+    [1, 'file', 'run_ab.py', 'the runner (Claude runs it)'],
     [1, 'file', 'wizard.html', 'the wizard (browser)'],
     [1, 'file', 'AGENTS.md', 'the intake, for Codex'],
     [1, 'folder', '.claude/skills/', ''],
-    [2, 'file', 'experiment-intake/SKILL.md', 'the intake, for Claude Code'],
+    [2, 'file', 'experiment-intake/SKILL.md', 'the intake, for Claude'],
     [1, 'folder', 'examples/', 'demonstrations, examples'],
     [2, 'folder', 'recorded/', 'real runs, ready to load'],
     'gap',
@@ -1328,7 +1420,7 @@ function folderMapWide() {
   head(p, tx, P.toml, 0, 'web');
   p.text(36, by - 8, 'Step 1 loads it. Step 2’s frozen copy comes back here, through Downloads.', { size: 11.5, cls: 't-web b halo' });
   actor(p, ax, act.setup, aw, 'term', 'setup', 'makes the class assistant');
-  actor(p, ax, act.intake, aw, 'agent', '/experiment-intake', 'in Claude Code');
+  actor(p, ax, act.intake, aw, 'agent', '/experiment-intake', 'in Claude');
   actor(p, ax, act.check, aw, 'term', 'check');
   actor(p, ax, act.run, aw, 'term', 'run');
   actor(p, ax, act.judge, aw, 'term', 'judge');
@@ -1339,9 +1431,9 @@ function folderMapWide() {
   p.path(`M24 ${ly} H64`, 'ln s-n'); head(p, 70, ly, 0, 'n'); p.text(78, ly + 4.5, 'writes or makes', { size: 12, cls: 't2' });
   p.path(`M200 ${ly} H240`, 'ln s-n dash'); head(p, 246, ly, 0, 'n'); p.text(254, ly + 4.5, 'reads', { size: 12, cls: 't2' });
   let x = 330;
-  [['term', 'Terminal (run_ab.py)'], ['agent', 'Claude Code'], ['web', 'The wizard']].forEach(([r, s]) => { x += chip(p, x, ly - 12, s, r, { icon: true, size: 11.5 }) + 8; });
-  p.text(W - 24, ly + 4.5, '<name> is your experiment’s name.', { size: 12, cls: 't3', anchor: 'end' });
-  p.h = ly + 26;
+  [['term', 'run_ab.py, run by Claude'], ['agent', 'A skill, in Claude'], ['web', 'The wizard']].forEach(([r, s]) => { x += chip(p, x, ly - 12, s, r, { icon: true, size: 11.5 }) + 8; });
+  p.text(W - 24, ly + 32, '<name> is your experiment’s name.', { size: 12, cls: 't3', anchor: 'end' });
+  p.h = ly + 46;
   return p;
 }
 function folderMapNarrow() {
@@ -1413,10 +1505,9 @@ function classAssistant() {
   return p;
 }
 
-// Stuck? Where to type status and ask.
+// Stuck? Ask Claude where you are.
 function stuck(ctx) {
-  return termScene({ lines: [{ cmd: F('{py} run_ab.py status', ctx) }, { note: 'it says where you are, and the next command to type' }, { gap: 6 },
-    { cmd: F('{py} run_ab.py ask', ctx) }, { note: 'Claude Code (or Codex) opens, looks at your files, and helps you step by step' }] });
+  return C(ctx, [{ you: 'Where am I and what should I do next?' }, { run: '{py} run_ab.py status' }, { note: 'Claude says where you are and the next step, with the skill for it' }]);
 }
 
 // ==== The small pictures beside each wizard step ====
@@ -1453,14 +1544,14 @@ function helpStep(n) {
     button(p, 12, y, 'Freeze', { primary: true }); y += 30; down('then');
     button(p, 12, y, 'Export the frozen experiment', { primary: true }); y += 30; down('your browser saves it');
     folderIcon(p, 12, y + 4, 'n'); p.text(32, y + 16, 'Downloads/', { size: 11.5, mono: true, bold: true }); fileChip(p, 116, y, 'experiment.toml', { cls: 'f-web', role: 'web' });
-    y += 30; down('move it back, over the old one');
+    y += 30; down('in Claude, /wizard puts it back, over the old one', 'agent');
     y = miniTree(p, 12, y + 4, [[0, 'folder', 'skill-eval-lite/experiments/<name>/'], [1, 'file', 'experiment.toml', 'the frozen one']]);
-    chip(p, 12, y + 2, 'the run uses this file', 'term', { icon: true, size: 11.5 }); y += 36;
+    chip(p, 12, y + 2, 'the run uses this file', 'agent', { icon: true, size: 11.5 }); y += 36;
   } else if (n === 3) {
     head('Where the runs come from');
-    const t = termScene({ w: HW, prompt: '$', lines: [{ cmd: 'python3 run_ab.py run …' }, { cmd: 'python3 run_ab.py judge runs/<name>' }], cursor: false });
+    const t = claudeScene({ w: HW, lines: [{ you: '/run-experiment Please run every round, then the AI judge.' }] });
     p.add(`<g transform="translate(0 ${y - 8})">${t.o.join('')}</g>`); y += t.h - 4;
-    down('they write', 'term');
+    down('they write', 'agent');
     y = miniTree(p, 12, y + 4, [[0, 'folder', 'skill-eval-lite/runs/<name>/'], [1, 'file', 'bundle.json', 'every answer']]) - 10;
     down('choose it');
     dropBox(p, 12, y, HW - 24, 'Step 3: under “Your runs”'); y += 52;
@@ -1481,7 +1572,7 @@ function helpStep(n) {
     button(p, 12, y, 'Export results.json', { primary: true }); y += 30;
     down('they go to Downloads');
     folderIcon(p, 12, y + 4, 'n'); p.text(32, y + 16, 'Downloads/', { size: 11.5, mono: true, bold: true });
-    y += 28; down('move both here');
+    y += 28; down('in Claude, /wizard keeps both here', 'agent');
     y = miniTree(p, 12, y + 4, [[0, 'folder', 'skill-eval-lite/runs/<name>/'], [1, 'file', 'judgments.csv', 'yours'], [1, 'file', 'results.json', 'the results']]);
     p.text(12, y + 6, 'A teammate’s judgments.csv: import it here.', { size: 11.5, cls: 't2' }); y += 18;
   }
@@ -1495,9 +1586,9 @@ function helpSuite(n) {
   const down = (label, role = 'web') => { arrow(p, [30, y], [30, y + 22], role); if (label) p.text(42, y + 15, label, { size: 10.5, cls: 't3 it' }); y += 28; };
   if (n === 1) {
     head('Where the bundle comes from');
-    const t = termScene({ w: HW, prompt: '$', lines: [{ cmd: 'python3 run_ab.py suite ../my-suites/suites.yaml' }], cursor: false });
+    const t = claudeScene({ w: HW, lines: [{ you: '/run-suites Please run the mechanical tests in my suites.' }] });
     p.add(`<g transform="translate(0 ${y - 8})">${t.o.join('')}</g>`); y += t.h - 4;
-    down('it writes', 'term');
+    down('it writes', 'agent');
     y = miniTree(p, 12, y + 4, [[0, 'folder', 'my-suites/'], [1, 'file', 'bundle.json', 'your packet']]) - 10;
     down('choose it');
     dropBox(p, 12, y, HW - 24, 'Step 1: choose it here'); y += 52;
@@ -1523,7 +1614,7 @@ function helpSuite(n) {
     head('Save the reports in your packet');
     button(p, 12, y, 'Export judgments.csv', { primary: true }); y += 32;
     button(p, 12, y, 'Export <suite>-<version>.md', { primary: true }); y += 30;
-    down('from Downloads, move them');
+    down('in Claude, /wizard puts them here', 'agent');
     y = miniTree(p, 12, y + 4, [[0, 'folder', 'my-suites/'], [1, 'file', 'judgments.csv', 'every row'], [1, 'folder', 'reports/'], [2, 'file', '<suite>-<version>.md', 'each report']]);
     p.text(12, y + 6, 'A classmate’s judgments.csv: import it here.', { size: 11.5, cls: 't2' }); y += 18;
   }
@@ -1563,12 +1654,15 @@ const T = (ctx, lines, o = {}) => termScene(Object.assign({ lines: lines.map(l =
 const WZ = (step, focus, mode) => wizScene({ step, focus, mode });
 const sel = (...parts) => ['skill-eval-lite', ...parts];
 
-// Steps used on more than one path.
+// Steps used on more than one path. A step in Claude (`where: 'agent'`) has
+// `say`, the message to type in Claude's Code tab, in the session on the
+// skill-eval-lite folder; `cmd`, if there is one, is the same thing typed in
+// a terminal, for students who prefer it.
 const S_ = {
-  setup: { where: 'term', title: 'Make the class assistant.', cmd: '{py} run_ab.py setup ../class-assistant',
-    body: 'This makes Wren, the class assistant, in a new folder called `class-assistant`, next to `skill-eval-lite`. (`../` means “next to this folder”.) You only do this once.',
-    see: '`The class assistant is ready in ../class-assistant`', ifnot: 'If it says the folder `already exists and is not empty`, you made it before. Go on to the next step.',
-    pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py setup ../class-assistant' }, { note: 'it downloads the assistant and sets it up' }, { out: 'The class assistant is ready in ../class-assistant', ok: true }]) },
+  setup: { where: 'agent', title: 'Make the class assistant.', say: 'Please set up the class assistant in ../class-assistant.', cmd: '{py} run_ab.py setup ../class-assistant',
+    body: 'Claude makes Wren, the class assistant, in a new folder called `class-assistant`, next to `skill-eval-lite`. (`../` means “next to this folder”.) You only do this once: `/get-ready` offers it too.',
+    see: '`The class assistant is ready in ../class-assistant`', ifnot: 'Claude says the folder `already exists and is not empty`? You made it before. Go on to the next step.',
+    pic: ctx => C(ctx, [{ you: 'Please set up the class assistant in ../class-assistant.' }, { run: '{py} run_ab.py setup ../class-assistant' }, { note: 'Claude asks before it runs this; it downloads the assistant and sets it up' }, { out: 'The class assistant is ready in ../class-assistant', ok: true }]) },
   loadRuns: (exp, stepN) => ({ where: 'web', title: stepN === 1 ? 'Load the runs into the wizard.' : 'Load the runs.',
     click: stepN === 1 ? 'In step 1, under “A run you have made”, click *choose a file*.' : 'In step 3, under “Your runs”, click *choose a file*.',
     body: 'A *bundle* is one file, `bundle.json`, that holds everything from the runs: the plan and every answer. Pick it in the window that opens.',
@@ -1576,45 +1670,48 @@ const S_ = {
     ifnot: 'Can’t find the file? It is in the `skill-eval-lite` folder, then `runs`, then `' + exp + '`.',
     pic: ctx => WZ(stepN, { kind: 'choose', panel: stepN === 1 ? 'A run you have made (bundle.json)' : 'Your runs', file: 'bundle.json', drop: stepN === 1 ? null : 'The runner’s bundle.json:', path: sel('runs', F(exp, ctx), 'bundle.json') }) }),
   loadExp: exp => ({ where: 'web', title: 'Load your experiment file into the wizard.', click: 'In step 1, under “Your experiment file”, click *choose a file*.',
-    body: 'Open the wizard (this page) and press *Go to step 1* below. In the window that opens, pick your experiment file.',
-    see: 'A summary of your experiment, and “Nothing is missing.” in green.', ifnot: 'Something listed in red? Fix it in the file (or ask Claude Code to), then load it again.',
+    body: 'Ask Claude to open the wizard (`/wizard`) or open this page, then press *Go to step 1* below. In the window that opens, pick your experiment file.',
+    see: 'A summary of your experiment, with “Nothing is missing.” in green.', ifnot: 'Something listed in red? Ask Claude to fix it in the file, then load it again.',
     pic: ctx => WZ(1, { kind: 'choose', panel: 'Your experiment file', file: 'experiment.toml', drop: 'Drop experiment.toml here, or', path: sel('experiments', F(exp, ctx), 'experiment.toml') }) }),
   freeze: { where: 'web', title: 'Freeze it.', click: 'In step 2, read the list, then click *Freeze*.',
     body: FREEZE.replace('Freezing', '*Freezing*'),
-    see: '“The record”, with the date and a fingerprint.', ifnot: 'Is *Freeze* grey? An item on the list is not met. Fix it in the file, load it again in step 1, and come back.',
+    see: '“The record”, with the date and a fingerprint.', ifnot: 'Is *Freeze* grey? An item on the list is not met. Fix it in the file, load it again in step 1 and come back.',
     pic: () => WZ(2, { kind: 'click', panel: 'Before you freeze', items: ['The held-out prompts are sealed', 'The criterion is written', 'Every product check passes on every reference'], buttons: [{ label: 'Freeze', primary: true, target: true }] }) },
   exportFrozen: { where: 'web', title: 'Save the frozen file.', click: 'Still in step 2, click *Export the frozen experiment*.',
     body: 'The frozen file is your experiment file with the freeze written at the end. The runner must run this one.',
-    see: 'Your browser saves `experiment.toml` in your Downloads folder.', ifnot: 'If it is saved as `experiment (1).toml`, an older one was there. Use the newest one, and rename it `experiment.toml`.',
+    see: 'Your browser saves `experiment.toml` in your Downloads folder.', ifnot: 'If it is saved as `experiment (1).toml`, an older one was there. Claude takes the newest one in the next step.',
     pic: () => WZ(2, { kind: 'click', panel: 'Frozen', items: [], buttons: [{ label: 'Export the frozen experiment', primary: true, target: true }], after: 'Your browser saves experiment.toml in Downloads.' }) },
-  moveBack: exp => ({ where: 'file', title: 'Put the frozen file back in its folder.', cmd: '{move}',
-    body: 'Move `experiment.toml` from Downloads into `skill-eval-lite`, then `experiments`, then `' + exp + '`. Replace the old one. Drag it in Finder or File Explorer, or type this in the terminal:',
-    see: 'Nothing in the terminal. No message means it worked.', ifnot: '`No such file`? Look in Downloads for the newest `experiment` file, and check its name.',
-    pic: ctx => filesScene({ files: ['experiment.toml'], to: sel('experiments', F(exp, ctx)), replace: true }) }),
-  checkFrozen: exp => ({ where: 'term', title: 'Check that it is frozen.', cmd: '{py} run_ab.py check experiments/' + exp + '/experiment.toml',
-    body: 'The same check as before. Now it should also say the file is frozen.', see: '`Frozen: yes`, with today’s date.',
-    ifnot: '`Frozen: not yet`? The old file is still there. Do the step before again. `must fix: The file has changed since it was frozen`? Someone edited it after the freeze: freeze it again, and keep the earlier file, dated.',
-    pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py check experiments/' + exp + '/experiment.toml' }, { out: '  Nothing is missing.', ok: true }, { out: '  Frozen: yes, ' + '2026-…', ok: true }]) }),
-  judge: run => ({ where: 'term', title: 'Ask the AI judge.', cmd: '{py} run_ab.py judge runs/' + run,
-    body: 'The *AI judge* is a language model that compares two answers to the same request. It doesn’t know which version wrote which. Your own judgments come later, in the wizard.',
-    see: '`The judge’s verdicts are in runs/' + run + '/bundle.json`', ifnot: '`There is no bundle.json`? The runs didn’t finish. Run the step before again: finished runs are not run twice.',
-    pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py judge runs/' + run }, { note: 'a line for each pair it judges' }, { out: 'The judge’s verdicts are in runs/' + F(run, ctx) + '/bundle.json', ok: true }]) }),
+  moveBack: exp => ({ where: 'agent', title: 'Put the frozen file back in its folder.', say: '/wizard I’ve exported the frozen experiment. Please put it back in experiments/' + exp + ' and check it.', cmd: '{move}',
+    body: 'Claude finds the newest `experiment.toml` in your Downloads folder, keeps the earlier file under its date, puts the frozen one in `experiments/' + exp + '` and checks it.',
+    see: '`Frozen: yes`, with today’s date.',
+    ifnot: '`Frozen: not yet`? The old file is still there: ask Claude to look in Downloads again. `The file has changed since it was frozen`? Someone edited it after the freeze: freeze it again.',
+    pic: ctx => C(ctx, [{ you: '/wizard I’ve exported the frozen experiment. Please put it back in experiments/' + exp + ' and check it.' }, { note: 'Claude moves the file from Downloads, then runs the check' }, { out: '  Nothing is missing.', ok: true }, { out: '  Frozen: yes, 2026-…', ok: true }]) }),
+  run: (exp, asst, n) => ({ where: 'agent', title: 'Run every round.', say: '/run-experiment Please run every round of experiments/' + exp + '/experiment.toml on ' + asst + '.',
+    cmd: '{py} run_ab.py run experiments/' + exp + '/experiment.toml --assistant ' + asst + ' --jobs 4',
+    body: 'Claude checks that the file is frozen, says how many runs it makes and about how long they take. It asks first. ' + n + ' Each run is one session on your plan. You can leave it running.',
+    see: 'A line for each run, then `The bundle for the wizard: runs/' + exp + '/bundle.json`',
+    ifnot: 'A run that failed is kept as a failure; that is all right. Stopped? Ask Claude to run it again: finished runs are not run twice.',
+    pic: ctx => C(ctx, [{ you: '/run-experiment Please run every round of experiments/' + exp + '/experiment.toml on ' + asst + '.' }, { run: '{py} run_ab.py run experiments/' + exp + '/experiment.toml --assistant ' + asst + ' --jobs 4' }, { note: 'a line for each run' }, { out: 'The bundle for the wizard: runs/' + F(exp, ctx) + '/bundle.json', ok: true }]) }),
+  judge: run => ({ where: 'agent', title: 'Ask the AI judge.', say: '/run-experiment Please run the AI judge on runs/' + run + '.', cmd: '{py} run_ab.py judge runs/' + run,
+    body: 'The *AI judge* is a language model that compares two answers to the same request. It doesn’t know which version wrote which. Your own judgments come later, in the wizard. Claude doesn’t read its verdicts out to you.',
+    see: '`The judge\'s verdicts are saved in runs/' + run + '/bundle.json`', ifnot: '`There is no bundle.json`? The runs didn’t finish. Ask Claude to run them again: finished runs are not run twice.',
+    pic: ctx => C(ctx, [{ you: '/run-experiment Please run the AI judge on runs/' + run + '.' }, { run: '{py} run_ab.py judge runs/' + run }, { note: 'a line for each pair it judges' }, { out: 'The judge\'s verdicts are saved in runs/' + F(run, ctx) + '/bundle.json', ok: true }]) }),
   initials: { where: 'web', title: 'Start judging.', click: 'In step 4, type your initials and click *Start*.',
     body: 'Each of you judges alone, under your own initials. Please don’t compare notes until you have all finished.',
     see: 'Two answers side by side, called Left and Right.', ifnot: 'Step 4 is grey? Load the runs first (step 3).',
     pic: () => WZ(4, { kind: 'initials', initials: 'MR' }) },
   pairs: { where: 'web', title: 'Judge each pair.', click: 'Choose *Left is better*, *About the same* or *Right is better*. Write one line saying why. Click *Record*.',
     body: 'Read both answers against the question in blue. You can’t see which version wrote which until you record your choice.',
-    see: 'After each one, which version wrote each side. Then *Next pair →*.', ifnot: '*Record* is grey? Choose one of the three, and write your reason.',
+    see: 'After each one, which version wrote each side. Then *Next pair →*.', ifnot: '*Record* is grey? Choose one of the three, then write your reason.',
     pic: () => WZ(4, { kind: 'judge' }) },
-  results: { where: 'web', title: 'Read the results, and save them.', click: 'In step 5, click *Export judgments.csv*, then *Export results.json*.',
-    body: 'Step 5 shows how often you preferred the new version, and whether the controls moved as they should. Send `judgments.csv` to your teammates, and import theirs here.',
+  results: { where: 'web', title: 'Read the results and save them.', click: 'In step 5, click *Export judgments.csv*, then *Export results.json*.',
+    body: 'Step 5 shows how often you preferred the new version and whether the controls moved as they should. Send `judgments.csv` to your teammates. Import theirs here.',
     see: 'Two files in your Downloads folder.', ifnot: 'The buttons are grey? Judge at least one pair in step 4.',
     pic: () => WZ(5, { kind: 'click', panel: 'Results', items: [], buttons: [{ label: 'Export judgments.csv', primary: true, target: true }, { label: 'Export results.json' }], after: 'Both files go to your Downloads folder.' }) },
-  keepResults: run => ({ where: 'file', title: 'Keep the results with the runs.', cmd: '{moveres}',
-    body: 'Move `judgments.csv` and `results.json` from Downloads into `skill-eval-lite`, then `runs`, then `' + run + '`. Drag them, or type this:',
-    see: 'Nothing in the terminal. No message means it worked.', ifnot: 'A name ends in (1)? Use the newest file, and rename it.',
-    pic: ctx => filesScene({ files: ['judgments.csv', 'results.json'], to: sel('runs', F(run, ctx)), label: 'drag them here' }) }),
+  keepResults: run => ({ where: 'agent', title: 'Keep the results with the runs.', say: '/wizard I’ve exported judgments.csv and results.json. Please keep them with the runs in runs/' + run + '.', cmd: '{moveres}',
+    body: 'Claude takes the newest of each from your Downloads folder and puts them in `runs/' + run + '`, beside the runs.',
+    see: 'Claude says where it put `judgments.csv` and `results.json`.', ifnot: 'A name ends in (1)? Claude uses the newest file. Tell it if you exported again.',
+    pic: ctx => C(ctx, [{ you: '/wizard I’ve exported judgments.csv and results.json. Please keep them with the runs in runs/' + run + '.' }, { note: 'Claude moves both files from Downloads into runs/' + F(run, ctx) + '/' }]) }),
 };
 
 // The designers' steps: the group path and the suites path show them when
@@ -1624,75 +1721,79 @@ const suiteByDesigner = ctx => ctx.packetHow === 'designer', suiteByCopy = ctx =
 const DZ_STEPS = {
   openExp: { only: byDesigner, where: 'web', title: 'Open the experiment designer.',
     click: 'On the Getting started screen, under “Make a new experiment file”, click *With the designer*. It is in step 1 too.',
-    body: 'The *experiment designer* is part of this page. It asks your group one thing on each screen, and writes the experiment file as you go. Nothing leaves your computer.',
+    body: 'The *experiment designer* is part of this page. It asks your group one thing on each screen. It writes the experiment file as you go. Nothing leaves your computer.',
     see: '“Experiment designer”, on its first screen, *Start*.', ifnot: 'Can’t find the button? Press “Getting started” at the top of this page.',
     pic: () => designerScene({ screen: 1, example: 'Start from: the class experiment' }) },
   answerExp: { only: byDesigner, where: 'web', title: 'Answer each screen, together.', input: 'name',
     body: 'Nine screens: the start, the assistant, the question, the change, the two controls, the prompts, the checks and the runs, then a review. Each has a picture and an example from the class experiment. This browser keeps your work, so you can stop and come back. On the first screen you give the experiment a name: it is *<name>* in the steps below.',
-    see: 'On the last screen, “Nothing is missing.”', ifnot: 'Something listed in red? Click *Fix it* beside it, and it takes you to that screen.',
+    see: 'On the last screen, “Nothing is missing.”', ifnot: 'Something listed in red? Click *Fix it* beside it: it takes you to that screen.',
     pic: () => designerScene({ screen: 6, example: 'Draft a reply to Priya about the site visit.' }) },
-  saveExp: { only: byDesigner, where: 'file', title: 'Save the experiment’s folder.', cmd: '{unzipexp}',
-    body: 'On the last screen, click *Save the folder*, and choose the `experiments` folder inside `skill-eval-lite`. If your browser can’t, click *Download a ZIP*, and unzip it into `experiments`: type this in the terminal, in the `skill-eval-lite` folder:',
-    see: 'A folder `experiments/{name}/`, with `experiment.toml`, `rounds` and `prompts` in it.', ifnot: 'No ZIP in Downloads? Click *Download a ZIP* again, and use the newest file with your experiment’s name.',
+  saveExp: { only: byDesigner, where: 'agent', title: 'Save the experiment’s folder.', say: '/wizard I’ve downloaded {name}.zip from the designer. Please unzip it into experiments.', cmd: '{unzipexp}',
+    body: 'On the last screen, click *Save the folder* and choose the `experiments` folder inside `skill-eval-lite`. If your browser can’t, click *Download a ZIP*, then ask Claude to unzip it:',
+    see: 'A folder `experiments/{name}/`, with `experiment.toml`, `rounds` and `prompts` in it.', ifnot: 'No ZIP in Downloads? Click *Download a ZIP* again: Claude takes the newest file with your experiment’s name.',
     pic: ctx => dzSave('experiment', ctx) },
   openSuite: { only: suiteByDesigner, where: 'web', title: 'Open the suite designer.',
     click: 'On the Getting started screen, under “Make a new suites file”, click *With the suite designer*.',
-    body: 'The *suite designer* is part of this page. It asks for your two suites, their cases, their tests and their control cases, one screen at a time, and writes `suites.yaml` and its folders.',
+    body: 'The *suite designer* is part of this page. It asks for your two suites, their cases, their tests and their control cases, one screen at a time. It writes `suites.yaml` and its folders.',
     see: '“Suite designer”, on its first screen, *Start*.', ifnot: 'Can’t find the button? Press “Getting started” at the top of this page.',
     pic: () => designerScene({ kind: 'suites', screen: 1, example: 'Start from: the worked example' }) },
   answerSuite: { only: suiteByDesigner, where: 'web', title: 'Answer each screen.',
     body: 'Six screens: the start, the two suites, the cases, the tests, the control cases, then a review. This browser keeps your work, so you can stop and come back.',
-    see: 'On the last screen, “Nothing to fix.”', ifnot: 'Something listed in red? Click *Fix it* beside it, and it takes you to that screen.',
+    see: 'On the last screen, “Nothing to fix.”', ifnot: 'Something listed in red? Click *Fix it* beside it: it takes you to that screen.',
     pic: () => designerScene({ kind: 'suites', screen: 4, example: 'Would Morgan send this draft as it is?' }) },
-  saveSuite: { only: suiteByDesigner, where: 'file', title: 'Save the packet next to skill-eval-lite.', cmd: '{unzippacket}',
-    body: 'On the last screen, click *Save the packet*, and choose the folder that holds `skill-eval-lite`. If your browser can’t, click *Download a ZIP*, and unzip it there: type this in the terminal, in the `skill-eval-lite` folder:',
-    see: 'A folder `{packetname}` next to `skill-eval-lite`, with `suites.yaml` in it.', ifnot: 'No ZIP in Downloads? Click *Download a ZIP* again, and use the newest file with your packet’s name.',
+  saveSuite: { only: suiteByDesigner, where: 'agent', title: 'Save the packet next to skill-eval-lite.', say: '/wizard I’ve downloaded {packetname}.zip from the suite designer. Please unzip it next to skill-eval-lite.', cmd: '{unzippacket}',
+    body: 'On the last screen, click *Save the packet* and choose the folder that holds `skill-eval-lite`. If your browser can’t, click *Download a ZIP*, then ask Claude to unzip it:',
+    see: 'A folder `{packetname}` next to `skill-eval-lite`, with `suites.yaml` in it.', ifnot: 'No ZIP in Downloads? Click *Download a ZIP* again: Claude takes the newest file with your packet’s name.',
     pic: ctx => dzSave('suites', ctx) },
 };
 
 const PATHS = {
   first: { title: 'First time on this computer', short: 'Do these once.', steps: [
-    { where: 'term', title: 'Open a terminal.', body: 'A *terminal* is a window where you type commands. You type one, press Enter, and it runs.',
-      how: { mac: 'Press Command and Space, type Terminal, and press Return.', win: 'Press the Windows key, type PowerShell, and press Enter.', linux: 'Press Ctrl, Alt and T together.' },
-      see: 'A window with a line that ends in `$`, `%` or `>`, and a blinking cursor.', ifnot: 'Ask a classmate or the instructor to show you once. It takes a minute.',
-      pic: () => openTerminalScene() },
-    { where: 'term', title: 'Install Claude Code.', cmd: '{install}',
-      body: '*Claude Code* is an AI assistant, made by Anthropic, that works in the terminal. The runner uses it to run your assistant. Copy the line, paste it into the terminal, and press Enter.',
-      see: 'A message saying that Claude Code is installed.', ifnot: 'Close the terminal, open a new one, and try again. The full guide is at code.claude.com/docs/en/setup.',
-      pic: ctx => T(ctx, [{ cmd: '{install}' }, { note: 'a message saying that Claude Code is installed' }], { folder: '~' }) },
-    { where: 'term', title: 'Log in to Claude Code, once.', cmd: 'claude',
-      body: 'This starts Claude Code for the first time. Your web browser opens: log in with your Claude account. Then come back to the terminal, type `/exit` and press Enter.',
-      see: 'Claude Code’s welcome. After `/exit`, the terminal’s prompt again.', ifnot: 'No browser page? Copy the web address that Claude Code shows into your browser.',
-      pic: ctx => T(ctx, [{ cmd: 'claude' }, { note: 'your browser opens: log in, then come back here' }, { out: '/exit', ag: true }], { folder: '~' }) },
-    { where: 'term', title: 'Download Skill Eval Lite.', cmd: 'git clone https://github.com/vanderbilt-ms-ai/skill-eval-lite',
-      body: '*git* is a tool that keeps a record of every version of a folder. To *clone* is to download a copy of a project with git. This makes a folder called `skill-eval-lite`.',
-      see: '`Cloning into \'skill-eval-lite\'...`', ifnot: '`git: command not found`? Install git from git-scm.com, open a new terminal, and try again.',
-      pic: ctx => T(ctx, [{ cmd: 'git clone https://github.com/vanderbilt-ms-ai/skill-eval-lite' }, { out: 'Cloning into \'skill-eval-lite\'...' }], { folder: '~' }) },
-    { where: 'term', title: 'Go into the folder.', cmd: 'cd skill-eval-lite',
-      body: '`cd` means “change folder”. Type every command after this one in the `skill-eval-lite` folder.',
-      see: 'The prompt now shows `skill-eval-lite`.', ifnot: '`No such file or directory`? The download didn’t finish. Do the step before again.',
-      pic: ctx => { const p = T(ctx, [{ cmd: 'cd skill-eval-lite' }], { folder: '~', cursor: false }); return p; } },
-    { where: 'term', title: 'Check your setup.', cmd: '{py} run_ab.py doctor',
-      body: '`doctor` checks Python, git, Claude Code and your login. It makes one tiny test run, a few seconds long. (On Windows, type `py` where you see `python3`.)',
-      see: 'Every line starts with `ok`.', ifnot: 'A line starts with `FIX`? It says what to do. If it says you are not logged in, do “Log in to Claude Code” again.',
-      pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py doctor' }, { out: '  ok   Python: …', ok: true }, { out: '  ok   Claude Code: …', ok: true }, { note: 'every line starts with ok' }]) },
-    { where: 'web', title: 'Open the wizard.', cmd: '{open}',
-      body: 'The *wizard* is this page. It opens in your web browser. You can also double-click `wizard.html` in the `skill-eval-lite` folder.',
+    { where: 'app', title: 'Install Claude’s desktop app and sign in.',
+      body: 'Skill Eval Lite is used through Claude, in the desktop app’s *Code* tab, which works in a folder on your computer. It needs a paid Claude plan: Pro, Max, Ultra, Team or Enterprise.',
+      how: { mac: 'Open claude.com/download, download Claude for macOS, open the .dmg file and drag Claude onto Applications.', win: 'Open claude.com/download, download Claude for Windows and open the installer.', linux: 'Open claude.com/download and follow its Linux instructions (the Linux app is in beta).' },
+      see: 'Claude’s window, signed in with your account.', ifnot: 'It asks you to upgrade? The Code tab needs a paid plan.',
+      pic: () => installScene() },
+    { where: 'app', title: 'Make a folder for the course.',
+      body: 'In Finder or File Explorer, make a folder called `ai5500` in your home folder. Please keep it out of OneDrive, iCloud Drive and your Desktop, which copy files while programs write them.',
+      see: 'An empty folder, `ai5500`, in your home folder.', ifnot: 'Can’t find your home folder? On a Mac, press Command, Shift and H in Finder. On Windows, type %USERPROFILE% in File Explorer’s address bar.',
+      pic: () => homeFolderScene() },
+    { where: 'app', title: 'Open the folder in the Code tab.',
+      body: 'In Claude, click the Code button, `</>`, at the top of the sidebar. In the row under the message box, choose *This computer*, then the folder control, *Open folder…* and `ai5500`. Choose *Manual* in the mode menu: Claude then asks before it changes a file or runs a command.',
+      see: '`ai5500` under the message box, which reads “Describe a task or ask a question”.', ifnot: 'Claude can’t see your files? You chose another environment: choose *This computer*.',
+      pic: ctx => C(ctx, [{ note: 'Code chosen, with This computer and the ai5500 folder under the message box' }], { folder: 'ai5500' }) },
+    { where: 'agent', title: 'Ask Claude to download Skill Eval Lite.',
+      say: 'Please download Skill Eval Lite into this folder as skill-eval-lite: git clone https://github.com/vanderbilt-ms-ai/skill-eval-lite if git is installed. If it isn’t, download https://github.com/vanderbilt-ms-ai/skill-eval-lite/archive/refs/heads/main.zip, unpack it here and rename the folder skill-eval-lite.',
+      cmd: 'git clone https://github.com/vanderbilt-ms-ai/skill-eval-lite',
+      body: 'Type this in the session on `ai5500`. Claude says what it will run and asks first. Already have Skill Eval Lite? Ask Claude to update it instead, keeping your `experiments` and `runs` folders.',
+      see: 'A folder `skill-eval-lite` in `ai5500`.', ifnot: 'Claude can’t reach GitHub? Check your internet connection and ask again.',
+      pic: ctx => C(ctx, [{ you: 'Please download Skill Eval Lite into this folder as skill-eval-lite.' }, { run: 'git clone https://github.com/vanderbilt-ms-ai/skill-eval-lite' }, { out: 'Cloning into \'skill-eval-lite\'...' }], { folder: 'ai5500' }) },
+    { where: 'app', title: 'Open a session on skill-eval-lite.',
+      body: 'Click *+ New* in the sidebar. Choose *This computer*, then *Open folder…* and `skill-eval-lite`, inside `ai5500`. Do everything after this in a session on this folder: that is where Claude finds Skill Eval Lite’s skills.',
+      see: 'Type `/` in the message box: a list with `get-ready`, `wizard`, `shared-i`, `personal-i` and more.', ifnot: 'No Skill Eval Lite skills in the list? The session is on another folder: start a new one on `skill-eval-lite`.',
+      pic: ctx => C(ctx, [{ note: 'type / and Skill Eval Lite’s skills are listed: /get-ready, /wizard, /shared-i, /personal-i …' }], { typed: '/' }) },
+    { where: 'agent', title: 'Get your computer ready.', say: '/get-ready', cmd: '{py} run_ab.py doctor',
+      body: 'Claude checks Python 3.11 or later, git and the `claude` command (a separate copy of Claude Code that Skill Eval Lite’s runner uses) and its sign-in. It installs what is missing, one thing at a time, after you say yes. Then it runs `doctor`, which makes one tiny test run on your plan.',
+      see: 'Every line of `doctor` starts with `ok`.',
+      ifnot: 'Claude can’t sign the `claude` command in? Click the Terminal button, `>_`, at the top right of the window, type `claude auth login` and sign in in your browser. Then type `/get-ready` again.',
+      pic: ctx => C(ctx, [{ you: '/get-ready' }, { note: 'Claude checks each thing and asks before it installs anything' }, { run: '{py} run_ab.py doctor' }, { out: '  ok   Python: …', ok: true }, { out: '  ok   Claude Code: …', ok: true }]) },
+    { where: 'agent', title: 'Open the wizard.', say: '/wizard Please open the wizard on its Getting started screen.', cmd: '{open}',
+      body: 'The *wizard* is this page, `wizard.html` in the `skill-eval-lite` folder. Claude opens it in your web browser. Please use the same browser each time: the wizard keeps your work in it.',
       see: 'This page, in your browser.', ifnot: 'Nothing opens? Double-click `wizard.html` in the `skill-eval-lite` folder instead.',
-      pic: ctx => T(ctx, [{ cmd: '{open}' }, { note: 'your web browser opens the wizard' }]) },
+      pic: ctx => C(ctx, [{ you: '/wizard Please open the wizard on its Getting started screen.' }, { run: '{open}' }, { note: 'your web browser opens the wizard' }]) },
   ] },
   demo: { title: 'A demonstration', steps: [
     S_.setup,
-    { where: 'term', title: 'Look at the demonstration’s plan.', cmd: '{py} run_ab.py check examples/demo-graph-removed.toml',
-      body: 'An *experiment file* is the plan for a test: which versions of the assistant to compare (the *rounds*), the requests to give it (the *prompts*), and how to judge the answers. `check` reads it and lists anything missing. Here, round A is Wren as it is. Round C is Wren with its knowledge graph removed, so it should do worse.',
-      see: 'Some notes marked `(demo)`, and `Frozen: not yet`. That is right for a demonstration: it is a small example, not a full experiment.',
-      ifnot: '`There is no experiment file`? You are not in the `skill-eval-lite` folder. Type `cd skill-eval-lite` and try again.',
-      pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py check examples/demo-graph-removed.toml' }, { out: '  (demo)  There are 2 development prompts; …' }, { out: '  Frozen: not yet (the wizard’s step 2 freezes it)' }]) },
-    { where: 'term', title: 'Run it.', cmd: '{py} run_ab.py run examples/demo-graph-removed.toml --assistant ../class-assistant --jobs 4',
-      body: 'Each *run* gives one request to one version of the assistant, in a fresh copy, and keeps the answer. This makes 4 runs, 4 at a time. It takes about 1 to 3 minutes.',
+    { where: 'agent', title: 'Look at the demonstration’s plan.', say: 'Please check the demonstration, examples/demo-graph-removed.toml. Tell me what it compares.', cmd: '{py} run_ab.py check examples/demo-graph-removed.toml',
+      body: 'An *experiment file* is the plan for a test: which versions of the assistant to compare (the *rounds*), the requests to give it (the *prompts*) and how to judge the answers. `check` reads it and lists anything missing. Here, round A is Wren as it is. Round C is Wren with its knowledge graph removed, so it should do worse.',
+      see: 'Some notes marked `(demo)`, then `Frozen: not yet`. That is right for a demonstration: it is a small example, not a full experiment.',
+      ifnot: '`There is no experiment file`? The session is on another folder: start a new one on `skill-eval-lite`.',
+      pic: ctx => C(ctx, [{ you: 'Please check the demonstration, examples/demo-graph-removed.toml.' }, { run: '{py} run_ab.py check examples/demo-graph-removed.toml' }, { out: '  (demo)  There are 2 development prompts; …' }, { out: '  Frozen: not yet (the wizard’s step 2 freezes it)' }]) },
+    { where: 'agent', title: 'Run it.', say: 'Please run the demonstration examples/demo-graph-removed.toml on ../class-assistant, 4 at a time.', cmd: '{py} run_ab.py run examples/demo-graph-removed.toml --assistant ../class-assistant --jobs 4',
+      body: 'Each *run* gives one request to one version of the assistant, in a fresh copy. It keeps the answer. This makes 4 runs, 4 at a time: about 1 to 3 minutes. Each run is one session on your plan.',
       see: 'A line for each run that says `ok`, then `The bundle for the wizard: runs/demo-graph-removed/bundle.json`',
-      ifnot: '`Claude Code is not logged in`? Type `claude`, log in, type `/exit`, and run this again.',
-      pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py run examples/demo-graph-removed.toml --assistant ../class-assistant --jobs 4' }, { out: '[1/4] ok      prep-priya-call   round A …' }, { note: 'three more lines' }, { out: 'The bundle for the wizard: runs/demo-graph-removed/bundle.json', ok: true }]) },
+      ifnot: '`Claude Code is not logged in`? Type `/get-ready`: it signs the `claude` command in.',
+      pic: ctx => C(ctx, [{ you: 'Please run the demonstration on ../class-assistant, 4 at a time.' }, { run: '{py} run_ab.py run examples/demo-graph-removed.toml --assistant ../class-assistant --jobs 4' }, { out: '[1/4] ok      prep-priya-call   round A …' }, { note: 'three more lines' }, { out: 'The bundle for the wizard: runs/demo-graph-removed/bundle.json', ok: true }]) },
     S_.judge('demo-graph-removed'),
     S_.loadRuns('demo-graph-removed', 1),
     { where: 'web', title: 'Freeze the demonstration.', click: 'In step 2, click *Freeze this demonstration*.',
@@ -1701,7 +1802,7 @@ const PATHS = {
       pic: () => WZ(2, { kind: 'click', panel: 'Before you freeze', items: ['The criterion is written', 'The judging question is written'], buttons: [{ label: 'Freeze', primary: true }, { label: 'Freeze this demonstration', target: true }] }) },
     { where: 'web', title: 'Read the answers.', click: 'In step 3, click a green *ok*.',
       body: 'Each cell is one run: one request (a *prompt*), one version (a *round*) and one repeat.',
-      see: 'The request, the answer, and each step the assistant took.', ifnot: 'Step 3 is grey? Freeze first (step 2).',
+      see: 'The request, the answer and each step the assistant took.', ifnot: 'Step 3 is grey? Freeze first (step 2).',
       pic: () => WZ(3, { kind: 'cells', panel: 'Coverage' }) },
     S_.initials, S_.pairs,
     { where: 'web', title: 'Read the results.', click: 'Go to step 5.',
@@ -1711,96 +1812,95 @@ const PATHS = {
   ], shortcut: 'No time to run? Skip steps 1 to 4. In the wizard’s step 1, load `examples/recorded/demo-graph-removed/bundle.json` instead: a real run, recorded on 2026-10-26.' },
   class: { title: 'The class experiment', steps: [
     S_.setup,
-    { where: 'term', title: 'Make a folder for your experiments.', cmd: '{mkdir}',
-      body: '`mkdir` means “make a folder”. This makes `experiments`, inside `skill-eval-lite`.',
-      see: 'Nothing. No message means it worked.', ifnot: 'An error? Check that the prompt shows `skill-eval-lite`.',
-      pic: ctx => T(ctx, [{ cmd: '{mkdir}' }]) },
-    { where: 'term', title: 'Copy the class experiment into it.', cmd: 'cp -r examples/class-assistant experiments/class-assistant',
-      body: 'Your copy is the one you will freeze and run. The original stays as it was. `cp -r` copies a folder and everything in it.',
-      see: 'Nothing. No message means it worked.', ifnot: '`No such file or directory`? Check that the prompt shows `skill-eval-lite`.',
-      pic: ctx => T(ctx, [{ cmd: 'cp -r examples/class-assistant experiments/class-assistant' }]) },
-    { where: 'term', title: 'Check it.', cmd: '{py} run_ab.py check experiments/class-assistant/experiment.toml',
-      body: 'An *experiment file* is the plan for a test: which versions of the assistant to compare (the *rounds*), the requests to give it (the *prompts*), and how to judge the answers. `check` lists anything missing.',
-      see: '`Nothing is missing.` and `Frozen: not yet`.', ifnot: '`There is no experiment file`? Do the two steps before again.',
-      pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py check experiments/class-assistant/experiment.toml' }, { out: '  Nothing is missing.', ok: true }, { out: '  Frozen: not yet (the wizard’s step 2 freezes it)' }]) },
-    S_.loadExp('class-assistant'), S_.freeze, S_.exportFrozen, S_.moveBack('class-assistant'), S_.checkFrozen('class-assistant'),
-    { where: 'term', title: 'Run every round.', cmd: '{py} run_ab.py run experiments/class-assistant/experiment.toml --assistant ../class-assistant --jobs 4',
-      body: '4 versions × 4 requests × 2 repeats = 32 runs, 4 at a time. It takes about 5 to 15 minutes. You can leave it running.',
-      see: 'A line for each run, then `The bundle for the wizard: runs/class-assistant/bundle.json`',
-      ifnot: 'A run that failed is kept as a failure; that is all right. Stopped? Run the same command again: finished runs are not run twice.',
-      pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py run experiments/class-assistant/experiment.toml --assistant ../class-assistant --jobs 4' }, { out: '[1/32] ok      reply-to-priya   round B …' }, { note: '31 more lines' }, { out: 'The bundle for the wizard: runs/class-assistant/bundle.json', ok: true }]) },
+    { where: 'agent', title: 'Copy the class experiment.', say: '/shared-i Please copy the class experiment into experiments/class-assistant and check it.', cmd: '{py} run_ab.py new class-assistant --from class',
+      body: 'Your copy, in `experiments/class-assistant`, is the one you will freeze and run. The original stays as it was. An *experiment file* is the plan for a test: which versions of the assistant to compare (the *rounds*), the requests to give it (the *prompts*) and how to judge the answers. `check` lists anything missing.',
+      see: '`Nothing is missing.` and `Frozen: not yet`.', ifnot: 'Claude says the folder is there already? You copied it before: ask Claude to check it.',
+      pic: ctx => C(ctx, [{ you: '/shared-i Please copy the class experiment into experiments/class-assistant and check it.' }, { run: '{py} run_ab.py new class-assistant --from class' }, { run: '{py} run_ab.py check experiments/class-assistant/experiment.toml' }, { out: '  Nothing is missing.', ok: true }, { out: '  Frozen: not yet (the wizard’s step 2 freezes it)' }]) },
+    S_.loadExp('class-assistant'), S_.freeze, S_.exportFrozen, S_.moveBack('class-assistant'),
+    S_.run('class-assistant', '../class-assistant', '4 versions × 4 requests × 2 repeats make 32 runs, 4 at a time: about 5 to 15 minutes.'),
     S_.judge('class-assistant'), S_.loadRuns('class-assistant', 3), S_.initials, S_.pairs, S_.results, S_.keepResults('class-assistant'),
   ] },
   group: { title: 'Your group’s experiment', steps: [
     Object.assign({}, S_.setup, { only: ctx => ctx.asstKind !== 'own', title: 'Make the class assistant, if you use it.',
-      body: S_.setup.body + ' Using your own assistant instead? Put its folder next to `skill-eval-lite`, and skip this step.' }),
+      body: S_.setup.body + ' Using your own assistant instead? Put its folder next to `skill-eval-lite`. Skip this step.' }),
     { only: ctx => ctx.asstKind === 'own', where: 'file', title: 'Put your assistant’s folder next to skill-eval-lite.',
-      body: 'Your assistant is a folder of files. Its main instructions are in a file called `CLAUDE.md`. Put the folder next to `skill-eval-lite`, and type its name in the box above. The intake checks the folder. If it is not a git project yet, the intake offers to make it one, and asks you first.',
+      body: 'Your assistant is a folder of files. Its main instructions are in a file called `CLAUDE.md`. Put the folder next to `skill-eval-lite`. Type its name in the box above. The intake checks the folder. If it is not a git project yet, the intake offers to make it one. It asks you first.',
       see: 'Two folders side by side: `skill-eval-lite` and yours.', ifnot: 'No `CLAUDE.md`? The intake will explain what it needs. It never writes your assistant’s instructions for you.',
       pic: ctx => sideBySideScene({ asst: F('{asstname}', ctx) }) },
     DZ_STEPS.openExp, DZ_STEPS.answerExp, DZ_STEPS.saveExp,
-    { only: byIntake, where: 'term', title: 'Start Claude Code.', cmd: 'claude',
-      body: 'Type it in the `skill-eval-lite` folder, so that Claude Code finds the intake skill. The *intake skill* is a set of instructions that lets Claude Code write your experiment file with you.',
-      see: 'Claude Code’s welcome, and a box to type in.', ifnot: '`command not found`? Do “Install Claude Code” (First time on this computer) again.',
-      pic: ctx => T(ctx, [{ cmd: 'claude' }, { note: 'Claude Code opens, with a box to type in' }], { cursor: false }) },
-    { only: byIntake, where: 'agent', title: 'Start the intake.', cmd: '/experiment-intake {asst}',
-      body: 'Type this into Claude Code’s box and press Enter. It reads your assistant’s files, then asks your group up to five questions, one at a time. Using Codex instead? Type `codex` in the terminal, then: “Please follow AGENTS.md to write an experiment intake for {asst}.”',
-      see: 'A list of the assistant’s parts, then a first question.', ifnot: 'It doesn’t know the command? You started `claude` in another folder. Type `/exit`, then `cd skill-eval-lite`, and start again.',
-      pic: ctx => T(ctx, [{ you: F('/experiment-intake {asst}', ctx) }, { note: 'Claude reads the assistant, then asks your group its first question' }], { claude: true, cursor: true }) },
+    { only: byIntake, where: 'agent', title: 'Start the intake.', say: '/experiment-intake {asst}',
+      body: 'Type this in Claude, in your session on `skill-eval-lite`. The *intake skill* reads your assistant’s files, then asks your group up to five questions, one at a time. Using Codex instead? Ask it to follow `AGENTS.md` to write an experiment intake for {asst}.',
+      see: 'A list of the assistant’s parts, then a first question.', ifnot: 'Claude doesn’t know `/experiment-intake`? The session is on another folder: start a new one on `skill-eval-lite`.',
+      pic: ctx => C(ctx, [{ you: '/experiment-intake {asst}' }, { note: 'Claude reads the assistant, then asks your group its first question' }]) },
     { only: byIntake, where: 'agent', title: 'Answer its questions, together.', input: 'name',
       body: 'Answer in your own words. It suggests the versions to compare, the requests and the checks: correct anything that is wrong. At the end it writes `experiments/<name>/experiment.toml`. Note the name it gives: it is *<name>* in the steps below.',
       see: '“I wrote experiments/…/experiment.toml” and a checklist.', ifnot: 'Stuck on a question? Ask it to explain, or say “please suggest an answer”.',
-      pic: ctx => T(ctx, [{ note: 'for example, you might answer:' }, { you: 'Our assistant drafts replies. We want to improve its voice file.' }, { note: 'it asks up to five questions, then writes the file' }, { out: 'Wrote experiments/' + F('{name}', ctx) + '/experiment.toml', ag: true }], { claude: true, cursor: true }) },
-    { only: byIntake, where: 'agent', title: 'Leave Claude Code.', cmd: '/exit', body: 'Type `/exit` and press Enter. You are back in the terminal, in the `skill-eval-lite` folder.',
-      see: 'The terminal’s prompt again.', ifnot: 'Still in Claude Code? Press Ctrl and C twice.',
-      pic: ctx => T(ctx, [{ you: '/exit' }, { gap: 4 }], { claude: true, cursor: false }) },
-    ...[byIntake, byDesigner].map(only => ({ only, where: 'term', title: 'Check it.', cmd: '{py} run_ab.py check experiments/{name}/experiment.toml',
-      body: '`check` reads the experiment file and lists anything missing or wrong.',
+      pic: ctx => C(ctx, [{ you: 'Our assistant drafts replies. We want to improve its voice file.' }, { note: 'it asks up to five questions, then writes the file' }, { claude: 'I wrote experiments/' + F('{name}', ctx) + '/experiment.toml.' }]) },
+    ...[byIntake, byDesigner].map(only => ({ only, where: 'agent', title: 'Check it.', say: 'Please check experiments/{name}/experiment.toml.', cmd: '{py} run_ab.py check experiments/{name}/experiment.toml',
+      body: '`check` reads the experiment file and lists anything missing or wrong. `/critique` reads it against the brief, if you want a second look before you freeze.',
       see: '`Nothing is missing.` and `Frozen: not yet`.',
-      ifnot: only === byIntake ? 'Lines that start with `must fix`? Start `claude` again and ask: “Please fix the errors that check lists.”'
-        : 'Lines that start with `must fix`? Fix them in the designer (its last screen lists them too), save the folder again, and check again.',
-      pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py check experiments/{name}/experiment.toml' }, { out: '  Nothing is missing.', ok: true }, { out: '  Frozen: not yet (the wizard’s step 2 freezes it)' }]) })),
-    S_.loadExp('{name}'), S_.freeze, S_.exportFrozen, S_.moveBack('{name}'), S_.checkFrozen('{name}'),
-    { where: 'term', title: 'Run every round.', cmd: '{py} run_ab.py run experiments/{name}/experiment.toml --assistant {asst} --jobs 4',
-      body: 'Every version of the assistant gets every request, twice. With 4 versions and 4 requests, that is 32 runs, 4 at a time: about 5 to 15 minutes.',
-      see: 'A line for each run, then `The bundle for the wizard: runs/<name>/bundle.json`',
-      ifnot: 'A run that failed is kept as a failure; that is all right. Stopped? Run the same command again: finished runs are not run twice.',
-      pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py run experiments/{name}/experiment.toml --assistant {asst} --jobs 4' }, { note: 'a line for each run' }, { out: 'The bundle for the wizard: runs/' + F('{name}', ctx) + '/bundle.json', ok: true }]) },
+      ifnot: only === byIntake ? 'Lines that start with `must fix`? Ask Claude: “Please fix the errors that check lists.”'
+        : 'Lines that start with `must fix`? Fix them in the designer (its last screen lists them too), save the folder again, then check again.',
+      pic: ctx => C(ctx, [{ you: 'Please check experiments/{name}/experiment.toml.' }, { run: '{py} run_ab.py check experiments/{name}/experiment.toml' }, { out: '  Nothing is missing.', ok: true }, { out: '  Frozen: not yet (the wizard’s step 2 freezes it)' }]) })),
+    S_.loadExp('{name}'), S_.freeze, S_.exportFrozen, S_.moveBack('{name}'),
+    S_.run('{name}', '{asst}', 'Every version gets every development request, twice: with 4 versions and 4 requests, 32 runs, 4 at a time, about 5 to 15 minutes.'),
     S_.judge('{name}'), S_.loadRuns('{name}', 3), S_.initials, S_.pairs, S_.results, S_.keepResults('{name}'),
+    { where: 'agent', title: 'Run the held-out prompts, once your changes are final.', say: '/read-results Our changes are final. Please run the held-out prompts.',
+      cmd: '{py} run_ab.py run experiments/{name}/experiment.toml --assistant {asst} --rounds A,B --held-out --jobs 4',
+      body: 'The held-out prompts stay sealed until your group’s changes are final. Then Claude runs round A and your final version on them, then the AI judge on their pairs. (In the terminal command, put your final round where it says B.)',
+      see: 'A line for each held-out run, then the judge’s line.', ifnot: 'Claude asks whether your changes are final? It never unseals the held-out prompts before you say so.',
+      pic: ctx => C(ctx, [{ you: '/read-results Our changes are final. Please run the held-out prompts.' }, { run: '{py} run_ab.py run experiments/{name}/experiment.toml --assistant {asst} --rounds A,B --held-out --jobs 4' }, { run: '{py} run_ab.py judge runs/{name} --held-out' }]) },
+    { where: 'web', title: 'Judge the held-out pairs, each of you alone.', click: 'Load the new `bundle.json` in step 3. In step 4, click *Held out: the confirmation*, then judge each pair as before.',
+      body: 'The held-out pairs are a set of their own, judged blind like the others: sides varied, versions hidden, a reason for each.',
+      see: 'Two answers side by side, under *Held out: the confirmation*.', ifnot: 'No held-out set in step 4? The bundle has no held-out runs yet: load the one Claude made in the step before.',
+      pic: () => WZ(4, { kind: 'judge' }) },
+    { where: 'web', title: 'Read the confirmation.', click: 'In step 5, read *Held out: the confirmation*, under the main result. Then export `judgments.csv` and `results.json` again.',
+      body: 'It gives the held-out share with its interval, beside the development result for the same comparison. With two prompts the interval is wide: say what it supports.',
+      see: '“Held out: the confirmation”, with its share and its interval.', ifnot: 'It says the confirmation needs round A run on them too? Ask Claude to run round A on the held-out prompts.',
+      pic: () => WZ(5, { kind: 'click', panel: 'Held out: the confirmation', items: ['Judged blind, on the held-out prompts', 'Beside the development result'], buttons: [{ label: 'Export judgments.csv', primary: true }, { label: 'Export results.json' }] }) },
   ] },
   suites: { title: 'Personal I: suites', steps: [
     DZ_STEPS.openSuite, DZ_STEPS.answerSuite, DZ_STEPS.saveSuite,
-    { only: suiteByCopy, where: 'term', title: 'Start your packet from the worked example.', cmd: 'cp -r examples/personal-suites {packet}',
-      body: 'A *packet* is the folder for Personal I: the suites file, the cases and the tests. A *suite* is a set of tests run on every case. The example’s are about Wren; replace them with yours later.',
-      see: 'Nothing. No message means it worked.', ifnot: '`No such file or directory`? Check that the prompt shows `skill-eval-lite`.',
-      pic: ctx => T(ctx, [{ cmd: 'cp -r examples/personal-suites {packet}' }]) },
-    { where: 'term', title: 'Check the suites file.', cmd: '{py} run_ab.py suite {packet}/suites.yaml --check',
+    { only: suiteByCopy, where: 'agent', title: 'Start your packet from the worked example.', say: 'Please copy the worked example, examples/personal-suites, to {packet}.', cmd: 'cp -r examples/personal-suites {packet}',
+      body: 'A *packet* is the folder for Personal I: the suites file, the cases and the tests. A *suite* is a set of tests run on every case. The example’s are about Wren; `/suites-intake` helps you replace them with yours.',
+      see: 'A folder `{packetname}` next to `skill-eval-lite`.', ifnot: 'Claude says the folder is there already? You copied it before: go on.',
+      pic: ctx => C(ctx, [{ you: 'Please copy the worked example, examples/personal-suites, to {packet}.' }, { run: 'cp -r examples/personal-suites {packet}' }]) },
+    { where: 'agent', title: 'Check the suites file.', say: 'Please check my suites, {packet}/suites.yaml.', cmd: '{py} run_ab.py suite {packet}/suites.yaml --check',
       body: '`--check` reads `suites.yaml` and lists anything missing, without running a test.',
-      see: '`2 suites (…). Nothing to fix.`', ifnot: 'A list of problems? Fix them in `suites.yaml`, then check again.',
-      pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py suite {packet}/suites.yaml --check' }, { out: F('{packet}', ctx) + '/suites.yaml: 2 suites (…). Nothing to fix.', ok: true }]) },
-    { where: 'term', title: 'Run the tests.', cmd: '{py} run_ab.py suite {packet}/suites.yaml',
-      body: 'It runs every program test and every AI test on every case. Each AI test takes a few seconds.',
-      see: '`Next: open wizard.html and load …/bundle.json`', ifnot: '`Claude Code is not logged in`? Type `claude`, log in, type `/exit`, and run this again.',
-      pic: ctx => T(ctx, [{ cmd: '{py} run_ab.py suite {packet}/suites.yaml' }, { note: 'a table of results for each suite' }, { out: 'Next: open wizard.html and load ' + F('{packet}', ctx) + '/bundle.json …', ok: true }]) },
+      see: '`2 suites (…). Nothing to fix.`', ifnot: 'A list of problems? Ask Claude to fix them with you, then check again.',
+      pic: ctx => C(ctx, [{ you: 'Please check my suites, {packet}/suites.yaml.' }, { run: '{py} run_ab.py suite {packet}/suites.yaml --check' }, { out: F('{packet}', ctx) + '/suites.yaml: 2 suites (…). Nothing to fix.', ok: true }]) },
+    { where: 'agent', title: 'Run the mechanical tests.', say: '/run-suites Please run the mechanical tests in my suites, {packet}.', cmd: '{py} run_ab.py suite {packet}/suites.yaml --no-llm',
+      body: 'Every program test on every case, the control cases included. It calls no model: a few seconds. The LLM tests come after your own reference, because the runner prints their verdicts as it goes.',
+      see: 'A table for each suite, with `-` where a test hasn’t run yet.', ifnot: 'A test failed to run? Ask Claude what its reason says.',
+      pic: ctx => C(ctx, [{ you: '/run-suites Please run the mechanical tests in my suites, {packet}.' }, { run: '{py} run_ab.py suite {packet}/suites.yaml --no-llm' }, { note: 'a table for each suite' }]) },
     { where: 'web', title: 'Load the bundle into the wizard.', click: 'In step 1, under “A run you have made”, click *choose a file*.',
-      body: 'Pick `bundle.json` in your packet. The wizard switches to its checks-only mode, with four steps.',
+      body: 'Ask Claude to open the wizard (`/wizard`). Pick `bundle.json` in your packet. The wizard switches to its checks-only mode, with four steps.',
       see: '“Checks-only mode · step 1 of 4”.', ifnot: 'Can’t find it? It is in the folder next to `skill-eval-lite`: `{packetname}`.',
       pic: ctx => WZ(1, { kind: 'choose', panel: 'A run you have made (bundle.json)', file: 'bundle.json', path: [F('{packetname}', ctx), 'bundle.json'] }) },
-    { where: 'web', title: 'Judge the AI tests’ questions yourself, first.', click: 'In step 2, type your initials, pick a test, and choose *Pass*, *Unknown* or *Fail* for each case.',
-      body: 'You decide first, with a reason. The AI test’s answers appear once you have judged every case.', see: '“You and the LLM”: your answers beside the AI test’s.', ifnot: 'Nothing to judge? Your suites have no AI tests.',
+    { where: 'web', title: 'Judge the LLM tests’ questions yourself, first.', click: 'In step 2, type your initials, pick a test, then choose *Pass*, *Unknown* or *Fail* for each case.',
+      body: 'You decide first, with a reason, before any LLM test has run. Then export `judgments.csv` in step 4.', see: 'Each case judged, with `judgments.csv` in your Downloads folder.', ifnot: 'Nothing to judge? Your suites have no LLM tests.',
       pic: () => WZ(2, { kind: 'judge', choices: ['Pass', 'Unknown', 'Fail'] }, 'suites') },
-    { where: 'web', title: 'Rate the cases.', click: 'In step 3, pick a human test and rate each case.',
-      body: 'The cases come shuffled, with the control cases mixed in, and nothing says which is which. Please ask a classmate to do the same in their own browser.',
+    { where: 'agent', title: 'Bring your reference into the packet.', say: '/wizard I’ve exported judgments.csv with my reference. Please put it in my packet.', cmd: '{movesuite}',
+      body: 'Claude adds the new rows to your packet’s `judgments.csv`, so nothing is lost when the wizard loads another bundle.',
+      see: 'Claude counts your reference rows: one for every case of each LLM test you judged.', ifnot: 'No new rows? Export `judgments.csv` again in step 4.',
+      pic: ctx => C(ctx, [{ you: '/wizard I’ve exported judgments.csv with my reference. Please put it in my packet.' }, { note: 'Claude adds the new rows to ' + F('{packetname}', ctx) + '/judgments.csv' }]) },
+    { where: 'agent', title: 'Run the LLM tests.', say: '/run-suites My reference is in my packet. Please run the LLM tests.', cmd: '{py} run_ab.py suite {packet}/suites.yaml',
+      body: 'Each LLM test on each case is one fresh session on your plan, a few seconds each. Claude says how many before it starts.',
+      see: '`Next, load …/bundle.json in the wizard\'s step 1`', ifnot: '`Claude Code is not logged in`? Type `/get-ready`: it signs the `claude` command in.',
+      pic: ctx => C(ctx, [{ you: '/run-suites My reference is in my packet. Please run the LLM tests.' }, { run: '{py} run_ab.py suite {packet}/suites.yaml' }, { note: 'a line for each run, then the tables' }, { out: 'Next, load ' + F('{packet}', ctx) + '/bundle.json in the wizard\'s step 1 …', ok: true }]) },
+    { where: 'web', title: 'Rate the cases.', click: 'Load the new `bundle.json` in step 1. In step 3, pick a human test and rate each case.',
+      body: 'The cases come shuffled, with the control cases mixed in. Nothing says which is which. Please ask a classmate to do the same in their own browser, from the bundle the last run wrote.',
       see: 'After each case, the other tests’ results on it.', ifnot: 'Nothing to rate? Your suites have no human tests.',
       pic: () => WZ(3, { kind: 'judge', choices: ['1', '2', '3', '4'], cards: 1 }, 'suites') },
     { where: 'web', title: 'Save the reports.', click: 'In step 4, click *Export judgments.csv*, then each *Export <suite>.md*.',
       body: 'Import your classmate’s `judgments.csv` here too, to see where you agree.', see: 'The files in your Downloads folder.', ifnot: '',
       pic: () => WZ(4, { kind: 'click', panel: 'Suite report', items: [], buttons: [{ label: 'Export judgments.csv', primary: true, target: true }, { label: 'Export board-drafts….md' }], after: 'The files go to your Downloads folder.' }, 'suites') },
-    { where: 'file', title: 'Keep them in your packet.', cmd: '{movesuite}',
-      body: 'Move `judgments.csv` into your packet, `{packetname}`, and each report into its `reports` folder. Drag them, or type this for judgments.csv:',
-      see: 'Nothing in the terminal. No message means it worked.', ifnot: 'A name ends in (1)? Use the newest file, and rename it.',
-      pic: ctx => filesScene({ files: ['judgments.csv'], to: [F('{packetname}', ctx)], replace: true }) },
+    { where: 'agent', title: 'Keep them in your packet.', say: '/wizard I’ve exported judgments.csv and the reports. Please put them in my packet.', cmd: '{movesuite}',
+      body: 'Claude adds the new rows to your packet’s `judgments.csv` and puts each report in its `reports` folder.',
+      see: 'Claude says where it put each file.', ifnot: 'A name ends in (1)? Claude uses the newest file. Tell it if you exported again.',
+      pic: ctx => C(ctx, [{ you: '/wizard I’ve exported judgments.csv and the reports. Please put them in my packet.' }, { note: 'Claude adds the rows to judgments.csv and puts the reports in ' + F('{packetname}', ctx) + '/reports/' }]) },
   ], shortcut: 'Want to see the mode first? In the wizard’s step 1, load `examples/recorded/personal-suites/bundle.json`: a real run of the worked example.' },
+
 };
 
 /* designer pictures:begin */
@@ -1834,7 +1934,7 @@ function designOverview(kind, ctx) {
       [1, 'folder', 'rounds/', 'the changed files'], [1, 'folder', 'prompts/', 'the starting files']];
   p.rect(16, y - 6, W - 32, rows.length * 24 + 12, 'pl', 10);
   y = tree(p, 30, y + 12, rows, { rh: 24, noteX: 226 }).y;
-  p.text(16, y + 14, kind === 'suites' ? 'Next, in the terminal: suite … --check, then suite.' : 'Next, in the terminal: check it. Then freeze it in the wizard.', { size: 12.5, bold: true });
+  p.text(16, y + 14, kind === 'suites' ? 'Next, in Claude: check it, then /run-suites.' : 'Next, in Claude: check it. Then freeze it in the wizard.', { size: 12.5, bold: true });
   p.h = y + 28;
   return p;
 }
@@ -2054,17 +2154,17 @@ function designerScene(o) {
 
 // ==== The module's interface ====
 const NAMED = {
-  'which-path': { draw: whichPath, title: 'Which path are you on?', desc: 'Four paths through Skill Eval Lite. A demonstration: setup, run and judge in the terminal, then steps 1 to 5 in the wizard. The class experiment: setup, copy and check in the terminal, freeze in the wizard, put the frozen file back, then run and judge, then wizard steps 3 to 5. Your group’s experiment: the intake skill in Claude Code, check, freeze, put the frozen file back, run, judge, wizard steps 3 to 5. Personal I suites: copy, suite, then the wizard’s checks-only mode.' },
-  'order-demo': { draw: () => orderDiagram('demo'), title: 'A demonstration, in order', desc: 'Terminal: setup, check, run, judge. Then the wizard: load the bundle in step 1, freeze in step 2, then steps 3 to 5. A demonstration is frozen after it is run; a recorded run can be loaded instead.' },
-  'order-class': { draw: () => orderDiagram('class'), title: 'The class experiment, in order', desc: 'Terminal: setup, copy, check. Wizard: load and freeze, export the frozen file. Your files: put it back in experiments/class-assistant. Terminal: run, judge. Wizard: load the runs in step 3, judge, results. Your files: keep the results in runs/class-assistant.' },
-  'order-group': { draw: ctx => orderDiagram(ctx && ctx.write === 'designer' ? 'groupDesigner' : 'group'), title: 'Your group’s experiment, in order: terminal or browser', desc: 'Claude Code: the intake skill writes experiments/<name>/experiment.toml. Terminal: check. Wizard: load and freeze, export the frozen file. Your files: put it back over experiments/<name>/experiment.toml, because the run uses the frozen file. Terminal: run, judge. Wizard: load runs/<name>/bundle.json in step 3, judge in step 4, results in step 5. Your files: keep the exports in runs/<name>.' },
-  'order-suites': { draw: ctx => orderDiagram(ctx && ctx.packetHow === 'designer' ? 'suitesDesigner' : 'suites'), title: 'Personal I suites, in order', desc: 'Terminal: copy the worked example into a packet, check it, run the suites. Wizard, checks-only mode: load the bundle, judge the AI tests yourself, rate the cases, save the reports. Your files: keep them in the packet.' },
-  'intake-decision': { draw: intakeDecision, title: 'Do I need to run the intake skill first?', desc: 'If you already have an experiment file (the class one, a demonstration or your group’s), skip the intake and check it. If not: is your assistant’s folder a git project with a CLAUDE.md? If not, run setup for the class assistant, or let the intake make your own folder a git project, with your permission. Then, in skill-eval-lite, type claude and /experiment-intake ../your-assistant (with Codex, follow AGENTS.md). It writes experiments/<name>/experiment.toml.' },
+  'which-path': { draw: whichPath, title: 'Which path are you on?', desc: 'Four paths through Skill Eval Lite, each in Claude (in a session on the skill-eval-lite folder) and the wizard. A demonstration: Claude sets up the class assistant, runs the demonstration and the AI judge, then steps 1 to 5 in the wizard. The class experiment: Claude copies it, you freeze it in the wizard, Claude puts the frozen file back, runs it and the AI judge, then wizard steps 3 to 5. Your group’s experiment: the intake skill writes it, then the same, then the held-out prompts and their confirmation. Personal I: Claude copies a packet and runs the mechanical tests, you make your reference in the wizard, Claude runs the LLM tests, then the wizard’s checks-only mode.' },
+  'order-demo': { draw: () => orderDiagram('demo'), title: 'A demonstration, in order', desc: 'Claude: set up the class assistant, check, run, judge. Then the wizard: load the bundle in step 1, freeze in step 2, then steps 3 to 5. A demonstration is frozen after it is run; a recorded run can be loaded instead.' },
+  'order-class': { draw: () => orderDiagram('class'), title: 'The class experiment, in order', desc: 'Claude: set up the class assistant, copy the class experiment and check it. Wizard: load and freeze, export the frozen file. Claude: put it back in experiments/class-assistant and check it, run every round, ask the AI judge. Wizard: load the runs in step 3, judge, results. Claude: keep the results in runs/class-assistant.' },
+  'order-group': { draw: ctx => orderDiagram(ctx && ctx.write === 'designer' ? 'groupDesigner' : 'group'), title: 'Your group’s experiment, in order: Claude or the wizard', desc: 'Claude: the intake skill writes experiments/<name>/experiment.toml, then check. Wizard: load and freeze, export the frozen file. Claude: put it back over experiments/<name>/experiment.toml, because the run uses the frozen file, then run every round and ask the AI judge. Wizard: load runs/<name>/bundle.json in step 3, judge in step 4, results in step 5. Claude: keep the exports in runs/<name>. Once your changes are final, Claude runs the held-out prompts. The wizard judges them and reports the confirmation.' },
+  'order-suites': { draw: ctx => orderDiagram(ctx && ctx.packetHow === 'designer' ? 'suitesDesigner' : 'suites'), title: 'Personal I suites, in order', desc: 'Claude: copy the worked example into a packet, check it, run the mechanical tests. Wizard, checks-only mode: load the bundle, judge the LLM tests yourself. Claude: bring your reference into the packet, run the LLM tests. Wizard: rate the cases, save the reports. Claude: keep them in the packet.' },
+  'intake-decision': { draw: intakeDecision, title: 'Do I need to run the intake skill first?', desc: 'If you already have an experiment file (the class one, a demonstration or your group’s), skip the intake and check it. If not: is your assistant’s folder a git project with a CLAUDE.md? If not, ask Claude to set up the class assistant, or let the intake make your own folder a git project, with your permission. Then, in Claude, in your session on skill-eval-lite, type /experiment-intake ../your-assistant (with Codex, follow AGENTS.md). It writes experiments/<name>/experiment.toml.' },
   'folder-map': { draw: folderMapWide, title: 'Where everything is', desc: 'Your workspace holds skill-eval-lite and the assistant side by side. setup makes the class assistant. The intake skill reads the assistant and writes experiments/<name>/. check and run read experiment.toml; run copies the assistant for each run and writes runs/<name>/; judge adds to bundle.json. The wizard loads experiment.toml and bundle.json, and the frozen experiment.toml comes back to experiments/<name>/ through Downloads.' },
   'folder-map-narrow': { draw: folderMapNarrow, title: 'Where everything is', desc: 'The same map, as a list: skill-eval-lite with run_ab.py, wizard.html, AGENTS.md, the intake skill, examples, experiments/<name>/ and runs/<name>/, each marked with what writes or reads it; and the assistant’s folder beside it.' },
   'class-assistant': { draw: classAssistant, title: 'The class assistant: Wren', desc: 'Morgan Reyes asks Wren for a draft; Wren writes it; Morgan sends it under Morgan’s own name. Both are made up. Wren is a folder: CLAUDE.md, read every time; five identity files read through it (soul, persona, operating, user, voice); the knowledge graph in kb/, searched when needed; and skills.' },
-  'designer-experiment': { draw: ctx => designOverview('experiment', ctx), title: 'The experiment designer, screen by screen', desc: 'Nine screens: start (the class experiment, a demonstration, or blank), the assistant and its parts, the question, the change (round B), the two controls (rounds C and D), the prompts, the checks and the AI judge, the runs, and a review. Then save: experiments/<name>/ with experiment.toml, rounds/ and prompts/. Next, check it in the terminal and freeze it in the wizard.' },
-  'designer-suites': { draw: ctx => designOverview('suites', ctx), title: 'The suite designer, screen by screen', desc: 'Six screens: start (the worked example, or blank), the two suites, the cases, the tests, the control cases, and a review. Then save the packet next to skill-eval-lite: suites.yaml, the cases in product/ and process/, controls/ and tests/. Next, suite --check, then suite, in the terminal.' },
+  'designer-experiment': { draw: ctx => designOverview('experiment', ctx), title: 'The experiment designer, screen by screen', desc: 'Nine screens: start (the class experiment, a demonstration, or blank), the assistant and its parts, the question, the change (round B), the two controls (rounds C and D), the prompts, the checks and the AI judge, the runs, and a review. Then save: experiments/<name>/ with experiment.toml, rounds/ and prompts/. Next, ask Claude to check it, then freeze it in the wizard.' },
+  'designer-suites': { draw: ctx => designOverview('suites', ctx), title: 'The suite designer, screen by screen', desc: 'Six screens: start (the worked example, or blank), the two suites, the cases, the tests, the control cases, and a review. Then save the packet next to skill-eval-lite: suites.yaml, the cases in product/ and process/, controls/ and tests/. Next, ask Claude to check it, then /run-suites: the mechanical tests, your reference in the wizard, then the LLM tests.' },
   'dz-assistant': { draw: dzAssistant, title: 'The designer reads your assistant', desc: 'The page reads your assistant’s folder (CLAUDE.md, .claude/identity/, kb/, .claude/skills/) and lists its parts. It never changes the folder, and nothing leaves your computer.' },
   'dz-question': { draw: dzQuestion, title: 'Three questions about every output', desc: 'For a draft: who reads it (what the outputs are for), is it good enough to send (the criterion), and which of two is better, Left or Right (the judging question).' },
   'dz-change': { draw: () => dzRounds('B'), title: 'Round B changes one part', desc: 'Four rounds, each a copy of the assistant. A is as it is. B is your change: here voice.md revised. C should get worse (kb/ removed). D should not move (voice.md reordered).' },
@@ -2078,19 +2178,19 @@ const NAMED = {
   'sz-cases': { draw: szCases, title: 'A folder for each case', desc: 'Each case is a folder: product/<item>/ with context.md and output.md; process/<item>/ with context.md and its steps (trace.jsonl or transcript.jsonl).' },
   'sz-tests': { draw: szTests, title: 'Three kinds of test', desc: 'Mechanical: a program or a built-in check says pass or fail. LLM: an AI model, with your prompt, says PASS, FAIL or UNKNOWN. Human: a person rates each case on your scale, 1 to 4.' },
   'sz-controls': { draw: szControls, title: 'Cases whose answers you know', desc: 'A reference every test should pass; planted faults, each broken in one way, that some tests should fail; harmless variations that should get the same results as the reference. A test that misses one is a finding.' },
-  'stuck': { draw: stuck, title: 'Stuck? Where to type status and ask', desc: 'In the terminal, in the skill-eval-lite folder, type python3 run_ab.py status to see where you are and the next command, or python3 run_ab.py ask to have Claude Code or Codex help you step by step.' },
+  'stuck': { draw: stuck, title: 'Stuck? Ask Claude where you are', desc: 'In Claude, in your session on skill-eval-lite, ask where you are and what to do next. Claude runs python3 run_ab.py status and says the next step, with the skill for it.' },
 };
 [1, 2, 3, 4, 5].forEach(n => { NAMED['help-step-' + n] = { draw: () => helpStep(n), title: 'Step ' + n + ': ' + ['where the file is', 'freeze, then put the frozen file back', 'where the runs come from', 'judge each pair', 'save your results'][n - 1], desc: [
   'experiments/<name>/experiment.toml, before the runs, or runs/<name>/bundle.json, after them, both inside skill-eval-lite: choose either one in step 1.',
-  'Press Freeze, then Export the frozen experiment. Your browser saves experiment.toml in Downloads. Move it back over skill-eval-lite/experiments/<name>/experiment.toml. The run uses this file.',
-  'In the terminal, run and then judge write skill-eval-lite/runs/<name>/bundle.json. Choose it under Your runs in step 3.',
+  'Press Freeze, then Export the frozen experiment. Your browser saves experiment.toml in Downloads. In Claude, /wizard puts it back over skill-eval-lite/experiments/<name>/experiment.toml. The run uses this file.',
+  'In Claude, /run-experiment runs every round and the AI judge, which write skill-eval-lite/runs/<name>/bundle.json. Choose it under Your runs in step 3.',
   'Two answers, Left and Right. Choose Left is better, About the same or Right is better, write why, and Record. Then you see which version wrote which.',
-  'Export judgments.csv and results.json. They go to Downloads; move both into skill-eval-lite/runs/<name>/. Import a teammate’s judgments.csv here.'][n - 1] }; });
+  'Export judgments.csv and results.json. They go to Downloads; in Claude, /wizard keeps both in skill-eval-lite/runs/<name>/. Import a teammate’s judgments.csv here.'][n - 1] }; });
 [1, 2, 3, 4].forEach(n => { NAMED['help-suite-' + n] = { draw: () => helpSuite(n), title: 'Checks-only step ' + n + ': ' + ['where the bundle comes from', 'you first, then the AI test', 'rate each case, blind', 'save the reports'][n - 1], desc: [
-  'python3 run_ab.py suite ../my-suites/suites.yaml writes my-suites/bundle.json. Choose it in step 1.',
+  'In Claude, /run-suites runs the suites, which write my-suites/bundle.json. Choose it in step 1.',
   'For each case, choose Pass, Unknown or Fail, with a reason. The AI test’s answers appear after you have judged every case.',
   'The cases come shuffled, with the control cases mixed in. Rate each from 1 to 4. A classmate does the same in their own browser.',
-  'Export judgments.csv and each report. Move judgments.csv into my-suites/ and the reports into my-suites/reports/.'][n - 1] }; });
+  'Export judgments.csv and each report. In Claude, /wizard adds the rows to my-suites/judgments.csv and puts the reports in my-suites/reports/.'][n - 1] }; });
 
 let uid = 0;
 function svg(p, o = {}) {
@@ -2108,7 +2208,7 @@ function draw(name, ctx, mode) {
 function stepTitle(step) { return step.title.replace(/[.]$/, ''); }
 function stepSvg(step, ctx, mode, name) {
   const plain = s => F(s || '', ctx).replace(/[*`]/g, '');
-  return svg(step.pic(ctx), { mode, name, title: (WHERE[step.where] || '') + ': ' + plain(stepTitle(step)), desc: plain(step.cmd ? 'Type: ' + step.cmd + '. ' : step.click || '') + ' You should see: ' + plain(step.see) });
+  return svg(step.pic(ctx), { mode, name, title: (WHERE[step.where] || '') + ': ' + plain(stepTitle(step)), desc: plain(step.say ? 'In Claude, type: ' + step.say + '. ' : step.cmd ? 'Type: ' + step.cmd + '. ' : step.click || step.body || '') + ' You should see: ' + plain(step.see) });
 }
 // The placeholder settings for docs/diagrams/steps/ and the README.
 const DOC_CTX = { first: GENERIC, demo: GENERIC, class: GENERIC, group: Object.assign({}, GENERIC, { asst: '../your-assistant' }), suites: GENERIC };
@@ -4023,7 +4123,7 @@ function bootstrap(groups, seed, B = RESAMPLES) {
 
 function fresh() {
   return { v: 1, step: 1, theme: null, intakeText: null, intakeName: null, frozen: null, changedSince: null,
-    outputs: {}, files: {}, madeUp: false, judge: '', plans: {}, judgments: [], llm: [], reveal: null,
+    outputs: {}, files: {}, madeUp: false, judge: '', plans: {}, heldPlans: {}, judgeSet: null, judgments: [], llm: [], reveal: null,
     programs: {}, programRefs: {}, programNote: null,
     imported: [], sources: [], bundleNote: null, next: { part: '', how: 'blank' }, mode: 'ab',
     view: 'start', path: null, gs: { os: guessOs(), asstKind: 'class', asst: '', name: '', packet: '' } };
@@ -4054,6 +4154,24 @@ const roundById = id => (X.rounds || []).find(r => r.id === id) || { id, label: 
 const comparison = () => (X.comparisons || [])[0];
 const devIds = () => (X.prompts && X.prompts.development) || [];
 const heldIds = () => (X.prompts && X.prompts.held_out) || [];
+const isHeld = p => heldIds().includes(p);
+// The baseline: the round whose role is baseline, else the first comparison's, else the first round.
+function baselineRound() {
+  const b = (X.rounds || []).find(r => r.role === 'baseline');
+  return b ? b.id : ((X.comparisons || [])[0] || {}).baseline || ((X.rounds || [])[0] || {}).id;
+}
+// The held-out confirmation (Shared I's fourth step: "run A and your final
+// version on them, judge them blind as before"): the baseline against each
+// round that has run on a held-out prompt. run_ab.py's judge --held-out pairs
+// them the same way (held_out_comparisons). Empty while the prompts are sealed.
+function heldRounds() { const out = new Set(); Object.values(S.outputs || {}).forEach(o => { if (o && isHeld(o.prompt)) out.add(o.round); }); return out; }
+function heldComparisons() {
+  if (!X) return [];
+  const held = heldRounds(), base = baselineRound();
+  return held.has(base) ? (X.rounds || []).filter(r => r.id !== base && held.has(r.id)).map(r => ({ baseline: base, new: r.id })) : [];
+}
+// judgments.csv keeps its columns: a held-out preference says so in its check.
+const PREF_CHECK = 'blind-preference', HELD_PREF_CHECK = 'blind-preference-held-out', HELD_JUDGE_CHECK = 'llm-judge-held-out';
 const repeats = () => X.repeats || 1;
 const okey = (p, r, k) => p + '|' + r + '|' + k;
 const roundName = id => id + ' · ' + roundById(id).label;
@@ -4179,8 +4297,8 @@ const canOpen = n => n === 1 || (n === 5 ? canOpen(4) : STEPS[n - 2].ready() && 
 
 // Step 1 ---------------------------------------------------------------
 STEPS[0].lead = ['Your *experiment file*, `experiment.toml`, is the plan for your test: which versions of the assistant you compare (the *rounds*), the requests you give it (the *prompts*), and how you judge the answers.',
-  'Load it here before you run anything. After the runs, you can load the runner’s `bundle.json` here instead: one file with the plan and every answer.', 'Your group writes the file with the intake skill in Claude Code. The class assistant’s file is ready.'];
-STEPS[0].try = 'Please click *choose a file* and pick your file, or press *Use the class assistant’s intake*. Read the summary. Something listed in red? Fix it in the file (or ask Claude Code to), and load it again.';
+  'Load it here before you run anything. After the runs, you can load the runner’s `bundle.json` here instead: one file with the plan and every answer.', 'Your group writes the file with the intake skill in Claude (`/experiment-intake`). The class assistant’s file is ready.'];
+STEPS[0].try = 'Please click *choose a file* and pick your file, or press *Use the class assistant’s intake*. Read the summary. Something listed in red? Ask Claude to fix it in the file, then load it again.';
 STEPS[0].shows = () => X && 'Everything the next four steps need is in this file. Nothing here calls a model.';
 STEPS[0].render = function () {
   const loaders = h('div', null, h('div', { class: 'grid2' },
@@ -4193,7 +4311,7 @@ STEPS[0].render = function () {
       h('p', { class: 'small muted' }, 'Wren, the AI 5100 template’s fictional assistant for Morgan Reyes. Round A is Wren as it is; B writes the voice file’s missing board memo section. Two controls: C removes the knowledge graph (it should get worse), and D reorders the voice file (nothing should change). The same file is examples/class-assistant/experiment.toml.'),
       h('button', { class: 'btn', disabled: !!S.frozen, onclick: () => loadIntake(document.getElementById('class-intake').textContent.trim(), 'experiment.toml') }, 'Use the class assistant’s intake')),
     h('div', { class: 'panel', style: 'margin-top:14px' }, h('h3', null, 'No experiment file yet?'),
-      h('p', { class: 'small muted' }, 'Make one with the designer: one screen at a time, with pictures and the class experiment as an example. It saves the folder experiments/<name>/ for you. (Or write it with the intake skill in Claude Code: see Getting started.)'),
+      h('p', { class: 'small muted' }, 'Make one with the designer: one screen at a time, with pictures and the class experiment as an example. It saves the folder experiments/<name>/ for you. (Or write it with the intake skill in Claude: see Getting started.)'),
       h('div', { class: 'toolbar' }, h('button', { class: 'btn primary', id: 'step1-designer', onclick: () => dzOpen('experiment') }, 'Make one with the designer'),
         h('button', { class: 'btn', onclick: () => dzOpen('suites') }, 'Personal I: make a suites file'))));
   if (!S.intakeText) return [loaders];
@@ -4337,12 +4455,12 @@ STEPS[1].render = function () {
 function frozenExportPanel() {
   const panel = (title, ...kids) => h('div', { class: 'panel', style: 'margin-top:14px' }, h('h3', null, title), ...kids);
   if (X.demo) return panel('Nothing to save', h('p', { class: 'small', style: 'margin:0' }, 'A demonstration is run before it is frozen, so there is no frozen file to save. Please go on to step 3.'));
-  if (S.frozen.fromFile) return panel('This file arrived frozen', h('p', { class: 'small', style: 'margin:0' }, 'It is ready to run. If you haven’t run it yet, please go back to the terminal and run it.'));
+  if (S.frozen.fromFile) return panel('This file arrived frozen', h('p', { class: 'small', style: 'margin:0' }, 'It is ready to run. If you haven’t run it yet, please ask Claude to run it: /run-experiment.'));
   return panel('Next: save the frozen file, and put it back',
     h('ol', { class: 'small', style: 'margin:0 0 10px;padding-left:20px;line-height:1.65' },
       h('li', null, 'Click ', h('b', null, 'Export the frozen experiment'), '. Your browser saves ', h('code', null, 'experiment.toml'), ' in your Downloads folder.'),
-      h('li', null, 'Move it into the folder it came from, ', h('code', null, 'skill-eval-lite/experiments/<name>/'), ', and replace the old one.'),
-      h('li', null, 'In the terminal, type ', h('code', null, 'python3 run_ab.py check experiments/<name>/experiment.toml'), '. It should say ', h('code', null, 'Frozen: yes'), '.')),
+      h('li', null, 'In Claude, type ', h('code', null, '/wizard I’ve exported the frozen experiment. Please put it back in experiments/<name> and check it.'), ' Claude puts it in the folder it came from, ', h('code', null, 'skill-eval-lite/experiments/<name>/'), ', keeps the old one under its date and checks it.'),
+      h('li', null, 'The check should say ', h('code', null, 'Frozen: yes'), '.')),
     h('p', { class: 'small muted', style: 'margin:0 0 10px' }, 'The runner must run the frozen file. It keeps a copy with the runs, so anyone can see what was planned before the results.'),
     h('button', { class: 'btn primary', onclick: exportIntake }, 'Export the frozen experiment'));
 }
@@ -4352,7 +4470,7 @@ async function freeze(unmet) {
 }
 
 // Step 3 ---------------------------------------------------------------
-STEPS[2].lead = ['This page doesn’t run the assistant. The runner, `run_ab.py`, does that in the terminal. It gives every request to every version, and writes `runs/<name>/bundle.json`: one file with every answer.', 'With Codex or a chat window, you can paste each answer in instead.'];
+STEPS[2].lead = ['This page doesn’t run the assistant. The runner, `run_ab.py`, does that: in Claude, `/run-experiment` runs it for you. It gives every request to every version and writes `runs/<name>/bundle.json`: one file with every answer.', 'With Codex or a chat window, you can paste each answer in instead.'];
 STEPS[2].try = 'Please click *choose a file* under “Your runs” and pick `bundle.json`. Each request, version and repeat gets a cell. Click a cell to read that run.';
 STEPS[2].shows = () => { const c = outputCount(); return c.ok + c.failed > 0 && c.ok + ' runs finished and ' + c.failed + ' failed or timed out. A failed run counts as a failure for its round, never as missing.'; };
 STEPS[2].render = function () {
@@ -4379,7 +4497,12 @@ STEPS[2].render = function () {
         h('tr', null, h('th', null, 'Prompt'), cols.map(([r, k]) => h('th', { class: 'c' }, r + ' · ' + k))),
         devIds().map(id => h('tr', null, h('td', { class: 'mono' }, id),
           cols.map(([r, k]) => { const o = S.outputs[okey(id, r, k)]; return h('td', { class: 'c' }, o ? h('button', { class: 'cellbtn', onclick: () => openRun(id, r, k) }, statusChip(o)) : statusChip(null)); }))),
-        heldIds().map(id => h('tr', { class: 'sealed' }, h('td', { class: 'mono' }, id), h('td', { colspan: cols.length }, h('span', { class: 'chip esc' }, 'held out, sealed until your development decisions are final')))))));
+        heldIds().map(id => heldRounds().size
+          ? h('tr', null, h('td', { class: 'mono' }, id, ' ', h('span', { class: 'chip esc' }, 'held out')),
+              cols.map(([r, k]) => { const o = S.outputs[okey(id, r, k)]; return h('td', { class: 'c' }, o ? h('button', { class: 'cellbtn', onclick: () => openRun(id, r, k) }, statusChip(o)) : h('span', { class: 'muted', title: 'Not run on the held-out prompts' }, '·')); }))
+          : h('tr', { class: 'sealed' }, h('td', { class: 'mono' }, id), h('td', { colspan: cols.length }, h('span', { class: 'chip esc' }, 'held out, sealed until your development decisions are final'))))),
+      heldRounds().size ? h('p', { class: 'small muted', style: 'margin:8px 0 0' }, 'The held-out prompts are unsealed: rounds ' + [...heldRounds()].sort().join(' and ') + ' have run on them. '
+        + (heldComparisons().length ? 'Step 4 adds their pairs as a set of their own, Held out: the confirmation.' : 'The confirmation needs round ' + baselineRound() + ' run on them too.')) : null));
 };
 function outputCount() {
   if (!X) return { ok: 0, failed: 0, missing: 0 };
@@ -4476,7 +4599,13 @@ function openDrawer(title, body) {
 // Step 4 ---------------------------------------------------------------
 STEPS[3].lead = ['You judge alone. You see two answers to the same request, side by side, called Left and Right. You don’t know which version wrote which: the sides are random, and the controls (versions whose result you can predict) are mixed in.'];
 STEPS[3].try = 'Please type your initials and click *Start*. For each pair, choose one, write one line saying why, and click *Record*. The checks’ results show only after you judge. *Fast judging* (for a room voting together, or a quick first pass) records with one click, makes the reason optional, and lets you skip a pair with *Skip →*.';
-STEPS[3].shows = () => { const p = S.plans[S.judge]; if (!p) return null; const d = p.filter(x => judged(S.judge, x)).length; return d === p.length ? 'All ' + d + ' pairs judged. Export your judgments in step 5 and send them to your teammates.' : null; };
+STEPS[3].shows = () => {
+  const p = S.plans[S.judge]; if (!p) return null;
+  const d = p.filter(x => judged(S.judge, x)).length, hp = (S.heldPlans || {})[S.judge] || [], left = hp.filter(x => !judged(S.judge, x)).length;
+  if (d !== p.length) return null;
+  if (left) return 'All ' + d + ' development pairs judged. The held-out set has ' + left + (left === 1 ? ' pair' : ' pairs') + ' left.';
+  return (hp.length ? 'Every pair judged: ' + d + ' development pairs and ' + hp.length + ' held out.' : 'All ' + d + ' pairs judged.') + ' Export your judgments in step 5 and send them to your teammates.';
+};
 const cfg = c => c.baseline + '|' + c.new;
 const pairItem = x => x.prompt + '/' + x.repeat;
 const pairKey = x => x.config + ':' + pairItem(x);
@@ -4497,12 +4626,28 @@ document.addEventListener('keydown', e => {
   if (b && !b.disabled) { e.preventDefault(); b.click(); }
 });
 function pairsFor() {
-  const list = [], waiting = [];
+  const list = [], waiting = [], held = [], heldWaiting = [];
   (X.comparisons || []).forEach(c => devIds().forEach(p => { for (let k = 1; k <= repeats(); k++) {
     const x = { prompt: p, repeat: k, config: cfg(c), baseline: c.baseline, new: c.new };
     (S.outputs[okey(p, c.baseline, k)] && S.outputs[okey(p, c.new, k)] ? list : waiting).push(x);
   } }));
-  return { list, waiting };
+  heldComparisons().forEach(c => heldIds().forEach(p => { for (let k = 1; k <= repeats(); k++) {
+    const x = { prompt: p, repeat: k, config: cfg(c), baseline: c.baseline, new: c.new, held: true };
+    (S.outputs[okey(p, c.baseline, k)] && S.outputs[okey(p, c.new, k)] ? held : heldWaiting).push(x);
+  } }));
+  return { list, waiting, held, heldWaiting };
+}
+const shuffled = xs => { for (let k = xs.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [xs[k], xs[j]] = [xs[j], xs[k]]; } return xs; };
+// A judge's held-out plan: made when the held-out runs arrive, apart from the
+// development plan (which stays as it was). It grows if more arrive.
+function ensureHeldPlan(judge) {
+  if (!judge) return null;
+  const { held } = pairsFor(), plan = (S.heldPlans || {})[judge] || [];
+  const have = new Set(plan.map(pairKey)), add = shuffled(held.filter(x => !have.has(pairKey(x))));
+  if (!add.length) return plan.length ? plan : null;
+  S.heldPlans = Object.assign({}, S.heldPlans || {}, { [judge]: plan.concat(add.map(x => Object.assign(x, { left: Math.random() < 0.5 ? x.baseline : x.new }))) });
+  save();
+  return S.heldPlans[judge];
 }
 function startJudging(initials) {
   initials = initials.trim().toUpperCase().slice(0, 6);
@@ -4510,13 +4655,14 @@ function startJudging(initials) {
   const plans = Object.assign({}, S.plans);
   if (!plans[initials]) {
     const { list } = pairsFor();
-    for (let k = list.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [list[k], list[j]] = [list[j], list[k]]; }
-    plans[initials] = list.map(x => Object.assign(x, { left: Math.random() < 0.5 ? x.baseline : x.new }));
+    plans[initials] = shuffled(list).map(x => Object.assign(x, { left: Math.random() < 0.5 ? x.baseline : x.new }));
   }
-  set({ judge: initials, plans, reveal: null });
+  S.plans = plans;
+  ensureHeldPlan(initials);
+  set({ judge: initials, plans, reveal: null, judgeSet: null });
 }
 STEPS[3].render = function () {
-  const plan = S.plans[S.judge];
+  let plan = S.plans[S.judge];
   const who = h('div', { class: 'panel' }, h('h3', null, 'Who is judging?'),
     h('div', { class: 'row', style: 'align-items:center' },
       h('input', { type: 'text', id: 'initials', value: S.judge || '', placeholder: 'Your initials', style: 'width:140px', onkeydown: e => { if (e.key === 'Enter') startJudging(e.target.value); } }),
@@ -4526,7 +4672,18 @@ STEPS[3].render = function () {
       h('input', { type: 'checkbox', id: 'fast', checked: !!S.fast, onchange: e => set({ fast: e.target.checked }) }),
       h('span', null, h('b', null, 'Fast judging. '), 'One click records; a reason is optional; ', h('i', null, 'Skip →'), ' leaves a pair for later. Keys: L, S, R to record, → to skip or go on.')));
   if (!plan) return [who];
-  const { waiting } = pairsFor();
+  const heldPlan = ensureHeldPlan(S.judge);
+  const doneAll = p => p.every(x => judged(S.judge, x));
+  const which = heldPlan && (S.judgeSet === 'held' || (S.judgeSet !== 'dev' && doneAll(plan) && !doneAll(heldPlan))) ? 'held' : 'dev';
+  const devPlan = plan;
+  plan = which === 'held' ? heldPlan : devPlan;
+  const { waiting: devWaiting, heldWaiting } = pairsFor(), waiting = which === 'held' ? heldWaiting : devWaiting;
+  const count = p => p.filter(x => judged(S.judge, x)).length + ' of ' + p.length;
+  const sets = heldPlan ? h('div', { class: 'panel', style: 'margin-top:14px' },
+    h('div', { class: 'choices', role: 'group', 'aria-label': 'Which pairs' },
+      h('button', { 'aria-pressed': which === 'dev' ? 'true' : 'false', onclick: () => set({ judgeSet: 'dev', goto: null, reveal: null }) }, 'Development pairs · ' + count(devPlan)),
+      h('button', { 'aria-pressed': which === 'held' ? 'true' : 'false', onclick: () => set({ judgeSet: 'held', goto: null, reveal: null }) }, 'Held out: the confirmation · ' + count(heldPlan))),
+    which === 'held' ? h('div', { class: 'small muted', style: 'margin-top:8px' }, 'The held-out prompts, unsealed: round ' + heldPlan[0].baseline + ' against the version your group ran on them. Judge them as before: blind, alone and with a reason.') : null) : null;
   const cur = S.reveal ? plan.find(x => pairKey(x) === S.reveal)
     : S.goto ? plan.find(x => pairKey(x) === S.goto)
     : plan.find(x => !judged(S.judge, x) && !skippedBy(S.judge, x));
@@ -4535,16 +4692,16 @@ STEPS[3].render = function () {
     return h('span', { class: 'go ' + (x === cur ? 'cur' : state === 'judged' ? 'done' : state === 'skipped' ? 'skipped' : ''), title: 'Pair ' + (k + 1) + ': ' + state,
       role: 'button', tabindex: '0', onclick: () => { S._pick = null; set({ goto: pairKey(x), reveal: null }); } }, k + 1);
   }));
-  const head = h('div', { class: 'panel' }, h('div', { class: 'row', style: 'justify-content:space-between;align-items:center' },
+  const head = h('div', { class: 'panel', style: sets ? 'margin-top:14px' : null }, h('div', { class: 'row', style: 'justify-content:space-between;align-items:center' },
     h('div', null, h('b', null, S.judge), ' · ', plan.filter(x => judged(S.judge, x)).length + ' of ' + plan.length + ' pairs judged'), dots),
     waiting.length ? h('div', { class: 'small muted', style: 'margin-top:6px' }, waiting.length + ' pairs wait for outputs.') : null);
   if (!cur) {
     const left = plan.filter(x => !judged(S.judge, x));
-    if (left.length) return [who, head, h('div', { class: 'panel', style: 'margin-top:14px' },
+    if (left.length) return [who, sets, head, h('div', { class: 'panel', style: 'margin-top:14px' },
       h('div', { class: 'verdict info' }, 'You skipped ' + left.length + (left.length === 1 ? ' pair' : ' pairs') + '. Only the pairs you judged count in step 5.'),
       h('div', { class: 'toolbar' }, h('button', { class: 'btn primary', onclick: () => set({ skipped: Object.assign({}, S.skipped || {}, { [S.judge]: [] }), goto: null }) }, 'Back to the skipped pairs'),
         h('button', { class: 'btn', onclick: () => set({ step: 5 }) }, 'Go to step 5')))];
-    return [who, head, h('div', { class: 'verdict right', style: 'margin-top:14px' }, 'You have judged every pair. Go to step 5 for the results.')];
+    return [who, sets, head, h('div', { class: 'verdict right', style: 'margin-top:14px' }, which === 'held' ? 'You have judged every pair in the held-out set. Go to step 5 for the confirmation.' : 'You have judged every pair. Go to step 5 for the results.')];
   }
   const prompt = promptById(cur.prompt), right = cur.left === cur.baseline ? cur.new : cur.baseline;
   const L = S.outputs[okey(cur.prompt, cur.left, cur.repeat)], R = S.outputs[okey(cur.prompt, right, cur.repeat)];
@@ -4559,7 +4716,7 @@ STEPS[3].render = function () {
     runCard(prompt, L, { label: 'Left', request: false, status: false, meta: false }), runCard(prompt, R, { label: 'Right', request: false, status: false, meta: false }));
   if (!done && S.fast) {
     const opts = [['left', 'Left is better', 'L'], ['tie', 'About the same', 'S'], ['right', 'Right is better', 'R']];
-    return [who, head, req, cards,
+    return [who, sets, head, req, cards,
       h('div', { class: 'panel', style: 'margin-top:14px' },
         h('input', { type: 'text', id: 'reason', placeholder: 'A reason, if you have one (optional)', value: S._reason || '', oninput: e => { S._reason = e.target.value; } }),
         h('div', { class: 'choices big', style: 'margin-top:10px' }, opts.map(([v, label, key]) => h('button', { 'data-fast': v, title: 'Key: ' + key, onclick: () => record(cur, v) }, label))),
@@ -4569,7 +4726,7 @@ STEPS[3].render = function () {
   if (!done) {
     const choose = side => { S._pick = { key: pairKey(cur), side }; render(); };
     const opts = [['left', 'Left is better'], ['tie', 'About the same'], ['right', 'Right is better']];
-    return [who, head, req, cards,
+    return [who, sets, head, req, cards,
       h('div', { class: 'panel', style: 'margin-top:14px' },
         h('div', { class: 'choices big' }, opts.map(([v, label]) => h('button', { 'aria-pressed': pick === v ? 'true' : 'false', onclick: () => choose(v) }, label))),
         h('input', { type: 'text', id: 'reason', placeholder: 'Your reason, in one line', style: 'margin-top:10px', oninput: e => { S._reason = e.target.value; document.getElementById('record').disabled = !(pick && e.target.value.trim()); } }),
@@ -4580,24 +4737,24 @@ STEPS[3].render = function () {
   // After the judgment: reveal the rounds, then the checks and the routes.
   const allowed = ((X.checks || []).find(c => c.kind === 'trace-no-tool-outside') || {}).allowed;
   const chosen = done.result === 'tie' ? 'about the same' : done.result === cur.left ? 'the left one' : 'the right one';
-  return [who, head, req, cards,
+  return [who, sets, head, req, cards,
     h('div', { class: 'panel', style: 'margin-top:14px' },
       h('div', { class: 'verdict info' }, 'Left was ', h('b', null, roundName(cur.left)), '; right was ', h('b', null, roundName(right)), '. ', roleChip(roundById(cur.new)), ' You chose ' + chosen + (done.reason ? ': “' + done.reason + '”' : '.')),
       h('h3', { style: 'margin-top:12px' }, 'What the checks found'),
       checkTable(prompt, [{ name: 'Left · ' + cur.left, o: L }, { name: 'Right · ' + right, o: R }]),
       h('h3', { style: 'margin-top:12px' }, 'The two routes'),
       floorplan([{ name: 'Left · ' + cur.left, o: L }, { name: 'Right · ' + right, o: R }], allowed),
-      h('div', { class: 'toolbar' }, h('button', { class: 'btn primary', 'data-fast': 'next', onclick: () => { set({ reveal: null, goto: null }); document.getElementById('stage').scrollTop = 0; } }, plan.every(x => judged(S.judge, x)) ? 'Finish' : 'Next pair →')))];
+      h('div', { class: 'toolbar' }, h('button', { class: 'btn primary', 'data-fast': 'next', onclick: () => { set({ reveal: null, goto: null, judgeSet: which }); document.getElementById('stage').scrollTop = 0; } }, plan.every(x => judged(S.judge, x)) ? 'Finish' : 'Next pair →')))];
 };
 function record(x, side) {
   const reason = ((document.getElementById('reason') || {}).value || '').trim();
   if (!reason && !S.fast) return;
   const right = x.left === x.baseline ? x.new : x.baseline;
   const result = side === 'tie' ? 'tie' : side === 'left' ? x.left : right;
-  S.judgments = S.judgments.concat([{ item: pairItem(x), config: x.config, object: 'product', check: 'blind-preference', route: 'human',
+  S.judgments = S.judgments.concat([{ item: pairItem(x), config: x.config, object: 'product', check: x.held ? HELD_PREF_CHECK : PREF_CHECK, route: 'human',
     judge: S.judge, version: (S.frozen && S.frozen.hash || '').slice(0, 19), result, reason, shown_left: x.left, when: new Date().toISOString(), prompt: x.prompt, repeat: x.repeat }]);
   S._pick = null; S._reason = '';
-  set({ reveal: pairKey(x), goto: null });
+  set({ reveal: pairKey(x), goto: null, judgeSet: x.held ? 'held' : 'dev' });
 }
 
 // Step 5 ---------------------------------------------------------------
@@ -4630,9 +4787,9 @@ function summary(groups, seed) {
   if (!groups.length) return null;
   return { n: groups.flat().length, prompts: groups.length, est: mean(groups.flat()), ci: bootstrap(groups, seed) };
 }
-function passRates(check, c) {
+function passRates(check, c, ids = devIds()) {
   const a = [], b = [];
-  devIds().forEach(p => { for (let k = 1; k <= repeats(); k++) {
+  ids.forEach(p => { for (let k = 1; k <= repeats(); k++) {
     const ra = runCheck(check, promptById(p), S.outputs[okey(p, c.baseline, k)]), rb = runCheck(check, promptById(p), S.outputs[okey(p, c.new, k)]);
     if (!ra || !rb || ra.result === 'n/a' || rb.result === 'n/a') continue;
     a.push(ra.result === 'pass' ? 1 : 0); b.push(rb.result === 'pass' ? 1 : 0);
@@ -4682,7 +4839,8 @@ function results() {
   const c = mainComparison(), seed = X.seed || 1;
   const people = summary(prefGroups(humanRows(), c, devIds()), seed);
   const judge = summary(prefGroups(S.llm || [], c, devIds()), seed);
-  const judges = [...new Set(humanRows().filter(j => j.config === cfg(c)).map(j => j.judge))];
+  const devRows = humanRows().filter(j => !isHeld(j.prompt));
+  const judges = [...new Set(devRows.filter(j => j.config === cfg(c)).map(j => j.judge))];
   const checks = (X.checks || []).map(ch => ({ c: ch, rates: passRates(ch, c), s: summary(checkGroups(ch, c, devIds()), seed) }));
   const byComparison = (X.comparisons || []).map(x => ({ x, people: summary(prefGroups(humanRows(), x, devIds()), seed), judge: summary(prefGroups(S.llm || [], x, devIds()), seed) }));
   const controls = (X.rounds || []).filter(r => r.role && r.role !== 'baseline').map(r => ({ r, rows: controlRows(r) }));
@@ -4691,7 +4849,7 @@ function results() {
   devIds().forEach(p => (promptById(p).tags || []).forEach(t => { (tags[t] = tags[t] || []).push(...humanRows().filter(j => j.config === cfg(c) && j.prompt === p).map(j => score(j.result))); }));
   const byTag = Object.entries(tags).filter(([, v]) => v.length).map(([t, v]) => ({ tag: t, n: v.length, share: mean(v) }));
   const agree = [];
-  const rows = humanRows();
+  const rows = devRows;
   for (let u = 0; u < judges.length; u++) for (let w = u + 1; w < judges.length; w++) {
     const both = rows.filter(j => j.judge === judges[u]).map(j => [j, rows.find(k => k.judge === judges[w] && k.item === j.item && k.config === j.config)]).filter(x => x[1]);
     agree.push({ a: judges[u], b: judges[w], n: both.length, same: both.filter(([x, y]) => x.result === y.result).length });
@@ -4700,7 +4858,58 @@ function results() {
     const both = rows.filter(j => j.judge === p).map(j => [j, (S.llm || []).find(k => k.item === j.item && k.config === j.config)]).filter(x => x[1]);
     if (both.length) agree.push({ a: p, b: 'the LLM judge', n: both.length, same: both.filter(([x, y]) => x.result === y.result).length });
   });
-  return { c, people, judge, judges, seed, checks, byComparison, controls, byTag, agree };
+  return { c, people, judge, judges, seed, checks, byComparison, controls, byTag, agree, held: heldResults() };
+}
+// The held-out confirmation: each comparison of heldComparisons() on the
+// held-out prompts alone, with the development result for the same new round.
+function heldResults() {
+  const seed = X.seed || 1, ids = heldIds();
+  return heldComparisons().map(c => {
+    const rows = humanRows().filter(j => isHeld(j.prompt));
+    const devC = (X.comparisons || []).find(x => x.baseline === c.baseline && x.new === c.new) || (X.comparisons || []).filter(x => x.new === c.new).slice(-1)[0] || null;
+    let runs = 0;
+    ids.forEach(p => { for (let k = 1; k <= repeats(); k++) [c.baseline, c.new].forEach(r => { if (S.outputs[okey(p, r, k)]) runs++; }); });
+    return { c, runs,
+      people: summary(prefGroups(rows, c, ids), seed),
+      judge: summary(prefGroups((S.llm || []).filter(j => isHeld(j.prompt)), c, ids), seed),
+      judges: [...new Set(rows.filter(j => j.config === cfg(c)).map(j => j.judge))],
+      checks: (X.checks || []).map(ch => ({ c: ch, rates: passRates(ch, c, ids), s: summary(checkGroups(ch, c, ids), seed) })),
+      dev: devC ? { c: devC, people: summary(prefGroups(humanRows(), devC, devIds()), seed) } : null };
+  });
+}
+// The confirmation in words. It says where the interval lies and how it
+// sits beside the development result; it doesn't round either into a verdict.
+function heldSentences(hr) {
+  const c = hr.c, s = hr.people;
+  if (!s) return ['Not judged yet. Each member judges the held-out pairs in step 4, alone.'];
+  const n = s.prompts, out = ['Judged blind, round ' + c.new + ' was preferred to round ' + c.baseline + ' in ' + pct(s.est) + ' of ' + s.n + ' judgments on '
+    + (n === 1 ? 'the held-out prompt' : 'the ' + n + ' held-out prompts') + ' (ties count half). 95% interval, resampling prompts: ' + pct(s.ci.lo) + ' to ' + pct(s.ci.hi) + '.'];
+  out.push(s.ci.lo > 0.5 ? 'The whole interval is above 50%.' : s.ci.hi < 0.5 ? 'The whole interval is below 50%.'
+    : 'The interval includes 50%: on the held-out prompts alone, you can’t tell the two rounds apart.');
+  const d = hr.dev && hr.dev.people;
+  if (d) {
+    const what = hr.dev.c.baseline === c.baseline ? 'the same comparison' : 'round ' + c.new + ' against round ' + hr.dev.c.baseline;
+    const sideOf = x => x > 0.5 ? 1 : x < 0.5 ? -1 : 0, a = sideOf(d.est), b = sideOf(s.est);
+    out.push('On the development prompts, ' + what + ' gave ' + pct(d.est) + ' (' + pct(d.ci.lo) + ' to ' + pct(d.ci.hi) + ').');
+    out.push((a === 0 || b === 0 ? 'One of the two estimates is at 50%.' : a === b ? 'The held-out estimate is on the same side of 50%.' : 'The held-out estimate is on the other side of 50%.')
+      + ' The two intervals ' + (d.ci.lo <= s.ci.hi && s.ci.lo <= d.ci.hi ? 'overlap.' : 'don’t overlap.'));
+  }
+  out.push('With ' + n + (n === 1 ? ' prompt' : ' prompts') + ' the interval is wide. Please say what the held-out result supports and what more prompts would settle.');
+  return out;
+}
+const heldReading = hr => heldSentences(hr).join(' ');
+function heldPanel(list) {
+  if (!list.length) return null;
+  return h('div', { class: 'panel', id: 'held-out', style: 'margin-top:14px' }, h('h3', null, 'Held out: the confirmation ', h('span', { class: 'chip esc' }, 'held out')),
+    list.map(hr => h('div', { style: 'margin-top:6px' },
+      h('p', { class: 'headline', style: 'margin:0' }, heldSentences(hr)[0]),
+      hr.people ? intervalSvg(hr.people) : null,
+      heldSentences(hr).length > 1 ? h('p', { style: 'margin:4px 0 0' }, heldSentences(hr).slice(1).join(' ')) : null,
+      h('p', { class: 'small muted', style: 'margin:4px 0 0' }, hr.runs + ' runs on the held-out prompts' + (hr.judges.length ? ', judged by ' + hr.judges.join(', ') : '') + '.'
+        + (hr.judge ? ' The LLM judge preferred round ' + hr.c.new + ' in ' + pct(hr.judge.est) + ' of ' + hr.judge.n + ' pairs.' : ' No LLM judge’s verdicts on them yet (python3 run_ab.py judge <run folder> --held-out).')),
+      hr.checks.some(x => x.s) ? h('table', { class: 't', style: 'margin-top:8px' }, h('tr', null, h('th', null, 'Check'), h('th', null, 'Object'), h('th', { class: 'num' }, hr.c.baseline + ' passes'), h('th', { class: 'num' }, hr.c.new + ' passes'), h('th', { class: 'num' }, hr.c.new + ' − ' + hr.c.baseline + ', points'), h('th', { class: 'num' }, '95% interval')),
+        hr.checks.filter(x => x.s).map(x => h('tr', null, h('td', { class: 'mono' }, x.c.id), h('td', null, objChip(x.c.object)),
+          h('td', { class: 'num' }, pct(x.rates.a)), h('td', { class: 'num' }, pct(x.rates.b)), h('td', { class: 'num' }, pts(x.s.est)), h('td', { class: 'num' }, pts(x.s.ci.lo) + ' to ' + pts(x.s.ci.hi))))) : null)));
 }
 function balance() {
   const count = (ids, b, key) => ids.filter(p => (promptById(p)[key] || []).includes(b)).length;
@@ -4729,8 +4938,9 @@ STEPS[4].render = function () {
     h('div', { class: 'panel' }, h('h3', null, roundById(c.new).role === 'improvement' ? 'The improvement ' : 'The comparison ', roleChip(roundById(c.new)), ' ', S.madeUp ? madeUpChip() : null),
       h('p', { class: 'headline', style: 'margin:0' }, 'Judged blind, round ' + c.new + ' (' + nb + ') was preferred to round ' + c.baseline + ' (' + nbase + ') in ' + pct(r.people.est) + ' of ' + r.people.n + ' judgments (ties count half), on ' + r.people.prompts + ' development prompts, by ' + r.judges.join(', ') + '. 95% interval, resampling prompts: ' + pct(r.people.ci.lo) + ' to ' + pct(r.people.ci.hi) + '.'),
       intervalSvg(r.people),
-      h('p', { class: 'small muted', style: 'margin:4px 0 0' }, RESAMPLES.toLocaleString('en-US') + ' resamples, seed ' + r.seed + '. Above 50% favors round ' + c.new + '. This is about these ' + r.people.prompts + ' prompts and these judges; the ' + (heldIds().length === 1 ? 'held-out prompt is' : heldIds().length + ' held-out prompts are') + ' still sealed.' + (r.judge ? ' The LLM judge preferred it in ' + pct(r.judge.est) + ' of ' + r.judge.n + ' pairs.' : '') + (S.madeUp ? ' The outputs and the judge’s verdicts are made up, so this says nothing about any model.' : ''))),
+      h('p', { class: 'small muted', style: 'margin:4px 0 0' }, RESAMPLES.toLocaleString('en-US') + ' resamples, seed ' + r.seed + '. Above 50% favors round ' + c.new + '. This is about these ' + r.people.prompts + ' prompts and these judges; ' + (r.held.length ? 'the held-out confirmation is below.' : 'the ' + (heldIds().length === 1 ? 'held-out prompt is' : heldIds().length + ' held-out prompts are') + ' still sealed.') + (r.judge ? ' The LLM judge preferred it in ' + pct(r.judge.est) + ' of ' + r.judge.n + ' pairs.' : '') + (S.madeUp ? ' The outputs and the judge’s verdicts are made up, so this says nothing about any model.' : ''))),
     tools,
+    heldPanel(r.held),
     h('div', { class: 'panel', style: 'margin-top:14px' }, h('h3', null, 'Did the evaluation move when it should? ', h('span', { class: 'muted' }, '(each round against ' + c.baseline + '; a source has “stayed” within ' + Math.round(tol() * 100) + ' points)')),
       misses.length ? h('div', { class: 'verdict wrong', style: 'margin-bottom:10px' }, misses.map(m => h('div', null, lesson(m))))
         : h('div', { class: 'verdict right', style: 'margin-bottom:10px' }, 'Every source moved where you predicted it would and stayed still where nothing should change.'),
@@ -4793,10 +5003,11 @@ const csvCell = v => { const s = v == null ? '' : String(v); return /[",\n]/.tes
 function judgmentsCsv() {
   const now = new Date().toISOString(), lines = [CSV_COLUMNS.join(',')];
   humanRows().forEach(j => lines.push(CSV_COLUMNS.map(c => csvCell(j[c])).join(',')));
-  (S.llm || []).forEach(j => lines.push(CSV_COLUMNS.map(c => csvCell(j[c])).join(',')));
-  // Mechanical checks, recomputed for every development output, and on each
-  // prompt's reference output (the positive control; config "reference").
-  devIds().forEach(p => (X.rounds || []).forEach(rd => { for (let k = 1; k <= repeats(); k++) {
+  (S.llm || []).forEach(j => { const row = isHeld(j.prompt) ? Object.assign({}, j, { check: HELD_JUDGE_CHECK }) : j; lines.push(CSV_COLUMNS.map(c => csvCell(row[c])).join(',')); });
+  // Mechanical checks, recomputed for every output (a held-out prompt's once
+  // it has run) and on each prompt's reference output (the positive control;
+  // config "reference").
+  devIds().concat(heldIds()).forEach(p => (X.rounds || []).forEach(rd => { for (let k = 1; k <= repeats(); k++) {
     const o = S.outputs[okey(p, rd.id, k)];
     (X.checks || []).forEach(c => { const r = runCheck(c, promptById(p), o); if (!r) return;
       lines.push([p + '/' + k, rd.id, c.object, c.id, 'mechanical', checkJudge(c), anyVersion(c), r.result, r.reason, '', now].map(csvCell).join(',')); });
@@ -4839,7 +5050,11 @@ function resultsJson() {
     controls: r.controls.flatMap(x => x.rows).map(x => ({ round: x.round, on: x.segment, expected: x.direction, source: x.source, estimate: x.s.est, interval_95: x.s.ci, n: x.s.n, predicted: x.predicted, moved: x.how, verdict: x.verdict })),
     checks: r.checks.map(x => ({ id: x.c.id, object: x.c.object, kind: x.c.kind, rates: x.rates, difference: est(x.s) })),
     balance: balance(), references: referenceResults().map(x => ({ prompt: x.prompt, check: x.check.id, result: x.r.result })),
-    by_tag: r.byTag, agreement: r.agree, exported: new Date().toISOString() };
+    by_tag: r.byTag, agreement: r.agree,
+    held_out: r.held.length ? { prompts: heldIds(), comparisons: r.held.map(hr => ({ comparison: cfg(hr.c), runs: hr.runs, people: est(hr.people), judge: est(hr.judge), judges: hr.judges,
+      checks: hr.checks.map(x => ({ id: x.c.id, object: x.c.object, kind: x.c.kind, rates: x.rates, difference: est(x.s) })),
+      development: hr.dev ? { comparison: cfg(hr.dev.c), people: est(hr.dev.people) } : null, reading: heldReading(hr) })) } : null,
+    exported: new Date().toISOString() };
 }
 function parseCsv(text) {
   const rows = []; let row = [], cell = '', q = false;
@@ -4860,7 +5075,7 @@ async function importCsv(file) {
   const add = [];
   rows.forEach(r => {
     const j = Object.fromEntries(CSV_COLUMNS.map((c, k) => [c, r[k]]));
-    if (j.route !== 'human' || j.check !== 'blind-preference') return;
+    if (j.route !== 'human' || (j.check !== PREF_CHECK && j.check !== HELD_PREF_CHECK)) return;
     const [prompt, repeat] = j.item.split('/');
     if (S.judgments.some(x => x.judge === j.judge && x.item === j.item && x.config === j.config)) return;
     add.push(Object.assign(j, { prompt, repeat: Number(repeat) }));
@@ -5253,19 +5468,21 @@ const GS_PATHS = [
   ['group', 'Your group’s experiment', 'Shared I, with an experiment your group writes, on the class assistant or your own.', ''],
   ['suites', 'Personal I: suites', 'Your own suites of tests, run on every case, in the wizard’s checks-only mode.', ''],
 ];
-const GS_WHERE = { term: 'In the terminal', agent: 'In Claude Code', web: 'In the wizard', file: 'In your files' };
+const GS_WHERE = { term: 'In the terminal', agent: 'In Claude', web: 'In the wizard', file: 'In your files', app: 'On your computer' };
 const GS_WORDS = [
-  ['terminal', 'A window where you type commands. On a Mac it is called Terminal; on Windows, PowerShell.'],
-  ['command', 'A line you type in the terminal. Press Enter to run it.'],
+  ['Claude', 'Anthropic’s AI assistant. You use its desktop app’s *Code* tab, on *This computer*, in a session on the `skill-eval-lite` folder: you say what you want and it runs the commands, asking you first.'],
+  ['skill', 'A set of instructions Claude follows for one task. Type `/` in Claude to see Skill Eval Lite’s: `/get-ready`, `/wizard`, `/shared-i`, `/personal-i` and more.'],
+  ['terminal', 'A window where you type commands. On a Mac it is called Terminal; on Windows, PowerShell. Claude types the commands for you, so you need one only if Claude asks you to sign in there once (the Code tab’s Terminal button, `>_`).'],
+  ['command', 'A line typed in a terminal. Claude runs each one for you, after you say yes.'],
   ['folder', 'A place on your computer that holds files (a directory).'],
   ['git', 'A tool that keeps a record of every version of a folder.'],
   ['clone', 'To download a copy of a project with git.'],
   ['commit', 'One saved version of a folder, recorded by git.'],
-  ['Claude Code', 'An AI assistant, made by Anthropic, that works in the terminal. The runner uses it to run your assistant.'],
-  ['Codex', 'OpenAI’s assistant for the terminal. It can follow AGENTS.md, as Claude Code follows the intake skill.'],
-  ['the runner', '`run_ab.py`: the program you run in the terminal. It runs your assistant and keeps every answer.'],
+  ['Claude Code', 'Claude working in the files of a folder on your computer: the desktop app’s Code tab. The runner uses a separate copy of it, the `claude` command, to run your assistant; `/get-ready` installs it.'],
+  ['Codex', 'OpenAI’s coding assistant. It can follow AGENTS.md, as Claude follows the intake skill.'],
+  ['the runner', '`run_ab.py`: the program Claude runs for you. It runs your assistant and keeps every answer.'],
   ['the wizard', 'This page. You freeze, judge and read the results here.'],
-  ['intake skill', 'A set of instructions that lets Claude Code write your experiment file with your group.'],
+  ['intake skill', '`/experiment-intake`: a skill that lets Claude write your experiment file with your group.'],
   ['experiment file', '`experiment.toml`: the plan for your test.'],
   ['round', 'One version of the assistant. Round A is the assistant as it is.'],
   ['prompt', 'One request given to the assistant.'],
@@ -5312,20 +5529,24 @@ function gsInput(field, id, placeholder, label, hint) {
     hint ? h('div', { class: 'hint' }, hint) : null);
 }
 const gsOsRow = () => h('div', null, h('div', { class: 'lab' }, 'Your computer'), gsSeg('os', [['mac', 'Mac'], ['win', 'Windows'], ['linux', 'Linux']]),
-  h('div', { class: 'hint' }, 'The commands change to match. On Windows, type them in PowerShell.'));
+  h('div', { class: 'hint' }, 'The steps and the terminal commands change to match.'));
 function gsSettings(key) {
   const g = S.gs || {};
   return h('div', { class: 'gs-settings' }, gsOsRow(),
     key === 'group' ? h('div', null, h('div', { class: 'lab' }, 'Your assistant'), gsSeg('asstKind', [['class', 'The class assistant'], ['own', 'Our own assistant']])) : null,
-    key === 'group' ? h('div', null, h('div', { class: 'lab' }, 'How will you write the experiment file?'), gsSeg('write', [['designer', 'With the designer, on screen'], ['intake', 'With the intake skill, in Claude Code']]),
+    key === 'group' ? h('div', null, h('div', { class: 'lab' }, 'How will you write the experiment file?'), gsSeg('write', [['designer', 'With the designer, on screen'], ['intake', 'With the intake skill, in Claude']]),
       h('div', { class: 'hint' }, 'Both write experiments/<name>/experiment.toml with its folders. The steps below change to match.')) : null,
     key === 'suites' ? h('div', null, h('div', { class: 'lab' }, 'How will you make your packet?'), gsSeg('packetHow', [['designer', 'With the suite designer, on screen'], ['copy', 'Copy the worked example']])) : null,
     key === 'group' && g.asstKind === 'own' ? gsInput('asst', 'gs-asst', '../our-assistant', 'Its folder', 'Its name, after ../ (“next to skill-eval-lite”).') : null,
     key === 'group' ? gsInput('name', 'gs-name', 'for example board-memo', 'Your experiment’s name', 'The intake tells you the name when it writes the file. Type it here, and the commands use it.') : null,
     key === 'suites' ? gsInput('packet', 'gs-packet', '../my-suites', 'Your packet’s folder', 'Its name, after ../ (“next to skill-eval-lite”).') : null);
 }
+function sayBox(text) {
+  return h('div', { class: 'gs-say' }, h('code', null, text),
+    h('button', { type: 'button', title: 'Copy this message', 'aria-label': 'Copy: ' + text, onclick: e => copyText(text, e.currentTarget) }, 'Copy'));
+}
 function gsStep(step, i, ctx, key) {
-  const cmd = step.cmd ? DG.F(step.cmd, ctx) : null, how = step.how ? step.how[ctx.os] : null;
+  const cmd = step.cmd ? DG.F(step.cmd, ctx) : null, say = step.say ? DG.F(step.say, ctx) : null, how = step.how ? step.how[ctx.os] : null;
   return h('li', { class: 'gs-step', id: 'gs-' + key + '-' + (i + 1) },
     h('div', { class: 'gs-num ' + step.where, 'aria-hidden': 'true' }, i + 1),
     h('div', { class: 'gs-body' },
@@ -5333,7 +5554,10 @@ function gsStep(step, i, ctx, key) {
       h('h3', null, h('span', { class: 'sr-only' }, (i + 1) + '. '), DG.F(step.title, ctx)),
       step.body ? h('p', null, gsText(step.body, ctx)) : null,
       how ? h('p', null, h('b', null, how)) : null,
-      cmd ? [step.where !== 'file' ? h('div', { class: 'gs-type' }, step.where === 'agent' ? 'Type this in Claude Code, then press Enter:' : 'Type this, then press Enter:') : null, cmdBox(cmd)] : null,
+      say ? [h('div', { class: 'gs-type' }, 'Type this in Claude, then press Enter:'), sayBox(say)] : null,
+      say && cmd ? h('details', { class: 'gs-term' }, h('summary', null, 'In a terminal instead'),
+        h('p', null, step.where === 'agent' ? 'In the ' : 'In ', h('code', null, step.where === 'agent' && step.cmd.startsWith('git clone') ? 'ai5500' : 'skill-eval-lite'), ' folder, type this and press Enter:'), cmdBox(cmd)) : null,
+      !say && cmd ? [step.where !== 'file' ? h('div', { class: 'gs-type' }, 'Type this, then press Enter:') : null, cmdBox(cmd)] : null,
       step.click ? h('div', { class: 'gs-click' }, h('b', null, 'Click: '), gsText(step.click, ctx)) : null,
       step.input === 'name' ? gsInput('name', 'gs-name-step', 'for example board-memo', 'The name it gave', 'Type it here, and the commands below use it.') : null,
       step.see ? h('div', { class: 'gs-see' }, h('b', null, 'You should see: '), gsText(step.see, ctx)) : null,
@@ -5343,10 +5567,11 @@ function gsStep(step, i, ctx, key) {
 const gsFig = (name, ctx) => h('figure', { class: 'gs-fig' }, h('div', { html: DG.draw(name, ctx, 'inline') }));
 const gsSteps = (key, ctx) => h('ol', { class: 'gs-steps' }, DG.visibleSteps(key, ctx).map((s, i) => gsStep(s, i, ctx, key)));
 function gsStuck(ctx) {
-  return h('div', { class: 'gs-stuck' }, h('h2', null, 'Stuck? Ask where you are.'),
-    h('p', null, 'In the terminal, in the ', h('code', null, 'skill-eval-lite'), ' folder, type one of these and press Enter.'),
-    cmdBox(DG.F('{py} run_ab.py status', ctx)), h('p', null, 'It tells you where you are, and the next command to type.'),
-    cmdBox(DG.F('{py} run_ab.py ask', ctx)), h('p', null, 'Claude Code (or Codex) opens, looks at your files, and helps you step by step.'),
+  return h('div', { class: 'gs-stuck' }, h('h2', null, 'Stuck? Ask Claude where you are.'),
+    h('p', null, 'In Claude, in your session on ', h('code', null, 'skill-eval-lite'), ', type:'),
+    sayBox('Where am I and what should I do next?'), h('p', null, 'Claude runs ', h('code', null, 'run_ab.py status'), ', says where you are and gives the next step, with the skill for it. ', h('code', null, '/shared-i'), ' and ', h('code', null, '/personal-i'), ' guide each project.'),
+    h('details', { class: 'gs-term' }, h('summary', null, 'In a terminal instead'), h('p', null, 'In the ', h('code', null, 'skill-eval-lite'), ' folder:'),
+      cmdBox(DG.F('{py} run_ab.py status', ctx)), cmdBox(DG.F('{py} run_ab.py ask', ctx))),
     h('div', { html: DG.draw('stuck', ctx, 'inline') }));
 }
 // Making a new file: the designers, or the intake skill.
@@ -5357,7 +5582,7 @@ function gsMake() {
       h('div', { class: 'dz-row' },
         h('button', { type: 'button', class: 'btn primary', id: 'gs-open-designer', onclick: () => dzOpen('experiment') }, h('b', null, 'With the designer'), h('br'), h('span', { class: 'small' }, 'step by step on screen, with pictures')),
         h('button', { type: 'button', class: 'btn', onclick: () => { S.path = 'group'; S.gs = Object.assign({}, S.gs, { write: 'intake' }); save(); renderStart(); const a = document.getElementById('gs-path-title'); if (a && a.scrollIntoView) a.scrollIntoView({ block: 'start' }); } },
-          h('b', null, 'With the intake skill'), h('br'), h('span', { class: 'small' }, 'a conversation with Claude Code or Codex')))),
+          h('b', null, 'With the intake skill'), h('br'), h('span', { class: 'small' }, 'a conversation with Claude')))),
     h('div', null, h('h3', null, 'Make a new suites file (Personal I)'),
       h('p', null, 'The suite designer writes ', h('code', null, 'suites.yaml'), ' and the packet’s folders: your cases, control cases and tests.'),
       h('div', { class: 'dz-row' }, h('button', { type: 'button', class: 'btn primary', id: 'gs-open-suite-designer', onclick: () => dzOpen('suites') }, h('b', null, 'With the suite designer'), h('br'), h('span', { class: 'small' }, 'step by step on screen, with pictures')))));
@@ -5370,13 +5595,13 @@ function renderStart() {
     h('div', { class: 'gs-top' },
       h('div', null,
         h('h1', null, 'Getting started'),
-        h('p', { class: 'lead' }, 'Skill Eval Lite has two parts. You type commands in a ', h('em', null, 'terminal'), ', a window for typing commands. Then you freeze, judge and read the results here, in the ', h('em', null, 'wizard'), ': this page, in your web browser.'),
-        h('p', { class: 'lead' }, 'Please choose your path. Each step below is one thing to do: what to type or click, a picture of it, what you should see, and what to do if you don’t.'),
+        h('p', { class: 'lead' }, 'Skill Eval Lite has two parts. You work in ', h('em', null, 'Claude'), ', in the desktop app’s Code tab, in a session on the ', h('code', null, 'skill-eval-lite'), ' folder: you say what you want and Claude runs the commands, asking you first. Then you freeze, judge and read the results here, in the ', h('em', null, 'wizard'), ': this page, in your web browser.'),
+        h('p', { class: 'lead' }, 'Please choose your path. Each step below is one thing to do: what to type to Claude or click here, a picture of it, what you should see and what to do if you don’t. The same thing typed in a terminal is folded under each message, for those who prefer it.'),
         h('div', { class: 'gs-need' }, h('h2', null, 'What you need'), h('ul', null,
-          h('li', null, 'A computer: Mac, Windows or Linux.'),
-          h('li', null, 'Python 3.11 or later, git, and a web browser. The first-time steps check them for you.'),
-          h('li', null, 'A paid Claude plan that includes Claude Code. No API key is needed: Claude Code uses your plan’s login.'),
-          h('li', null, 'No Python or git yet? Install them from python.org and git-scm.com, or ask the instructor.')))),
+          h('li', null, 'A Mac or a Windows computer (the Linux app is in beta).'),
+          h('li', null, 'A paid Claude plan: Pro, Max, Ultra, Team or Enterprise. No API key is needed: Skill Eval Lite uses your plan’s login.'),
+          h('li', null, 'Claude’s desktop app, with its Code tab on This computer. Not Cowork, the app’s other mode: its commands run on a computer in the cloud, which can’t run Skill Eval Lite.'),
+          h('li', null, 'Python 3.11 or later, git and a web browser. ', h('code', null, '/get-ready'), ' checks them and installs what is missing, after you say yes.')))),
       gsStuck(ctx)),
     h('h2', { id: 'gs-which' }, 'Which path are you on?'),
     h('div', { class: 'gs-paths', role: 'group', 'aria-label': 'Paths' }, GS_PATHS.map(([k, t, w, who], i) =>
@@ -5392,7 +5617,7 @@ function renderStart() {
     P ? [h('h2', { id: 'gs-path-title' }, P.title + ', step by step'),
       h('div', { class: 'gs-overview' }, gsFig('order-' + key, ctx),
         h('div', null, gsSettings(key),
-          h('div', { class: 'gs-note' }, 'The picture shows the whole path. The steps below take it one action at a time. Green steps are in the terminal, blue ones in the wizard, purple ones in Claude Code, and gold ones in your files.'),
+          h('div', { class: 'gs-note' }, 'The picture shows the whole path. The steps below take it one action at a time. Purple steps are in Claude, blue ones in the wizard.'),
           P.shortcut ? h('div', { class: 'gs-note' }, h('b', null, 'A shortcut. '), gsText(P.shortcut, ctx)) : null,
           key === 'group' ? h('div', { class: 'gs-note' }, 'Not sure you need the intake skill? See “Do I need to run the intake skill first?” below.') : null)),
       gsSteps(key, ctx),
@@ -5406,16 +5631,16 @@ function renderStart() {
         h('p', null, 'Morgan is Director of Partnerships at Cedar Commons, a housing nonprofit, and chairs the finance committee of a youth charity’s board. Wren drafts Morgan’s replies, summaries and briefs. Morgan sends them under Morgan’s own name.'),
         h('p', null, 'Wren is a folder of files, and each file is a ', h('em', null, 'part'), ': the standing rules in ', h('code', null, 'CLAUDE.md'), ', five files about who Wren is and how Morgan writes, and a ', h('em', null, 'knowledge graph'), ' with a page for each person and organization in Morgan’s work.'),
         h('p', null, 'An experiment changes one part, and asks whether Wren’s drafts get better. The class experiment, for example, writes a missing section of ', h('code', null, 'voice.md'), ' (how Morgan writes to the board).'),
-        h('p', null, h('code', null, 'setup'), ' puts Wren on your computer:'), cmdBox(DG.F('{py} run_ab.py setup ../class-assistant', ctx)),
+        h('p', null, 'Claude puts Wren on your computer. In Claude, type:'), sayBox('Please set up the class assistant in ../class-assistant.'),
         h('p', null, 'For the full tour, please open ', h('a', { href: 'starting.html' }, 'starting.html'), '.')),
       gsFig('class-assistant', ctx)),
     h('h2', { id: 'gs-intake' }, 'Do I need to run the intake skill first?'),
     h('div', { class: 'gs-two' },
       h('div', { class: 'prose' },
-        h('p', null, 'The ', h('em', null, 'intake skill'), ' is a set of instructions that lets Claude Code write your experiment file with your group. It reads your assistant, asks your group up to five questions, and writes ', h('code', null, 'experiments/<name>/experiment.toml'), '.'),
+        h('p', null, 'The ', h('em', null, 'intake skill'), ' is a set of instructions that lets Claude write your experiment file with your group. It reads your assistant, asks your group up to five questions and writes ', h('code', null, 'experiments/<name>/experiment.toml'), '.'),
         h('p', null, 'You only need it for your group’s own experiment. The demonstrations and the class experiment come with their files.'),
         h('p', null, 'Your assistant’s folder must be ready: a ', h('em', null, 'git project'), ' (a folder that git keeps a record of) with a ', h('code', null, 'CLAUDE.md'), ' (the assistant’s main instructions). If it isn’t, the intake explains what it needs. With your permission, it can make the folder a git project. It never writes your assistant’s instructions for you.'),
-        h('p', null, 'To start it, type ', h('code', null, 'claude'), ' in the ', h('code', null, 'skill-eval-lite'), ' folder, then ', h('code', null, '/experiment-intake ../your-assistant'), '. With Codex, type ', h('code', null, 'codex'), ' and ask it to follow ', h('code', null, 'AGENTS.md'), '.')),
+        h('p', null, 'To start it, in Claude, in your session on ', h('code', null, 'skill-eval-lite'), ', type ', h('code', null, '/experiment-intake ../your-assistant'), '. With Codex, ask it to follow ', h('code', null, 'AGENTS.md'), '.')),
       gsFig('intake-decision', ctx)),
     h('h2', { id: 'gs-where' }, 'Where everything is'),
     h('div', { class: 'fm-wide' }, gsFig('folder-map', ctx)), h('div', { class: 'fm-narrow', style: 'max-width:470px' }, gsFig('folder-map-narrow', ctx)),
@@ -6440,7 +6665,7 @@ function ezCheckCard(D, c, i) {
   const body = [];
   if (isProgram(c)) body.push(h('p', { class: 'dz-hint', id: k + '-program' }, 'A program of your own, which the runner runs on every output: ', h('span', { class: 'mono' }, c.program || '(no program yet)'),
     '. Its sha256, ', h('span', { class: 'mono', style: 'overflow-wrap:anywhere' }, c.sha256 || '(none yet)'), ', puts it under the freeze. The designer keeps the program and its folder as they are. '
-    + 'To write or change one, use the check-authoring skill in Claude Code (CHECKS.md says how), then run python3 run_ab.py check.'));
+    + 'To write or change one, use the check-authoring skill in Claude (/check-authoring), then ask Claude to check the file.'));
   if (c.kind === 'contains' || c.kind === 'not-contains') body.push(dzInput(k + '-text', 'Words or phrases, one on each line', () => (c.text || []).join('\n'), v => { c.text = v.split('\n').filter(x => x !== ''); ED.edited = true; }, { rows: 4, mono: true, hint: 'Exactly as they would appear: capitals and spaces count.' }));
   if (c.kind === 'matches' || c.kind === 'trace-ran-command') body.push(dzInput(k + '-pattern', c.kind === 'matches' ? 'The pattern (a regular expression)' : 'The command, with * for anything', () => c.pattern, v => { c.pattern = v; ED.edited = true; }, { mono: true,
     hint: c.kind === 'matches' ? 'For example 120,?000 matches 120000 and 120,000. | means “or”.' : 'For example kb/kb search* matches every search of the knowledge graph.' }));
@@ -6589,7 +6814,7 @@ const EZ = {
           h('span', { class: 't' }, info.name, ' ', h('span', { class: 'chip' + (info.object === 'process' ? ' sound' : '') }, info.object)), h('span', null, info.what),
           h('span', { class: 'ok' }, 'A pass shows: ' + info.shows.charAt(0).toLowerCase() + info.shows.slice(1)), h('span', { class: 'no' }, 'Not: ' + info.not.charAt(0).toLowerCase() + info.not.slice(1)),
           h('button', { type: 'button', class: 'btn small', id: 'dz-add-' + kind, 'aria-label': 'Add a check: ' + info.name, onclick: () => ezSet(() => { D.checks.forEach(c => { c._open = false; }); ezAddCheck(D, kind); }, true) }, 'Add')))),
-          h('p', { class: 'dz-hint', id: 'dz-program-hint' }, 'A check none of these can make, such as the order of the steps, or “only these amounts”? It can be a program of your own: a program check. Claude Code writes one with you (the check-authoring skill; CHECKS.md says how), and the runner runs it. The designer keeps a program check it is given.')),
+          h('p', { class: 'dz-hint', id: 'dz-program-hint' }, 'A check none of these can make, such as the order of the steps, or “only these amounts”? It can be a program of your own: a program check. Claude writes one with you (/check-authoring). The runner runs it. The designer keeps a program check it is given.')),
         dzPanel('The checks on the references', h('p', { class: 'dz-hint' }, 'Each check on the output, run on each prompt’s reference. Every one should pass.'), h('div', { id: 'dz-reftable' }, ezReferenceTable(D))),
         dzPanel('The AI judge’s prompt',
           h('p', { class: 'dz-hint' }, 'The AI judge sees the request, two outputs as Left and Right, and this prompt. It must end by asking for one line: LEFT, RIGHT, TIE or UNKNOWN.'),
@@ -6718,9 +6943,10 @@ function ezNextSteps(D, ctx) {
   return h('div', { class: 'panel dz-next' }, h('div', { class: 'dz-saved' }, h('b', null, saved.how === 'zip' ? 'Downloaded ' + name + '.zip.' : 'Saved in ' + saved.where + ' (' + plural(saved.files, 'file') + ').'), ' ', h('span', { class: 'small muted' }, saved.when.slice(0, 16).replace('T', ' '))),
     h('h3', { style: 'margin-top:12px' }, 'Next, exactly'),
     h('ol', null,
-      saved.how === 'zip' ? step('Unzip it into experiments.', 'In the terminal, in the ', h('code', null, 'skill-eval-lite'), ' folder, type this and press Enter:', cmdBox(DG.F('{unzipexp}', ctx)),
+      saved.how === 'zip' ? step('Unzip it into experiments.', 'In Claude, in your session on ', h('code', null, 'skill-eval-lite'), ', type:', sayBox('/wizard I’ve downloaded ' + name + '.zip from the designer. Please unzip it into experiments.'),
+        h('div', { class: 'dz-hint' }, 'In a terminal instead, in the ', h('code', null, 'skill-eval-lite'), ' folder:'), cmdBox(DG.F('{unzipexp}', ctx)),
         h('div', { class: 'dz-hint' }, 'Or double-click the ZIP in Downloads, and drag the folder ', h('code', null, name), ' into ', h('code', null, 'skill-eval-lite/experiments'), '.')) : null,
-      step('Check it.', 'In the terminal, in the ', h('code', null, 'skill-eval-lite'), ' folder:', cmdBox(check), h('div', { class: 'gs-see' }, h('b', null, 'You should see: '), h('code', null, 'Nothing is missing.'), ' and ', h('code', null, 'Frozen: not yet'), '.'),
+      step('Check it.', 'In Claude, type:', sayBox('Please check experiments/' + name + '/experiment.toml.'), h('div', { class: 'dz-hint' }, 'In a terminal instead:'), cmdBox(check), h('div', { class: 'gs-see' }, h('b', null, 'You should see: '), h('code', null, 'Nothing is missing.'), ' and ', h('code', null, 'Frozen: not yet'), '.'),
         h('div', { class: 'gs-ifnot' }, h('b', null, 'If not: '), 'fix what it lists here, save again, and check again.')),
       step('Freeze it.', 'Load it in the wizard’s step 1, read the summary, and freeze it in step 2. Then export the frozen file and put it back, as Getting started shows (steps 1 and 2).',
         h('div', { class: 'dz-row', style: 'margin-top:8px' },
@@ -7183,12 +7409,15 @@ function szNextSteps(D, ctx, where) {
   return h('div', { class: 'panel dz-next' }, h('div', { class: 'dz-saved' }, h('b', null, saved.how === 'zip' ? 'Downloaded ' + D.packet + '.zip.' : 'Saved in ' + saved.where + ' (' + plural(saved.files, 'file') + ').'), ' ', h('span', { class: 'small muted' }, saved.when.slice(0, 16).replace('T', ' '))),
     h('h3', { style: 'margin-top:12px' }, 'Next, exactly'),
     h('ol', null,
-      saved.how === 'zip' ? step('Unzip it next to skill-eval-lite.', 'In the terminal, in the ', h('code', null, 'skill-eval-lite'), ' folder, type this and press Enter:', cmdBox(DG.F('{unzippacket}', ctx)),
+      saved.how === 'zip' ? step('Unzip it next to skill-eval-lite.', 'In Claude, in your session on ', h('code', null, 'skill-eval-lite'), ', type:', sayBox('/wizard I’ve downloaded ' + D.packet + '.zip from the suite designer. Please unzip it next to skill-eval-lite.'),
+        h('div', { class: 'dz-hint' }, 'In a terminal instead, in the ', h('code', null, 'skill-eval-lite'), ' folder:'), cmdBox(DG.F('{unzippacket}', ctx)),
         h('div', { class: 'dz-hint' }, 'Or double-click the ZIP in Downloads, and drag the folder ', h('code', null, D.packet), ' next to ', h('code', null, 'skill-eval-lite'), '.')) : null,
-      step('Check it.', 'In the terminal, in the ', h('code', null, 'skill-eval-lite'), ' folder:', cmdBox(DG.F('{py} run_ab.py suite ' + where + '/suites.yaml --check', ctx)),
+      step('Check it.', 'In Claude, type:', sayBox('Please check my suites, ' + where + '/suites.yaml.'), h('div', { class: 'dz-hint' }, 'In a terminal instead:'), cmdBox(DG.F('{py} run_ab.py suite ' + where + '/suites.yaml --check', ctx)),
         h('div', { class: 'gs-see' }, h('b', null, 'You should see: '), h('code', null, where + '/suites.yaml: ' + plural(D.suites.length, 'suite') + ' (…). Nothing to fix.')),
         h('div', { class: 'gs-ifnot' }, h('b', null, 'If not: '), 'fix what it lists here, save again, and check again. Lines that start with note: are the brief’s minimums.')),
-      step('Run the tests.', cmdBox(DG.F('{py} run_ab.py suite ' + where + '/suites.yaml', ctx)), h('div', { class: 'gs-see' }, h('b', null, 'You should see: '), h('code', null, 'Next: open wizard.html and load …/bundle.json'))),
+      step('Run the mechanical tests.', 'In Claude, type:', sayBox('/run-suites Please run the mechanical tests in my suites, ' + where + '.'), h('div', { class: 'dz-hint' }, 'In a terminal instead:'), cmdBox(DG.F('{py} run_ab.py suite ' + where + '/suites.yaml --no-llm', ctx)),
+        h('div', { class: 'gs-see' }, h('b', null, 'You should see: '), h('code', null, 'Next, load …/bundle.json in the wizard\'s step 1')),
+        h('div', { class: 'dz-hint' }, 'The LLM tests come after your own reference, in the wizard’s step 2: the runner prints their verdicts as it goes. Then ', h('code', null, '/run-suites'), ' runs them.')),
       step('Load the bundle in the wizard.', 'In step 1, under “A run you have made”, choose ', h('code', null, where.replace(/^\.\.\//, '') + '/bundle.json'), '. The wizard switches to its checks-only mode.',
         h('div', { class: 'dz-row', style: 'margin-top:8px' }, h('button', { type: 'button', class: 'btn primary', onclick: () => { dzKeep(); set({ view: 'steps', step: 1 }); window.scrollTo(0, 0); } }, 'Go to step 1'),
           h('button', { type: 'button', class: 'btn', onclick: () => { dzKeep(); S.gs = Object.assign({}, S.gs, { packet: where, packetHow: 'designer' }); set({ view: 'start', path: 'suites' }); } }, 'Getting started: the steps after this')))));
