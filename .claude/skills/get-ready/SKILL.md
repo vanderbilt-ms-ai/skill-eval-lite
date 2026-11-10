@@ -1,11 +1,11 @@
 ---
 name: get-ready
-description: Get this computer ready for Skill Eval Lite with the student typing nothing - check Python 3.11 or later, git, the claude command and its login, then run_ab.py doctor; install what is missing, one thing at a time, only after a yes; set up the class assistant; and let Claude reach the whole workspace. Use when a student first opens Skill Eval Lite in Claude, says "get ready" or "set me up", or when doctor or status shows a FIX line.
+description: Get this computer ready for Skill Eval Lite with the student typing nothing - check Python 3.11 or later, git, the claude command and its login, then run_ab.py doctor; install what is missing, one thing at a time, only after a yes, never suggesting another route instead; ask which system they test (their own stays where it is) and set up the class assistant; and let Claude reach the whole workspace. Use when a student first opens Skill Eval Lite in Claude, says "get ready" or "set me up", or when doctor or status shows a FIX line.
 ---
 
 # Getting this computer ready
 
-<!-- skill-eval-lite get-ready, version 1 (Skill Eval Lite 0.2.0) -->
+<!-- skill-eval-lite get-ready, version 2 (Skill Eval Lite 0.2.2) -->
 
 You are helping a student in AI 5500 (Vanderbilt) get their computer ready
 for Skill Eval Lite. They are in the Claude desktop app's Code tab, in a
@@ -26,6 +26,13 @@ They type messages to you and nothing else.
   `.env`). Never send, post or push anything.
 - Install only with the student's yes and only with the installers named
   here.
+- Skill Eval Lite is the route the course recommends for both projects.
+  What is missing or too old here (Python, git, the `claude` command) is
+  what this skill installs. It is never a reason to suggest another route,
+  such as a harness of their own or working by hand. If the student asks
+  about one, say the brief allows it, and that a harness is a program they
+  must build, read and test before they can trust its results. Then ask
+  which they would like.
 
 Say first, in two lines: you will check five things (Python, git, the
 `claude` command, its login and Skill Eval Lite's own check) and fix what
@@ -43,7 +50,8 @@ Run `python3 --version` (Windows: `py --version`).
 
 - 3.11 or later: say so and go on.
 - Older, or not found. Explain: Skill Eval Lite is a Python program. Then:
-  - *macOS.* The `python3` that comes with Apple's tools is too old. Offer
+  - *macOS.* The `python3` that comes with Apple's tools is too old (most
+    Macs have 3.9): that is expected, and this step fixes it. Offer
     to open python.org's download page in their browser
     (`open https://www.python.org/downloads/`). They download the latest
     Python 3 and open the installer; it asks for their Mac's password in a
@@ -141,11 +149,24 @@ Then run `python3 run_ab.py updates --again`, which checks Skill Eval Lite
 and the brief folders beside it against what is published. If a line says
 something is out or changed, offer `/check-updates` once the setup is done.
 
-## 7. The class assistant
+## 7. Their system
 
-Ask whether they will use the class assistant, Wren: the example in both
-briefs, Personal I's worked example and Shared I's choice when a group has
-no system of its own. It does no harm to have it.
+Ask which system they will test: the class assistant, or one of their own
+(for example an assistant they built in AI 5100).
+
+**A system of their own.** Ask where its folder is. For Personal I it can
+stay where it is: the tests read outputs and records they have saved, and
+`/personal-i` asks where those are. (Shared I runs the system, so the
+README puts its folder next to this one.) The project's work
+happens here, in this folder, not in a session opened on their system's
+folder. If they have started somewhere else (a plan from another Claude
+session, a draft `system.md`, a packet folder, questions already run), say
+that it carries over, and note where it is for `/personal-i`.
+
+**The class assistant**, Wren: the example in both briefs, Personal I's
+worked example and Shared I's choice when a group has no system of its own.
+It does no harm to have it, even with a system of their own. Ask whether
+they would like it.
 
 If yes and `../class-assistant` isn't there, run
 `python3 run_ab.py setup ../class-assistant`. It takes about a minute,

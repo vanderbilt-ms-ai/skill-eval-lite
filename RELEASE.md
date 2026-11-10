@@ -2,9 +2,33 @@ Skill Eval Lite is published as a public repository,
 https://github.com/vanderbilt-ms-ai/skill-eval-lite. Version 0.1.0 was
 released on 27 October 2026, versions 0.1.1, 0.1.2 and 0.1.3 on
 3 November 2026, version 0.1.4 on 4 November 2026, version 0.2.0 on
-7 November 2026 and version 0.2.1 on 9 November 2026. Each release is one
+7 November 2026, version 0.2.1 on 9 November 2026 and version 0.2.2 on
+10 November 2026. Each release is one
 commit on the public `main`, made from the course's private development
-history and tagged (`v0.1.0` to `v0.2.1`).
+history and tagged (`v0.1.0` to `v0.2.2`).
+
+## 0.2.2, 10 November 2026
+
+One skill, `get-ready`, changed. A student testing a system of their own
+gave Claude Code the Personal I brief in the folder of that system. Their
+Mac's Python was 3.9, so Claude proposed building a harness of their own
+instead of installing Python for Skill Eval Lite. Nothing else changes, and
+everything you have made carries over. To update, in Claude, in this
+folder, type `/check-updates`.
+
+### What changed
+
+| # | Before | In 0.2.2 |
+| --- | --- | --- |
+| 1 | `get-ready` installed what was missing but said nothing about other routes | `get-ready` (version 2): what is missing or too old is what it installs, never a reason to suggest a harness of one's own or working by hand. If the student asks about another route, it says the brief allows it, and what a harness asks of them |
+| 2 | On a Mac, it said Apple's `python3` is too old | It also says that most Macs have 3.9 and that this is expected: the step fixes it |
+| 3 | Step 7 offered the class assistant | Step 7 asks which system the student tests. A system of their own stays where it is for Personal I, the work happens in this folder, and what they have started elsewhere carries over to `/personal-i`. The class assistant is offered as before |
+
+### What was verified for 0.2.2
+
+- `python3 -m unittest`: the whole suite, with `tests/test_skills.py`
+  (front matter, version marks, every command named against the parser,
+  no sentence asking the student to type a command).
 
 ## 0.2.1, 9 November 2026
 

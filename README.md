@@ -29,7 +29,7 @@ It was made for AI 5500 (Vanderbilt, Fall 2026), for Shared I and Personal I. Th
 assistant is Wren, the AI 5100 assistant template's fictional example: Wren
 works for Morgan Reyes and nobody in it is real.
 
-Version 0.2.1 (the version is in `VERSION`). On an earlier version? In Claude, in this folder, type
+Version 0.2.2 (the version is in `VERSION`). On an earlier version? In Claude, in this folder, type
 `/check-updates`; in a terminal, `git pull`. [RELEASE.md](RELEASE.md) says what changed. Claude checks
 for a newer version by itself, at the start of a session, once a day.
 
@@ -1132,7 +1132,7 @@ where you are and hands you to the right skill:
 
 | Type | For | What it does |
 | --- | --- | --- |
-| `/get-ready` | both | Checks Python 3.11 or later, git, the `claude` command and its login, then `doctor`; installs what is missing, with your yes; sets up the class assistant |
+| `/get-ready` | both | Checks Python 3.11 or later, git, the `claude` command and its login, then `doctor`; installs what is missing, with your yes; asks which system you test; sets up the class assistant |
 | `/shared-i` | Shared I | The guide: reads your brief folder (`../ai5500-shared-1`), keeps `progress.md` with you, says where you are against the checkpoints and what comes next |
 | `/experiment-intake ../your-system` | Shared I | Reads your system, asks your group up to five questions and writes `experiments/<name>/experiment.toml` |
 | `/critique` | both | Critiques your experiment or suites against the brief and the rubric before you rely on them; also for the exchange |
@@ -1379,7 +1379,7 @@ asked; that a global `AGENTS.md`, a personal skill, an MCP tool or an MCP
 call stops the run; that runners are not mixed; and the import inlining,
 the trace names and the check before each run on their own.
 
-## Limits in 0.2.1
+## Limits in 0.2.2
 
 - The runner runs Claude Code or Codex. A Codex run reads the assistant
   through a generated `AGENTS.md` (see "With Codex"), so its results are not
