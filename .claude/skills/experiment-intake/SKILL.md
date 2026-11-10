@@ -5,7 +5,7 @@ description: Write experiment.toml for Skill Eval Lite with a Shared I group, fo
 
 # Writing an experiment intake
 
-<!-- skill-eval-lite experiment-intake, version 4 (Skill Eval Lite 0.2.0) -->
+<!-- skill-eval-lite experiment-intake, version 5 (Skill Eval Lite 0.2.1) -->
 
 You are helping a group of two or three students plan an experiment on an AI
 assistant: does one change to one of its parts make its work better? You
@@ -179,6 +179,21 @@ kinds `contains`, `not-contains`, `matches`, `word-count`, `json-parses`,
 and `does_not_show`. Run each product check in your head on each reference:
 every one must pass. If one doesn't, fix the check or ask the group about
 the reference.
+
+A `matches` pattern runs twice: in Python, in the runner, and in
+JavaScript, in the wizard. Write it so that both read it alike and both
+answer quickly:
+
+- start it with `^`, not `\A`, and end it with `$`, not `\Z`;
+- put its flags in the check's `flags` (`flags = "m"` for `^` and `$` at
+  each line), never in the pattern as `(?m)`;
+- never put a repeated group inside a repeat that can split the same text
+  many ways, such as `(?:\s*\S+){1,30}`: on a long output it takes
+  minutes. Make each repeated part start with something the part before
+  can't match: at most 30 words is `\S+(?:\s+\S+){0,29}`. For a whole
+  output's length, use `word-count`.
+
+`check` says so when a pattern breaks one of these.
 
 If the group needs a check that none of these kinds can make and code can
 decide it the same way every time (the order of the steps; "only these

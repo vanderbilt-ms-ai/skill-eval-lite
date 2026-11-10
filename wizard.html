@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="skill-eval-lite-version" content="0.2.0">
+<meta name="skill-eval-lite-version" content="0.2.1">
 <title>Skill Eval Lite</title>
 <!--
   Skill Eval Lite: the wizard. Five steps from an experiment file to results:
@@ -3960,7 +3960,7 @@ function traceCheck(c, trace) {
 const CHECK_KINDS = {
   'contains': (c, o) => { const miss = c.text.filter(t => !o.output.includes(t)); return [!miss.length, miss.length ? 'missing: ' + miss.map(show).join(', ') : 'all present']; },
   'not-contains': (c, o) => { const found = c.text.filter(t => o.output.includes(t)); return [!found.length, found.length ? 'found: ' + found.map(show).join(', ') : 'none found']; },
-  'matches': (c, o) => { const ok = new RegExp(c.pattern, c.flags || '').test(o.output); return [ok, ok ? 'matches' : 'no match for /' + c.pattern + '/']; },
+  'matches': (c, o) => { const ok = browserPattern(c).test(o.output); return [ok, ok ? 'matches' : 'no match for /' + c.pattern + '/']; },
   'word-count': (c, o) => { const w = words(o.output); const ok = (c.min == null || w >= c.min) && (c.max == null || w <= c.max); return [ok, w + ' words' + (ok ? '' : c.max != null && w > c.max ? ', over ' + c.max : ', under ' + c.min)]; },
   'json-parses': (c, o) => { try { JSON.parse(o.output); return [true, 'parses']; } catch (e) { return [false, 'does not parse: ' + e.message]; } },
   'trace-ran-command': (c, o) => { const [r, why] = traceCheck(c, o.trace.map(stepOf)); return [r === 'pass', why]; },
@@ -3983,8 +3983,29 @@ function runCheck(c, prompt, o) {
   if (o.status !== 'ok') return { result: 'fail', reason: 'the run ' + (o.status === 'timeout' ? 'timed out' : 'failed') };
   if (isProgram(c)) return programResult(c, o);
   if (c.object === 'process' && !o.trace) return { result: 'n/a', reason: 'no trace kept' };
-  const [ok, reason] = CHECK_KINDS[c.kind](c, o);
+  let ok, reason;
+  try { [ok, reason] = CHECK_KINDS[c.kind](c, o); }
+  catch (e) { return { result: 'n/a', reason: 'this page can\u2019t run the check: ' + e.message }; }
   return { result: ok ? 'pass' : 'fail', reason };
+}
+
+// A matches check runs twice: in Python, in the runner, and here, in the
+// browser's JavaScript. The two read most patterns alike. These they read
+// differently, and Skill Eval Lite's own intakes have written them (0.2.1):
+// flags written into the pattern's start, (?m), (?s), (?i), which the browser
+// refuses; and \A and \Z, which it reads as the letters A and Z. So the
+// pattern is read here as Python reads it: leading flags join `flags`, and
+// \A and \Z become the start and the end of the output. run_ab.py's
+// check_pattern says what else Python allows and the browser doesn't.
+function browserPattern(c) {
+  let p = String(c.pattern || ''), f = String(c.flags || '');
+  const lead = p.match(/^\(\?([aimsux]+)\)/);
+  if (lead) {
+    if (/[ax]/.test(lead[1])) throw new Error('(?' + lead[1] + ') has no equivalent in the browser');
+    f += lead[1].replace(/u/g, ''); p = p.slice(lead[0].length);
+  }
+  p = p.replace(/\\\\|\\A|\\Z/g, t => t === '\\A' ? '(?<![\\s\\S])' : t === '\\Z' ? '(?![\\s\\S])' : t);
+  return new RegExp(p, [...new Set(f)].filter(x => 'imsu'.includes(x)).join(''));
 }
 
 // A program check (kind = "program", CHECKS.md) is a Python program of the
@@ -6404,7 +6425,7 @@ function edProblems(D) {
       else if (f.path && !String(p.text).includes(f.path) && !String(p.text).includes(f.path.split('/').pop())) designer(5, 'Prompt “' + p.id + '”: the request doesn’t mention ' + f.path + '. Say where it is, so that the assistant reads it.', 'warn'); });
   });
   D.checks.forEach(c => {
-    if (c.kind === 'matches') { try { new RegExp(c.pattern || '', c.flags || ''); } catch (e) { designer(6, 'Check “' + c.id + '”: its pattern is not a valid regular expression (' + e.message + ').'); } }
+    if (c.kind === 'matches') { try { browserPattern(c); } catch (e) { designer(6, 'Check “' + c.id + '”: its pattern is not a valid regular expression (' + e.message + ').'); } }
     if ((c.kind === 'contains' || c.kind === 'not-contains') && !(c.text || []).length) designer(6, 'Check “' + c.id + '”: write the words or phrases it looks for.');
     if ((c.kind === 'trace-ran-command' || c.kind === 'matches') && !c.pattern) designer(6, 'Check “' + c.id + '”: write its pattern.');
   });

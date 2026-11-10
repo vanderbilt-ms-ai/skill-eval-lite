@@ -93,6 +93,10 @@ class Pipeline(unittest.TestCase):
 
     def test_judge(self):
         self.assertEqual(self.j.returncode, 0, self.j.stdout + self.j.stderr)
+        # 0.2.1: people judge the same pairs blind, often with this window open.
+        for word in ("left was", "LEFT", "RIGHT", "TIE"):
+            self.assertNotIn(word, self.j.stdout, "the judge's verdicts aren't printed")
+        self.assertIn("judged", self.j.stdout)
         verdicts = self.bundle["judge"]
         self.assertEqual(len(verdicts), 2)
         for v in verdicts:

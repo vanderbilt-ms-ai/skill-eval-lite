@@ -3,7 +3,7 @@ name: suites-intake
 description: Design Personal I's two suites with the student in Skill Eval Lite - choose the system (the class assistant or their own, with a system.md drafted from their answers), the product or stage and the process; gather six instances with their context and three recorded runs (finding saved Claude Code sessions, copied only with their yes and read by them for anything private); write ../my-suites/suites.yaml with three tests a suite, one of each kind; check it with run_ab.py suite --check. Use when a student designs Personal I's suites: choosing what to test, gathering instances and process records, adding or changing a test in suites.yaml.
 ---
 
-<!-- skill-eval-lite suites-intake, version 1 (Skill Eval Lite 0.2.0) -->
+<!-- skill-eval-lite suites-intake, version 2 (Skill Eval Lite 0.2.1) -->
 
 # Designing Personal I's suites
 
@@ -183,7 +183,14 @@ Then each kind's own fields:
   one: `kb/kb search*`, not `kb search`. Before you write one, print a
   record's steps (`python3 .claude/skills/suites-intake/case.py steps
   ../my-suites/process/<item>`) and write the
-  pattern from a command that is really there. Or a
+  pattern from a command that is really there. A `matches` pattern runs in
+  Python (the runner) and in JavaScript (the wizard): start it with `^`,
+  not `\A`; put flags in the check's `flags` (`flags: m`), never `(?m)`;
+  and never put a repeated group inside a repeat, such as
+  `(?:\s*\S+){1,30}`, which takes minutes on a long case (at most 30
+  words is `\S+(?:\s+\S+){0,29}`; a whole case's length is
+  `word-count`). `suite --check` says so when a pattern breaks one of
+  these. Or a
   program, `program: tests/<id>/check.py`: hand over to `/check-authoring`.
 - **LLM**: `prompt: tests/<id>/prompt.md` (or `skill: tests/<id>/SKILL.md`),
   `model` and `decision`: hand over to `/llm-test` for the prompt.

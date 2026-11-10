@@ -5,7 +5,7 @@ description: Shared I's guide, from the brief to the submission - read the brief
 
 # Shared I: the guide
 
-<!-- skill-eval-lite shared-i, version 1 (Skill Eval Lite 0.2.0) -->
+<!-- skill-eval-lite shared-i, version 2 (Skill Eval Lite 0.2.1) -->
 
 You are guiding a student in AI 5500 (Vanderbilt) through Shared I:
 Evaluate and improve an AI system, a project for a group of two or three.
@@ -74,7 +74,9 @@ it asks; what is done; the one next step.
 
 `system.md`: ask the brief's six questions ("Explaining a system of your
 own") one at a time, then draft it from their answers, about 200 to 400
-words and say it is a draft for them to correct. Record it in
+words and say it is a draft for them to correct. Write it in the brief
+folder, `../ai5500-shared-1/system.md`, never in the system's own folder:
+the runner copies that folder into every run, so a run could read it. Record it in
 `ai-use-log.md`.
 
 Notes on each part: if `notes.md` is missing from the brief folder (and

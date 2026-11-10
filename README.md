@@ -29,7 +29,7 @@ It was made for AI 5500 (Vanderbilt, Fall 2026), for Shared I and Personal I. Th
 assistant is Wren, the AI 5100 assistant template's fictional example: Wren
 works for Morgan Reyes and nobody in it is real.
 
-Version 0.2.0 (the version is in `VERSION`). On an earlier version? In Claude, in this folder, type
+Version 0.2.1 (the version is in `VERSION`). On an earlier version? In Claude, in this folder, type
 `/check-updates`; in a terminal, `git pull`. [RELEASE.md](RELEASE.md) says what changed. Claude checks
 for a newer version by itself, at the start of a session, once a day.
 
@@ -1021,7 +1021,8 @@ JSON). `examples/class-assistant/experiment.toml` uses every field.
 | `[provenance]` | Who wrote the file, when, with which skill |
 
 The check kinds: `contains` (every `text` appears), `not-contains` (none
-does), `matches` (the regular expression `pattern` matches), `word-count`
+does), `matches` (the regular expression `pattern` matches, with `flags`
+`i`, `m` or `s` if it needs them), `word-count`
 (`min`, `max`), `json-parses`, `trace-ran-command` (a shell command in the
 trace matches the glob `pattern`, in a step that didn't fail) and
 `trace-no-tool-outside` (every step matches the `allowed` list, each command
@@ -1378,7 +1379,7 @@ asked; that a global `AGENTS.md`, a personal skill, an MCP tool or an MCP
 call stops the run; that runners are not mixed; and the import inlining,
 the trace names and the check before each run on their own.
 
-## Limits in 0.2.0
+## Limits in 0.2.1
 
 - The runner runs Claude Code or Codex. A Codex run reads the assistant
   through a generated `AGENTS.md` (see "With Codex"), so its results are not
@@ -1389,6 +1390,11 @@ the trace names and the check before each run on their own.
 - Tested on Linux. In the desktop app's Code tab on Windows, installing and
   signing in the `claude` command was tried on 7 November; the rest of the
   route, and macOS, not yet.
+- A `matches` pattern runs in Python (the runner) and in your browser (the
+  wizard). The wizard reads flags at a pattern's start and `\A` and `\Z` as
+  Python does; `check` names what else it can't read, and a pattern too
+  slow for a long output. Start a pattern with `^`, put its flags in
+  `flags`, and don't put a repeated group inside a repeat.
 - The trace checks don't look inside `$(...)` or backticks and a refused
   step is marked only in a Claude Code record (not yet in a Codex one).
 - The checks-only mode reads suites the runner has run; the wizard itself

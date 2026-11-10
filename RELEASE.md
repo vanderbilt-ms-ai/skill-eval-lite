@@ -1,10 +1,47 @@
 Skill Eval Lite is published as a public repository,
 https://github.com/vanderbilt-ms-ai/skill-eval-lite. Version 0.1.0 was
 released on 27 October 2026, versions 0.1.1, 0.1.2 and 0.1.3 on
-3 November 2026, version 0.1.4 on 4 November 2026 and version 0.2.0 on
-7 November 2026. Each release is one commit on the public `main`, made from
-the course's private development history and tagged (`v0.1.0` to
-`v0.2.0`).
+3 November 2026, version 0.1.4 on 4 November 2026, version 0.2.0 on
+7 November 2026 and version 0.2.1 on 9 November 2026. Each release is one
+commit on the public `main`, made from the course's private development
+history and tagged (`v0.1.0` to `v0.2.1`).
+
+## 0.2.1, 9 November 2026
+
+Fixes from setting up Shared I and Personal I on a system of the course's
+own that isn't the class assistant (a made-up restaurant's menu writer,
+with a research skill, a writing skill and a checking skill), through the
+skills, as a group with its own system would. Experiments, runs, packets
+and freezes carry over as they are. If `check` now says "must fix" for one
+of your patterns, change the pattern and freeze again: a changed check
+needs no new runs. To update, in Claude, in this folder, type
+`/check-updates`.
+
+### What changed
+
+| # | Before | In 0.2.1 |
+| --- | --- | --- |
+| 1 | The wizard built a `matches` check's pattern as written. The experiment intake wrote patterns that Python reads and the browser doesn't: `(?m)` at the start, which the browser refuses, so the wizard's steps 3 to 5 stopped with "SyntaxError: Invalid regular expression ... Invalid group"; and `\A`, which the browser reads as the letter A, so a check failed every output | The wizard reads a pattern as the runner does: flags at its very start (`(?m)`, `(?s)`, `(?i)`) join `flags`, and `\A` and `\Z` are the start and the end of the output. A pattern it still can't build is "n/a" with the reason, never a stopped step. A frozen experiment needs no change and no new freeze |
+| 2 | `check` didn't look at patterns. The intake wrote a word limit as a repeated group inside a repeat, `(?:\s*\S+){1,30}`, which takes minutes on an output longer than its limit (in Python it ran for more than 40 seconds on one card before it was stopped) | `check` and `suite --check` say "must fix" for a pattern the browser can't read (a `(?P<...>)` group, an atomic group, a possessive repeat, `(?x)`) and for a pattern that takes more than 3 seconds on long made-up outputs and on the references or cases, stretched. Each is timed in a process of its own. The message names the safe form, `\S+(?:\s+\S+){0,29}` for at most 30 words, or `word-count` |
+| 3 | The intakes said nothing about patterns | The experiment intake (version 5, `AGENTS.md` too) and the suites intake (version 2): start with `^`, put flags in `flags`, no repeated group inside a repeat |
+| 4 | `judge` printed each pair's verdict as it ran ("left was A: RIGHT"), on the screen where the group would then judge the same pairs blind | `judge` prints that each pair is judged; the verdicts are in the bundle and the pair's file, and the wizard's step 5 sets them beside the group's. `run-experiment` (version 2) says so |
+| 5 | `shared-i` drafted `system.md` without saying where, and in a test drafted it inside the system's own folder, which the runner copies into every run | `shared-i` (version 2) writes it in the brief folder, `../ai5500-shared-1/system.md` |
+| 6 | After `check`, the next step named `--assistant ../class-assistant` for every experiment | It names the experiment's own `[system]` `folder` when there is one |
+
+### What was verified for 0.2.1
+
+- `tests/test_patterns.py`: the patterns the intake wrote, read alike in
+  Python and in headless Chrome's wizard (`runCheck`); a pattern the browser
+  can't build is n/a with no console error; each kind the browser can't
+  read is named; the nested word limit caught by `check` within its time
+  limit, the safe one passing in well under a second; the next step naming
+  the experiment's own system.
+- `tests/test_pipeline.py`: `judge` prints no verdict.
+- The whole suite, `python3 -m unittest`.
+- On the menu writer's experiment as the intake wrote it (in the course's
+  test workspace, on the Anthropic API): `check` names the slow pattern
+  and nothing else; with it fixed, the wizard loads the 40 runs and 28
+  judged pairs and shows steps 3 to 5 with no console error.
 
 ## 0.2.0, 7 November 2026
 

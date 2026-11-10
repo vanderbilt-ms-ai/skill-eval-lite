@@ -494,6 +494,8 @@ class Experiment:
             if c.get("id") in ids:
                 errors.append(f"Two checks are called {c.get('id')!r}. Give each its own id.")
             ids.add(c.get("id"))
+            if c.get("kind") == "matches":
+                errors += pattern_problems(c.get("id"), c.get("pattern"), c.get("flags", ""))
             if c.get("kind") == PROGRAM_KIND:
                 e, w = self.program_problems(c)
                 errors += e
@@ -1891,6 +1893,17 @@ FROZEN_LINE = {"frozen": "yes, {date}", "old": "yes, {date} (frozen with 0.1.0; 
                "unfrozen": "not yet (the wizard's step 2 freezes it)"}
 
 
+def experiment_slow_patterns(exp: "Experiment") -> list[str]:
+    """Each matches check timed on long made-up outputs and on the references, stretched."""
+    refs = [p.get("reference", "") for p in exp.data.get("prompt", []) if isinstance(p, dict)]
+    samples = pattern_samples(refs)
+    out = []
+    for c in exp.data.get("checks", []):
+        if isinstance(c, dict) and c.get("kind") == "matches" and not pattern_problems(c.get("id"), c.get("pattern"), c.get("flags", "")):
+            out += slow_pattern_problems(c.get("id"), c["pattern"], c.get("flags", ""), samples)
+    return out
+
+
 def cmd_check(a) -> int:
     exp = load(a.experiment)
     errors, warns = exp.problems()
@@ -1898,6 +1911,7 @@ def cmd_check(a) -> int:
     # which the wizard can't do: it doesn't run programs.
     st_errors, notes = program_selftest(exp)
     errors += st_errors
+    errors += experiment_slow_patterns(exp)
     state, date = exp.freeze_state()
     if state == "changed":
         errors.append(changed_since_frozen(date))
@@ -1917,8 +1931,9 @@ def cmd_check(a) -> int:
     if errors:
         say("\n" + fix_then_check(a.experiment, 'the lines marked "must fix"'))
     elif exp.data.get("demo") or frozen:
+        folder = str((exp.data.get("system") or {}).get("folder") or "../class-assistant")
         say("\nNext, run it. " + in_claude("skill-eval-helper" if exp.data.get("demo") else "run-experiment",
-                                           f"{PY} run_ab.py run {a.experiment} --assistant ../class-assistant --jobs 4") + ".")
+                                           f"{PY} run_ab.py run {a.experiment} --assistant {folder} --jobs 4") + ".")
     else:
         say("\nNext, freeze it in the wizard: load it in step 1, press Freeze in step 2, then press 'Export the frozen "
             f"experiment' (now in step 2) and save the file over {a.experiment}. " + in_claude("wizard", OPEN_WIZARD) + ".")
@@ -2953,8 +2968,10 @@ def cmd_judge(a) -> int:
                     have[(cfg, p, k, model)] = entry
                     out.bundle["judge"] = sorted(have.values(), key=lambda j: (j["comparison"], j["prompt"], j["repeat"]))
                     done[0] += 1
-                    say(f"[{done[0]}/{len(pairs)}] {cfg.replace('|', ' vs '):8} {p:28} repeat {k}  left was {left}: {decision}"
-                        + (f"  ({note})" if note else "") + (f"  {run.seconds:.0f} s" if run.seconds else ""))
+                    # The verdict isn't shown (0.2.1): people judge the same pairs blind,
+                    # often with this window open. It is in the bundle and the pair's file.
+                    say(f"[{done[0]}/{len(pairs)}] {cfg.replace('|', ' vs '):8} {p:28} repeat {k}  "
+                        + ("judged" if ok and decision != "UNKNOWN" else "no verdict") + (f"  {run.seconds:.0f} s" if run.seconds else ""))
                     out.save()
             finally:
                 shutil.rmtree(tmp, ignore_errors=True)
@@ -2966,7 +2983,9 @@ def cmd_judge(a) -> int:
     if problems:
         say("\n" + problems[0], err=True)
         return 3
-    say(f"\nThe judge's verdicts are saved in {out.bundle_path} (and one file per pair in {folder / 'judge'}).")
+    say(f"\nThe judge's verdicts are saved in {out.bundle_path} (and one file per pair in {folder / 'judge'}). "
+        "They aren't shown here, so that everyone can judge the same pairs blind first: the wizard's step 5 sets them "
+        "beside yours.")
     say("Next: open wizard.html and load the bundle in step 1." if name == "codex" else
         "Next, load the bundle in the wizard's step 1. " + in_claude("wizard", OPEN_WIZARD) + ".")
     return 0
@@ -4245,6 +4264,75 @@ def step_mark(st: dict) -> str:
     return "refused" if st.get("refused") else "error" if st.get("error") else ""
 
 
+# --- A pattern in Python and in the browser (0.2.1) -------------------------
+#
+# A matches check runs twice: here, in Python's re, and in the wizard, in the
+# browser's JavaScript. The wizard reads a pattern as Python does where the two
+# differ in ways an intake has written: flags at the pattern's very start,
+# (?m), (?s), (?i), and \A and \Z (wizard.html's browserPattern). What it
+# can't read is a "must fix" here, so that a check that works in the runner
+# works in the wizard too. And a pattern can take minutes on a long output (a
+# repeated group inside a repeat, such as (?:\s*\S+){1,30}), which would hang
+# the runner and the wizard alike: `check` and `suite --check` time each one,
+# in a process of its own, on long made-up outputs and stretched references.
+
+_BROWSER_CANT = [
+    (re.compile(r"\(\?P[<=>]"), "a named group written (?P<name>...) or (?P=name): write (?<name>...) and \\k<name>"),
+    (re.compile(r"\(\?>"), "an atomic group, (?>...)"),
+    (re.compile(r"\(\?\("), "a conditional group, (?(...)...)"),
+    (re.compile(r"\(\?#"), "a comment, (?#...)"),
+    (re.compile(r"[*+?}]\+"), "a possessive repeat, such as *+ or ++"),
+    (re.compile(r"^\(\?[aiLmsux]*[aLx][aiLmsux]*\)"), "a flag the browser has no form of: (?a), (?L) or (?x)"),
+]
+PATTERN_SECONDS = 3.0
+
+
+def pattern_problems(cid: str, pattern: str, flags: str = "") -> list[str]:
+    """What the browser can't read in a matches check's pattern, as must-fix
+    lines. Escaped characters are set aside first, so \\++ is a literal plus."""
+    if not isinstance(pattern, str) or not pattern:
+        return []
+    try:
+        re.compile(pattern, sum({"i": re.I, "m": re.M, "s": re.S}.get(f, 0) for f in (flags or "")))
+    except re.error as e:
+        return [f"Check {cid!r}: its pattern isn't a regular expression Python can read ({e})."]
+    bare = re.sub(r"\\.", "_", pattern)
+    found = [what for rx, what in _BROWSER_CANT if rx.search(bare)]
+    return [f"Check {cid!r}: its pattern has {what}, which the wizard (JavaScript, in your browser) can't read. "
+            "Write it another way, so that the runner and the wizard give the same answer." for what in found]
+
+
+def _stretch(text: str, times: int = 4) -> str:
+    """A text with each line's words repeated: the long output a pattern
+    should still answer quickly."""
+    return "\n".join(" ".join(line.split() * times) for line in text.splitlines())
+
+
+def pattern_samples(texts: list[str]) -> list[str]:
+    words = " ".join(["ingredient", "roasted", "with", "garden", "herbs"] * 60)
+    made_up = [f"## A heading\n{words}\nContains: something", f"## A heading\n{words}\n", words, "\n".join([words] * 3)]
+    return made_up + [_stretch(t) for t in texts if isinstance(t, str) and t.strip()][:8]
+
+
+def slow_pattern_problems(cid: str, pattern: str, flags: str, samples: list[str]) -> list[str]:
+    """Run the pattern on long samples in a process of its own; a must-fix
+    line if it takes longer than PATTERN_SECONDS (it backtracks)."""
+    if not isinstance(pattern, str) or not pattern:
+        return []
+    code = ("import json,re,sys\nd=json.load(sys.stdin)\n"
+            "f=sum({'i':re.I,'m':re.M,'s':re.S}.get(x,0) for x in d['flags'])\n"
+            "r=re.compile(d['pattern'],f)\n[r.search(t) for t in d['samples']]\n")
+    try:
+        subprocess.run([sys.executable, "-I", "-c", code], input=json.dumps({"pattern": pattern, "flags": flags or "", "samples": samples}),
+                       text=True, capture_output=True, timeout=PATTERN_SECONDS)
+    except subprocess.TimeoutExpired:
+        return [f"Check {cid!r}: its pattern took more than {PATTERN_SECONDS:g} seconds on a long made-up output, so it would hang "
+                "the runner and the wizard. It has a repeated group inside a repeat that can split the text many ways, such as "
+                "(?:\\s*\\S+){1,30}. Make each repeated part start with something the part before can't match, such as "
+                "\\S+(?:\\s+\\S+){0,29} for at most 30 words, or use a word-count check."]
+    return []
+
+
 def run_check(c: dict, text: str | None, trace: list | None, no_trace: str = "no trace kept") -> tuple[str, str]:
     """One check on an output and its trace: (pass, fail or n/a, the reason).
     wizard.html's CHECK_KINDS and runCheck give the same results."""
@@ -4370,6 +4458,9 @@ class Suites:
                 self.errors.append(f"Suite {sid}, test {tid}: a mechanical test needs `check` (a built-in kind) or `program`.")
             if t.get("kind") == "mechanical" and t.get("check") and t["check"].get("kind") not in CHECK_KINDS:
                 self.errors.append(f"Suite {sid}, test {tid}: check kind {t['check'].get('kind')!r} is not one Skill Eval Lite knows.")
+            if t.get("kind") == "mechanical" and isinstance(t.get("check"), dict) and t["check"].get("kind") == "matches":
+                self.errors += [f"Suite {sid}, test {tid}: " + e.split(": ", 1)[1]
+                                for e in pattern_problems(tid, t["check"].get("pattern"), t["check"].get("flags", ""))]
             if t.get("kind") == "llm" and not ({"prompt", "skill"} & set(files)):
                 self.errors.append(f"Suite {sid}, test {tid}: an LLM test needs `prompt` (a prompt.md) or `skill` (a SKILL.md).")
             version = short_hash(json.dumps(t, sort_keys=True, ensure_ascii=False),
@@ -4611,6 +4702,24 @@ def _num(x):
         return None
 
 
+def suites_slow_patterns(S: "Suites") -> list[str]:
+    """Each mechanical matches test timed on long made-up outputs and on its suite's cases, stretched."""
+    out = []
+    for su in S.suites:
+        texts = []
+        for c in su["cases"][:8]:
+            f = c["folder"] / su.get("file", "output.md")
+            if f.is_file():
+                texts.append(f.read_text(encoding="utf-8", errors="replace")[:20000])
+        samples = pattern_samples(texts)
+        for t in su["tests"]:
+            ck = t.get("check")
+            if t.get("kind") == "mechanical" and isinstance(ck, dict) and ck.get("kind") == "matches":
+                out += [f"Suite {su['id']}, test {t['id']}: " + e.split(": ", 1)[1]
+                        for e in slow_pattern_problems(t["id"], ck.get("pattern"), ck.get("flags", ""), samples)]
+    return out
+
+
 def cmd_suite(a) -> int:
     src = Path(a.suites)
     if not src.is_file():
@@ -4628,6 +4737,8 @@ def cmd_suite(a) -> int:
             src = out / src.name
     S = Suites(src)
     root = src.parent
+    if not S.errors:
+        S.errors += suites_slow_patterns(S)
     for w in [w for s in S.suites for w in s["warnings"]] + S.warnings:
         say("  note: " + w)
     if S.errors:

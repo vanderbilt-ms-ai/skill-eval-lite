@@ -5,7 +5,7 @@ description: Run a group's frozen Shared I experiment in Skill Eval Lite, with t
 
 # Running the experiment
 
-<!-- skill-eval-lite run-experiment, version 1 (Skill Eval Lite 0.2.0) -->
+<!-- skill-eval-lite run-experiment, version 2 (Skill Eval Lite 0.2.1) -->
 
 You are running a Shared I group's experiment with Skill Eval Lite's
 runner, `run_ab.py`, in this folder. Each run is one Claude Code session on
@@ -32,8 +32,9 @@ theirs loaded. The runner keeps every output, record and failure.
   say so in its report: the runs are then marked as made before the
   freeze.
 - No `--again` without saying that it replaces runs already made.
-- Never read out the judge's lines or open its files before every member
-  has judged: they say which side was which.
+- Never open the judge's files, or say what it chose, before every member
+  has judged: they say which side was which. The judge prints only that
+  each pair is judged (0.2.1).
 - Never change the assistant's folder, the experiment or a round's files
   here. A change is a new round: `/read-results`.
 

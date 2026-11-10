@@ -92,7 +92,9 @@ class EverySkill(unittest.TestCase):
                 m = MARK.search("\n".join(body.splitlines()[:12]))
                 self.assertIsNotNone(m, f"{d.name}: the version mark near the top")
                 self.assertEqual(m.group(1), "helper" if d.name == "skill-eval-helper" else d.name)
-                self.assertEqual(m.group(3), "0.2.0")
+                mark = tuple(int(x) for x in m.group(3).split("."))
+                release = tuple(int(x) for x in (REPO / "VERSION").read_text().strip().split("."))
+                self.assertTrue((0, 2, 0) <= mark <= release, f"{d.name}: marked {m.group(3)}, a release from 0.2.0 to VERSION")
 
     def test_names_only_commands_and_options_that_exist(self):
         subs, top = subcommands()
