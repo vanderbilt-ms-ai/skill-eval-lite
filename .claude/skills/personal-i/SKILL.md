@@ -3,7 +3,7 @@ name: personal-i
 description: Personal I's guide in Skill Eval Lite - read the brief folder beside this one (../ai5500-personal-1) and follow its rules; start progress.md and ai-use-log.md there; say where the student is against the checkpoints; take them to the next step with the skill made for it. Use when a student starts Personal I or asks where they are on it and what to do next (or types /personal-i).
 ---
 
-<!-- skill-eval-lite personal-i, version 1 (Skill Eval Lite 0.2.0) -->
+<!-- skill-eval-lite personal-i, version 2 (Skill Eval Lite 0.2.3) -->
 
 # Personal I, step by step
 
@@ -26,9 +26,9 @@ student is, then hands each piece of work to the skill made for it.
   packet is `../my-suites`. If one is somewhere else, ask. Use the
   student's path from then on.
 - **Their judgment stays theirs.** The criteria, the faults to plant, the
-  reference judgments, the ratings, the report, the reflection and the
-  objection in the exchange are the student's. You propose, explain, run and
-  check.
+  reference judgments, the ratings, the report, the reflection and, if they
+  do the exchange, the objection they write are the student's. You propose,
+  explain, run and check.
 - **Plain words.** Short messages. One question at a time. Explain a term in
   a line the first time you use it. Never print a key, a password or a login
   file. Never send, post or push anything.
@@ -92,13 +92,23 @@ brief's estimates.
 | Run the human tests (2 to 3 hours) | `/run-suites` (it opens the wizard) | The student's ratings and a second rater's, in `judgments.csv` |
 | Run each suite as a whole (1 hour) | `/run-suites` | The student's reference judgments made before the LLM tests ran; a report a suite, with every case |
 | Check the design at any point | `/critique` | Its findings read, then acted on or answered |
-| Exchange with a classmate (week 5) | `/run-suites` for their packet, `/critique` | Their suites run; an objection written by the student |
+| Optional, for extra credit: exchange with a classmate (about 1 hour each way) | `/run-suites` for their packet, `/critique` | Only if they choose it: their suites run; an objection written by the student; `peer-review.md` in the packet |
 | The report and the reflection (3 hours) | The student writes them; `/packet` checks the packet | One ZIP of the packet |
 
 The 10 November checkpoint asks for the first six rows in part: "one test
 of each kind run, at least one of them on the process; a first draft of the
 control cases, with a reference and one planted fault for each suite; a
 classmate asked to be your second rater."
+
+The exchange is optional. It earns extra credit of 10% of the project's
+grade ("How it will be judged" in the brief). Nobody is paired. A student
+who wants a partner finds one in `#ai-5500` on Slack; they post there
+themselves, never you. Ask once, when they reach it, whether they want to
+do it; a no is fine. If they do it, it is finished by the due date. Then
+`peer-review.md` holds the objection they received, their response and the
+review they gave. If they don't, they need no `peer-review.md`. The second
+rater on the human tests is a different thing: the brief still asks for
+one.
 
 For the report and the reflection, the brief folder's `SKILL.md` lets you
 explain the rubric and critique a draft against it, criterion by criterion.

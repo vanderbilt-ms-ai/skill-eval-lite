@@ -2,10 +2,40 @@ Skill Eval Lite is published as a public repository,
 https://github.com/vanderbilt-ms-ai/skill-eval-lite. Version 0.1.0 was
 released on 27 October 2026, versions 0.1.1, 0.1.2 and 0.1.3 on
 3 November 2026, version 0.1.4 on 4 November 2026, version 0.2.0 on
-7 November 2026, version 0.2.1 on 9 November 2026 and version 0.2.2 on
-10 November 2026. Each release is one
+7 November 2026, version 0.2.1 on 9 November 2026, version 0.2.2 on
+10 November 2026 and version 0.2.3 on 13 November 2026. Each release is one
 commit on the public `main`, made from the course's private development
-history and tagged (`v0.1.0` to `v0.2.2`).
+history and tagged (`v0.1.0` to `v0.2.3`).
+
+## 0.2.3, 13 November 2026
+
+Four skills changed, to match the briefs' latest revisions. In
+both projects the exchange is now optional, for extra credit: 10% of the
+project's grade. Nobody is paired: if you want a partner (Personal I) or
+another group (Shared I), say so in `#ai-5500` on Slack. `peer-review.md`
+or `exchange.md` goes in your packet only if you did the exchange. Shared
+I's report has six sections now: "The exchange" is no longer one of them.
+Both projects are due on Wednesday 2 December. The skills read the dates
+from your brief folder's `plan.md`, so they follow the new ones once your
+brief folder is up to date. Nothing else changes. Everything you have made
+carries over. To update, in Claude, in this folder, type
+`/check-updates`: it brings in this version and your brief folders' new
+revisions.
+
+### What changed
+
+| # | Before | In 0.2.3 |
+| --- | --- | --- |
+| 1 | `packet` checked Shared I's report for seven sections and listed `exchange.md` (Shared I) and `peer-review.md` (Personal I) as required | `packet` (version 2) checks Shared I's report for six sections and offers `/check-updates` if the brief folder still lists seven. It asks whether the student did the exchange, checks `exchange.md` or `peer-review.md` only if they did, and never lists it as missing otherwise |
+| 2 | `shared-i` listed the exchange as the fifth step and said the group writes "the report and the exchange" | `shared-i` (version 3): the exchange is an optional step for extra credit, with another group the group finds itself in `#ai-5500`; the report has the brief's six sections; `exchange.md` only if the group did the exchange |
+| 3 | `personal-i` listed the exchange with a classmate as a step for week 5 | `personal-i` (version 2): the exchange is an optional step for extra credit, with a partner the student finds in `#ai-5500`; `peer-review.md` only if they did it. The second rater on the human tests is still required |
+| 4 | `run-suites` ran a classmate's packet as part of the exchange | `run-suites` (version 2): the same steps, run only if the student chose to do the exchange. It also says where the objection, the response and the review go (`peer-review.md`) |
+
+### What was verified for 0.2.3
+
+- `python3 -m unittest`: the whole suite, with `tests/test_skills.py`
+  (front matter, version marks, every command named against the parser,
+  no sentence asking the student to type a command).
 
 ## 0.2.2, 10 November 2026
 

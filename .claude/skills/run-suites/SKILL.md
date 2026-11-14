@@ -3,12 +3,14 @@ name: run-suites
 description: Run Personal I's suites with the student in Skill Eval Lite, in the order that keeps their judgment first - run_ab.py suite --check, the mechanical tests (--no-llm), the student's reference judgments in the wizard, then the LLM tests on their plan, then the human tests with a second rater; read each suite report with them (the controls table, the agreement); run again after a test changes; run a classmate's packet in the exchange. Use when a student wants to run or rerun their suites or one test, read a suite report, get a second rater's judgments in or run a classmate's packet.
 ---
 
-<!-- skill-eval-lite run-suites, version 1 (Skill Eval Lite 0.2.0) -->
+<!-- skill-eval-lite run-suites, version 2 (Skill Eval Lite 0.2.3) -->
 
 # Running the suites
 
 You are helping one student run Personal I's two suites and read what they
-show: the brief's sixth and seventh steps, with the runs of the exchange.
+show: the brief's sixth and seventh steps. It also runs a classmate's
+packet in the exchange, if the student does it (it is optional, for extra
+credit).
 The runner, `run_ab.py suite`, runs the mechanical and LLM tests on every
 case and writes a report a suite. The wizard collects the student's own
 judgments.
@@ -151,11 +153,13 @@ the changed test's LLM runs are made) and step 6. Reports are named by the
 suite's version, so the old report stays: the brief asks for "each suite's
 report, for each version of the suite you ran".
 
-## 7. A classmate's packet (the exchange)
+## 7. A classmate's packet (the optional exchange)
 
-The brief: "Run their suites from their packet and check that you get their
-reports, follow their human instructions on two or three cases, and write
-the strongest objection you have to one of their tests".
+Only if the student has chosen to do the exchange, with a partner they
+found themselves in `#ai-5500` on Slack. The brief: "Run their suites from
+their packet and check that you get their reports, follow their human
+instructions on two or three cases, and write the strongest objection you
+have to one of their tests".
 
 1. Unzip their packet beside this folder, as `../peer-<their initials>/`.
 2. **Read their programs first**, with the student: a mechanical test's
@@ -174,6 +178,11 @@ the strongest objection you have to one of their tests".
 7. The objection is the student's. `/critique` can list what it notices in
    their tests; the student chooses one and writes it, at least one on the
    process suite.
+8. When the partner's objection comes, the student responds: they revise
+   the test and keep both versions (step 6, "After a change"), or say why
+   it stands. The objection they received, their response and the review
+   they gave go in `../my-suites/peer-review.md`. All three are the
+   student's.
 
 ## 8. Before you finish
 

@@ -29,7 +29,7 @@ It was made for AI 5500 (Vanderbilt, Fall 2026), for Shared I and Personal I. Th
 assistant is Wren, the AI 5100 assistant template's fictional example: Wren
 works for Morgan Reyes and nobody in it is real.
 
-Version 0.2.2 (the version is in `VERSION`). On an earlier version? In Claude, in this folder, type
+Version 0.2.3 (the version is in `VERSION`). On an earlier version? In Claude, in this folder, type
 `/check-updates`; in a terminal, `git pull`. [RELEASE.md](RELEASE.md) says what changed. Claude checks
 for a newer version by itself, at the start of a session, once a day.
 
@@ -1379,7 +1379,7 @@ asked; that a global `AGENTS.md`, a personal skill, an MCP tool or an MCP
 call stops the run; that runners are not mixed; and the import inlining,
 the trace names and the check before each run on their own.
 
-## Limits in 0.2.2
+## Limits in 0.2.3
 
 - The runner runs Claude Code or Codex. A Codex run reads the assistant
   through a generated `AGENTS.md` (see "With Codex"), so its results are not

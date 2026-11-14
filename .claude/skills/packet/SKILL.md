@@ -5,13 +5,14 @@ description: Assemble and check a student's submission packet against the brief'
 
 # Assembling the packet
 
-<!-- skill-eval-lite packet, version 1 (Skill Eval Lite 0.2.0) -->
+<!-- skill-eval-lite packet, version 2 (Skill Eval Lite 0.2.3) -->
 
 You are helping a student in AI 5500 (Vanderbilt) put together the folder
 they submit. The brief's "What to submit" is the list. You copy, check and
 zip. What they wrote (the report, the reflection, the contribution, the
-exchange or peer review, the AI-use statement, `system.md`) is theirs: you
-check that it is there, in the brief's sections. You never write it.
+AI-use statement, `system.md`, and the exchange or peer review if they did
+it) is theirs: you check that it is there, in the brief's sections. You
+never write it.
 
 ## How to work
 
@@ -44,7 +45,8 @@ folder, `runs/<name>/`:
 | `judgments.csv` | `runs/<name>/judgments.csv`, exported from the wizard with every member's judgments imported |
 | `analysis/` | `runs/<name>/results.json`, exported from the wizard |
 | `bundle.json` | `runs/<name>/bundle.json`, so another group can load it |
-| `report.md`, `exchange.md`, `ai-use.md`, `system.md` | the group's own files |
+| `report.md`, `ai-use.md`, `system.md` | the group's own files |
+| `exchange.md` | the group's own file, only if it did the exchange |
 
 Check and say what you find:
 
@@ -55,10 +57,15 @@ Check and say what you find:
 - `judgments.csv` has judgments under every member's initials, the
   controls' pairs included. `results.json` is there.
 - The held-out prompts were run and judged (the brief's fourth part).
-- `report.md` has the brief's seven sections; `exchange.md` has the
-  challenge received, the response and the review given. Each member's
-  contribution and reflection is submitted on its own, not in the group's
-  ZIP.
+- `report.md` has the brief's six sections. If the brief folder's
+  `brief.md` lists seven, the seventh "The exchange", it is an older
+  revision: offer `/check-updates`.
+- The exchange is optional, for extra credit. Ask whether the group did
+  it. If it did, `exchange.md` has the challenge received, the response and
+  the review given. If it didn't, there is no `exchange.md`: don't list it
+  as missing.
+- Each member's contribution and reflection is submitted on its own, not
+  in the group's ZIP.
 - `system.md`, unless the system is the class assistant.
 - `checks/`: the brief asks, for each mechanical check, a control it should
   pass and one it should fail, with their output. The built-in checks'
@@ -71,8 +78,8 @@ Ask for their name for the folder. Copy their packet (usually
 `reflection.md`, `README.md` (how to rerun each suite), `system.md` (unless
 the class assistant), `suites.yaml`, `judgments.csv`, `product/` or
 `stage/`, `process/`, `files/` (if the system makes files that aren't
-text), `controls/`, `tests/<test ID>/`, `reports/`, `peer-review.md` and
-`ai-use.md`.
+text), `controls/`, `tests/<test ID>/`, `reports/` and `ai-use.md`, with
+`peer-review.md` only if they did the exchange.
 
 Check and say what you find:
 
@@ -84,6 +91,10 @@ Check and say what you find:
 - Each human test has its instructions and both raters' judgments with
   reasons.
 - `report.md` has the brief's six sections; `reflection.md` its four parts.
+- The exchange is optional, for extra credit. Ask whether they did it. If
+  they did, `peer-review.md` has the objection they received, their
+  response and the review they gave. If they didn't, there is no
+  `peer-review.md`: don't list it as missing.
 - `README.md` says how to rerun each suite. You may draft its commands if
   they ask: say so in `ai-use-log.md`.
 
