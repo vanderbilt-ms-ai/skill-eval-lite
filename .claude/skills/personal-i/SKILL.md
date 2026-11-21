@@ -3,7 +3,7 @@ name: personal-i
 description: Personal I's guide in Skill Eval Lite - read the brief folder beside this one (../ai5500-personal-1) and follow its rules; start progress.md and ai-use-log.md there; say where the student is against the checkpoints; take them to the next step with the skill made for it. Use when a student starts Personal I or asks where they are on it and what to do next (or types /personal-i).
 ---
 
-<!-- skill-eval-lite personal-i, version 2 (Skill Eval Lite 0.2.3) -->
+<!-- skill-eval-lite personal-i, version 3 (Skill Eval Lite 0.2.4) -->
 
 # Personal I, step by step
 
@@ -89,16 +89,36 @@ brief's estimates.
 | Make the control cases (2 hours) | `/control-cases` | A reference, two planted faults and two harmless variations a suite, each with `expect.json` |
 | Build the mechanical tests (2 hours) | `/check-authoring` | Each a built-in check or a program; each meets a planted fault it should catch |
 | Build the LLM tests (2 to 3 hours) | `/llm-test` | A prompt or a skill, a decision rule and a model, settled before any run |
-| Run the human tests (2 to 3 hours) | `/run-suites` (it opens the wizard) | The student's ratings and a second rater's, in `judgments.csv` |
+| Run the human tests (2 to 3 hours) | `/run-suites` (it opens the wizard) | The student's own ratings, each with a reason, made blind with the control cases mixed in, in `judgments.csv` |
 | Run each suite as a whole (1 hour) | `/run-suites` | The student's reference judgments made before the LLM tests ran; a report a suite, with every case |
 | Check the design at any point | `/critique` | Its findings read, then acted on or answered |
 | Optional, for extra credit: exchange with a classmate (about 1 hour each way) | `/run-suites` for their packet, `/critique` | Only if they choose it: their suites run; an objection written by the student; `peer-review.md` in the packet |
-| The report and the reflection (3 hours) | The student writes them; `/packet` checks the packet | One ZIP of the packet |
+| The report and the reflection (3 hours) | The student writes them, the report from the packet; `/packet` checks the packet | One ZIP of the packet |
 
-The 10 November checkpoint asks for the first six rows in part: "one test
+The 10 November checkpoint asked for the first six rows in part: "one test
 of each kind run, at least one of them on the process; a first draft of the
-control cases, with a reference and one planted fault for each suite; a
-classmate asked to be your second rater."
+control cases, with a reference and one planted fault for each suite". The
+24 November checkpoint asks for the human tests and each suite run as a
+whole: "Your own judgments on each human test, made blind with the control
+cases mixed in; each LLM test compared with your own reference; for each
+test, whether it moved when it should and stayed still when it should."
+
+No second rater is needed. The student makes their own judgments on each
+human test, with a reason for each, blind: the wizard shuffles the cases
+with the control cases mixed in, so nothing says which is which. The
+control cases are what check a human test. The reference should pass, each
+planted fault should fail and each harmless variation should get the same
+result as its original. The instructions are still written so that someone
+else could follow them without asking.
+
+A second rater is optional. Judgments from one or more other people (a
+classmate, a colleague) on a human test, made on their own, are the brief's
+"Human calibration" extension, for extra credit of 10% of the project's
+grade. With it, the student reports how often they agreed, revises the
+instructions where they disagreed and shows what changed. Mention it once,
+when they reach the human tests; a no is fine. If the brief folder's
+`brief.md` still says a second rater is required, it is an older revision:
+offer `/check-updates`.
 
 The exchange is optional. It earns extra credit of 10% of the project's
 grade ("How it will be judged" in the brief). Nobody is paired. A student
@@ -106,13 +126,19 @@ who wants a partner finds one in `#ai-5500` on Slack; they post there
 themselves, never you. Ask once, when they reach it, whether they want to
 do it; a no is fine. If they do it, it is finished by the due date. Then
 `peer-review.md` holds the objection they received, their response and the
-review they gave. If they don't, they need no `peer-review.md`. The second
-rater on the human tests is a different thing: the brief still asks for
-one.
+review they gave. If they don't, they need no `peer-review.md`.
+
+The report is the main thing marked. The brief: "The report is the main
+thing I mark. The packet of tests, cases and results is its evidence." So the
+student writes each section from the packet and points to the cases, runs,
+suite reports and judgments it rests on. The report's fifth section, "Your
+own judgment", draws on the student's own references and on how their own
+judgments did on the control cases, not on a second rater.
 
 For the report and the reflection, the brief folder's `SKILL.md` lets you
 explain the rubric and critique a draft against it, criterion by criterion.
-Never write their text.
+In a critique, say which sections point to nothing in the packet. Never
+write their text.
 
 ## 4. Hand over
 

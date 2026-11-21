@@ -4689,8 +4689,13 @@ def suite_report(suite: dict, rows: list[dict], when: str) -> str:
                     near = sum(1 for x, y in pairs if _num(x) is not None and _num(y) is not None and abs(_num(x) - _num(y)) <= 1)
                     agree.append(f"- {t['id']}: {a} and {b} gave the same answer on {same} of {len(pairs)} cases"
                                  + (f", within one point on {near}" if t.get("form", "rating") == "rating" else "") + ".")
-            if len(raters) < 2:
-                agree.append(f"- {t['id']}: {len(raters)} rater{'s' if len(raters) != 1 else ''} so far; agreement needs two.")
+            # One rater is enough: another is optional (Personal I's Human
+            # calibration extension), so agreement shows only with two or more.
+            if not raters:
+                agree.append(f"- {t['id']}: no ratings yet.")
+            elif len(raters) == 1:
+                agree.append(f"- {t['id']}: one rater, {raters[0]}. Another rater is optional: with two or more, "
+                             "their agreement shows here.")
     out += agree or ["No LLM or human tests."]
     return "\n".join(out) + "\n"
 
@@ -5228,7 +5233,7 @@ def personal_step(st: dict, packets: list[dict]) -> dict:
                                   "yourself (Reference), then rate the cases (Human tests).", "skill": "/wizard", "command": OPEN_WIZARD})
         else:
             steps.append({"what": f"In the wizard's Report step, export judgments.csv into {x['folder']}/ and each report into "
-                                  f"{x['folder']}/reports/. Then ask a classmate to rate the same cases.",
+                                  f"{x['folder']}/reports/. Then read how each test did on the control cases.",
                           "skill": "/wizard", "command": OPEN_WIZARD, "done": True})
     s = next((s for s in steps if not s.get("done")), steps[0])
     s.pop("done", None)

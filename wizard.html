@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="skill-eval-lite-version" content="0.2.3">
+<meta name="skill-eval-lite-version" content="0.2.4">
 <title>Skill Eval Lite</title>
 <!--
   Skill Eval Lite: the wizard. Five steps from an experiment file to results:
@@ -1609,14 +1609,14 @@ function helpSuite(n) {
     y += 72;
     ['1', '2', '3', '4'].forEach((s, i) => button(p, 12 + i * 40, y, s, { w: 34, h: 26 }));
     ring(p, 92, y, 34, 26); y += 38;
-    browserIcon(p, 12, y); p.para(36, y + 12, 'A classmate does the same, in their own browser.', HW - 48, { size: 10.5, cls: 't2' }); y += 40;
+    browserIcon(p, 12, y); p.para(36, y + 12, 'Optional: another rater does the same, in their own browser.', HW - 48, { size: 10.5, cls: 't2' }); y += 40;
   } else if (n === 4) {
     head('Save the reports in your packet');
     button(p, 12, y, 'Export judgments.csv', { primary: true }); y += 32;
     button(p, 12, y, 'Export <suite>-<version>.md', { primary: true }); y += 30;
     down('in Claude, /wizard puts them here', 'agent');
     y = miniTree(p, 12, y + 4, [[0, 'folder', 'my-suites/'], [1, 'file', 'judgments.csv', 'every row'], [1, 'folder', 'reports/'], [2, 'file', '<suite>-<version>.md', 'each report']]);
-    p.text(12, y + 6, 'A classmate’s judgments.csv: import it here.', { size: 11.5, cls: 't2' }); y += 18;
+    p.text(12, y + 6, 'Optional: import another rater’s file here.', { size: 11.5, cls: 't2' }); y += 18;
   }
   p.h = y;
   return p;
@@ -1889,11 +1889,11 @@ const PATHS = {
       see: '`Next, load …/bundle.json in the wizard\'s step 1`', ifnot: '`Claude Code is not logged in`? Type `/get-ready`: it signs the `claude` command in.',
       pic: ctx => C(ctx, [{ you: '/run-suites My reference is in my packet. Please run the LLM tests.' }, { run: '{py} run_ab.py suite {packet}/suites.yaml' }, { note: 'a line for each run, then the tables' }, { out: 'Next, load ' + F('{packet}', ctx) + '/bundle.json in the wizard\'s step 1 …', ok: true }]) },
     { where: 'web', title: 'Rate the cases.', click: 'Load the new `bundle.json` in step 1. In step 3, pick a human test and rate each case.',
-      body: 'The cases come shuffled, with the control cases mixed in. Nothing says which is which. Please ask a classmate to do the same in their own browser, from the bundle the last run wrote.',
+      body: 'The cases come shuffled, with the control cases mixed in. Nothing says which is which. Rate each one with a one-line reason. Another rater is optional (the brief’s Human calibration extension): they rate in their own browser, from the bundle the last run wrote.',
       see: 'After each case, the other tests’ results on it.', ifnot: 'Nothing to rate? Your suites have no human tests.',
       pic: () => WZ(3, { kind: 'judge', choices: ['1', '2', '3', '4'], cards: 1 }, 'suites') },
     { where: 'web', title: 'Save the reports.', click: 'In step 4, click *Export judgments.csv*, then each *Export <suite>.md*.',
-      body: 'Import your classmate’s `judgments.csv` here too, to see where you agree.', see: 'The files in your Downloads folder.', ifnot: '',
+      body: 'If another person rated the cases too, import their `judgments.csv` here, to see where you agree.', see: 'The files in your Downloads folder.', ifnot: '',
       pic: () => WZ(4, { kind: 'click', panel: 'Suite report', items: [], buttons: [{ label: 'Export judgments.csv', primary: true, target: true }, { label: 'Export board-drafts….md' }], after: 'The files go to your Downloads folder.' }, 'suites') },
     { where: 'agent', title: 'Keep them in your packet.', say: '/wizard I’ve exported judgments.csv and the reports. Please put them in my packet.', cmd: '{movesuite}',
       body: 'Claude adds the new rows to your packet’s `judgments.csv` and puts each report in its `reports` folder.',
@@ -2189,7 +2189,7 @@ const NAMED = {
 [1, 2, 3, 4].forEach(n => { NAMED['help-suite-' + n] = { draw: () => helpSuite(n), title: 'Checks-only step ' + n + ': ' + ['where the bundle comes from', 'you first, then the AI test', 'rate each case, blind', 'save the reports'][n - 1], desc: [
   'In Claude, /run-suites runs the suites, which write my-suites/bundle.json. Choose it in step 1.',
   'For each case, choose Pass, Unknown or Fail, with a reason. The AI test’s answers appear after you have judged every case.',
-  'The cases come shuffled, with the control cases mixed in. Rate each from 1 to 4. A classmate does the same in their own browser.',
+  'The cases come shuffled, with the control cases mixed in. Rate each from 1 to 4, with a reason. Another rater is optional: they rate in their own browser.',
   'Export judgments.csv and each report. In Claude, /wizard adds the rows to my-suites/judgments.csv and puts the reports in my-suites/reports/.'][n - 1] }; });
 
 let uid = 0;
@@ -5230,7 +5230,9 @@ function sAgreement(suite, L) {
         out.push({ text: '- ' + t.id + ': ' + raters[a] + ' and ' + raters[b] + ' gave the same answer on ' + same + ' of ' + pairs.length + ' cases'
           + ((t.form || 'rating') === 'rating' ? ', within one point on ' + near : '') + '.', test: t.id });
       }
-      if (raters.length < 2) out.push({ text: '- ' + t.id + ': ' + raters.length + ' rater' + (raters.length !== 1 ? 's' : '') + ' so far; agreement needs two.', test: t.id });
+      // One rater is enough: another is optional, so agreement shows only with two or more (as in run_ab.py).
+      if (!raters.length) out.push({ text: '- ' + t.id + ': no ratings yet.', test: t.id });
+      else if (raters.length === 1) out.push({ text: '- ' + t.id + ': one rater, ' + raters[0] + '. Another rater is optional: with two or more, their agreement shows here.', test: t.id });
     }
   });
   return out;
@@ -5304,7 +5306,7 @@ function sWho() {
       h('input', { type: 'text', id: 's-initials', value: S.sjudge || '', placeholder: 'Your initials', style: 'width:140px',
         onkeydown: e => { if (e.key === 'Enter') { S.sjudge = e.target.value.trim().toUpperCase().slice(0, 6); save(); render(); } } }),
       h('button', { class: 'btn primary', onclick: () => { S.sjudge = document.getElementById('s-initials').value.trim().toUpperCase().slice(0, 6); S.sreveal = null; save(); render(); } }, S.sjudge ? 'Switch' : 'Start'),
-      h('span', { class: 'muted small' }, 'Judge on your own. A classmate judges in their own browser, and you import their judgments.csv in step 4.')));
+      h('span', { class: 'muted small' }, 'Judge on your own. Another rater is optional: they judge in their own browser and you import their judgments.csv in step 4.')));
 }
 function sTestPicker(list, label) {
   if (!S.stest || !list.some(x => x.s.id + '/' + x.t.id === S.stest)) S.stest = list.length ? list[0].s.id + '/' + list[0].t.id : null;
@@ -5345,9 +5347,9 @@ SUITE_STEPS[1].lead = ['An AI test’s answer is evidence to check, not proof. S
 SUITE_STEPS[1].try = 'Please type your initials, pick an AI test, and choose *Pass*, *Unknown* or *Fail* for each case.';
 SUITE_STEPS[1].shows = () => SUITE_STEPS[1].ready() && 'Every reference judgment is made. Step 4 counts where you and the LLM agree; look closely at a disagreement.';
 SUITE_STEPS[2].lead = ['Each case is shown on its own, in a random order, with the control cases mixed in and nothing to say which is which. Another test’s result appears only after you record yours.'];
-SUITE_STEPS[2].try = 'Please follow the test’s instructions, and rate (or compare) every case with a one-line reason. Ask one classmate to do the same in their own browser.';
-SUITE_STEPS[2].shows = () => SUITE_STEPS[2].ready() && 'Every case is rated. Export your judgments.csv in step 4 and send it to your second rater; import theirs.';
-SUITE_STEPS[3].lead = ['A row for each case and a column for each test. Then the failures, where the tests disagree, whether each test did what the control cases expect, and how often you, your classmate and the AI agree.'];
+SUITE_STEPS[2].try = 'Please follow the test’s instructions and rate (or compare) every case with a one-line reason. Another rater is optional: if you have one, they do the same in their own browser.';
+SUITE_STEPS[2].shows = () => SUITE_STEPS[2].ready() && 'Every case is rated. In step 4, see how each test did on the control cases, then export your judgments.csv. If someone else rated too, import theirs before you export.';
+SUITE_STEPS[3].lead = ['A row for each case and a column for each test. Then the failures, where the tests disagree and whether each test did what the control cases expect. Last, how often you and the AI agree. If another person rated too, how often the two of you agree.'];
 SUITE_STEPS[3].try = 'Please export `judgments.csv` into your packet, and each report into its `reports` folder. A test that missed a control case is a finding: look at why before you trust its other results.';
 SUITE_STEPS[3].shows = () => null;
 
@@ -5432,7 +5434,7 @@ SUITE_STEPS[3].render = function () {
   const tools = h('div', { class: 'toolbar' },
     h('button', { class: 'btn primary', onclick: () => download('judgments.csv', sCsv(), 'text/csv') }, 'Export judgments.csv'),
     SB().suites.map(s => h('button', { class: 'btn', onclick: () => download(s.id + '-' + s.version + '.md', sReport(s, rows, when), 'text/markdown') }, 'Export ' + s.id + '-' + s.version + '.md')),
-    h('label', { class: 'file' }, h('input', { type: 'file', accept: '.csv,text/csv', onchange: e => e.target.files.length && sImport(e.target.files[0]) }), 'Import a classmate’s judgments.csv'));
+    h('label', { class: 'file' }, h('input', { type: 'file', accept: '.csv,text/csv', onchange: e => e.target.files.length && sImport(e.target.files[0]) }), 'Import another rater’s judgments.csv'));
   const unref = S.sjudge ? sTests('llm').filter(({ s, t }) => !s.cases.every(c => sMine(t.id + '-reference', c.id))).map(({ t }) => t.id) : [];
   return [tools, (S.simported || []).length ? h('div', { class: 'small muted' }, 'Imported: ' + S.simported.join(', ')) : null,
     unref.length ? h('div', { class: 'verdict wrong', style: 'margin-top:10px' }, 'The LLM’s results are shown below, but your reference judgments are not finished for ' + unref.join(', ') + '. The brief asks you to make them first (step 2).') : null,

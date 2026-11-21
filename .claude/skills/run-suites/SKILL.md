@@ -1,9 +1,9 @@
 ---
 name: run-suites
-description: Run Personal I's suites with the student in Skill Eval Lite, in the order that keeps their judgment first - run_ab.py suite --check, the mechanical tests (--no-llm), the student's reference judgments in the wizard, then the LLM tests on their plan, then the human tests with a second rater; read each suite report with them (the controls table, the agreement); run again after a test changes; run a classmate's packet in the exchange. Use when a student wants to run or rerun their suites or one test, read a suite report, get a second rater's judgments in or run a classmate's packet.
+description: Run Personal I's suites with the student in Skill Eval Lite, in the order that keeps their judgment first - run_ab.py suite --check, the mechanical tests (--no-llm), the student's reference judgments in the wizard, then the LLM tests on their plan, then the human tests, rated blind by the student (another rater is optional); read each suite report with them (the controls table, the agreement); run again after a test changes; run a classmate's packet in the optional exchange. Use when a student wants to run or rerun their suites or one test, read a suite report, bring in another rater's judgments or run a classmate's packet.
 ---
 
-<!-- skill-eval-lite run-suites, version 2 (Skill Eval Lite 0.2.3) -->
+<!-- skill-eval-lite run-suites, version 3 (Skill Eval Lite 0.2.4) -->
 
 # Running the suites
 
@@ -105,18 +105,32 @@ model, the date, the test's version and the decision read from it).
 
 Hand over to `/wizard`, with the `bundle.json` the last run wrote:
 
-1. **The second rater.** The brief asks for one classmate to judge on their
-   own. The classmate needs a `bundle.json` that holds none of the
-   student's ratings: the one the last `suite` run wrote, before the
-   student's ratings were brought back and `suite` was run again. Send it
-   before or after the student rates, as long as it is that bundle. The
-   classmate loads it in their own wizard, rates in step 3 under their
-   initials and sends back their `judgments.csv`.
-2. **The student's ratings.** Step 3, *Human tests*: their initials, then
+1. **The student's ratings.** Step 3, *Human tests*: their initials, then
    each case, shuffled with the controls mixed in, rated with a one-line
-   reason.
-3. In step 4, *Import a classmate’s judgments.csv* when it comes, then
-   *Export judgments.csv*. Bring it back into `../my-suites/`.
+   reason. Nothing says which case is a control, so the student judges
+   blind. The control cases check a human test as they check the others,
+   as each `expect.json` says: the reference should pass, a planted fault
+   should fail and a harmless variation should get the same result as its
+   original.
+2. In step 4, *Export judgments.csv*. Bring it back into `../my-suites/`.
+
+**Another rater is optional.** Personal I needs no second rater. Judgments
+from one or more other people (a classmate, a colleague) on a human test,
+made on their own, are the brief's "Human calibration" extension, for extra
+credit: the student reports how often they agreed, revises the
+instructions where they disagreed and shows what changed. Ask once whether
+they want to do it; a no is fine. If the brief folder's `brief.md` still
+says a second rater is required, it is an older revision: offer
+`/check-updates`. If they do it:
+
+- Each other rater needs a `bundle.json` that holds none of the student's
+  ratings: the one the last `suite` run wrote, before the student's
+  ratings were brought back and `suite` was run again. The student sends
+  it before or after they rate, as long as it is that bundle. The rater
+  loads it in their own wizard, rates in step 3 under their initials and
+  sends back their `judgments.csv`.
+- In step 4, *Import another rater’s judgments.csv* for each file that
+  comes, then *Export judgments.csv*. Bring it back into `../my-suites/`.
 
 ## 6. The reports
 
@@ -137,8 +151,14 @@ the student, part by part:
   the reference passes: look at the reference first. `?` means no result
   yet; `-` means the control expects anything.
 - **Agreement**: the LLM and the student's reference ("agree on 9 of 11
-  cases", with each disagreement listed) and the two raters ("gave the
-  same answer on 8 of 11 cases, within one point on 10").
+  cases", with each disagreement listed). For a human test with one rater
+  it says `one rater` and counts nothing: that is fine. With other raters,
+  each pair ("gave the same answer on 8 of 11 cases, within one point on
+  10").
+
+For a human test, its row in the controls table is how the student's own
+judgments did on the control cases. With their references, that is what
+the report's fifth section, "Your own judgment", draws on.
 
 The brief: "A test that didn't move when it should have, or moved when it
 shouldn't have, is a finding: please look at why before you trust its other
@@ -188,7 +208,8 @@ have to one of their tests".
 
 - [ ] The student's reference was made before each LLM test ran.
 - [ ] Every case has a result from every mechanical and LLM test.
-- [ ] The student's ratings and the second rater's are in `judgments.csv`.
+- [ ] The student's own ratings, each with a reason, are in `judgments.csv`
+  (and any other rater's, if they chose Human calibration).
 - [ ] A report for each suite, written after the last rows came in.
 - [ ] Each `MISSED` control and one disagreement read with the student.
 

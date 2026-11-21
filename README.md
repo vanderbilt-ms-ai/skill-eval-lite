@@ -29,7 +29,7 @@ It was made for AI 5500 (Vanderbilt, Fall 2026), for Shared I and Personal I. Th
 assistant is Wren, the AI 5100 assistant template's fictional example: Wren
 works for Morgan Reyes and nobody in it is real.
 
-Version 0.2.3 (the version is in `VERSION`). On an earlier version? In Claude, in this folder, type
+Version 0.2.4 (the version is in `VERSION`). On an earlier version? In Claude, in this folder, type
 `/check-updates`; in a terminal, `git pull`. [RELEASE.md](RELEASE.md) says what changed. Claude checks
 for a newer version by itself, at the start of a session, once a day.
 
@@ -848,17 +848,26 @@ project. `/suites-intake` helps you make your own packet.
    - *Human tests*: each case on its own (or two side by side, for a
      comparison), shuffled, with the control cases mixed in and nothing to
      say which they are; another test's result appears only after you record
-     yours. Ask a classmate to do the same in their browser.
+     yours. You rate every case yourself, with a reason. The control cases
+     check the test: the reference should pass, each planted fault should
+     fail and each harmless variation should get the same result as its
+     original.
    - *Report*: a row per case and a column per test, the failures, where the
      tests disagree, whether each test did what the control cases expect,
-     and the agreement (the LLM with your reference; you with your second
+     and the agreement (the LLM with your reference; you with any other
      rater).
 
 5. **Export** `judgments.csv` (it holds every row, the runner's and yours)
    and each suite's report. Claude puts them in the packet and its
    `reports/` ("/wizard I've exported judgments.csv and the reports. Please
-   put them in my packet."). Import your second rater's `judgments.csv` in
-   the report step.
+   put them in my packet.").
+
+   A second rater is optional: Personal I's "Human calibration" extension,
+   for extra credit. If one or more other people (a classmate, a colleague)
+   rate a human test on their own, in their own browser, import each
+   one's `judgments.csv` in the report step before you export. The report
+   then counts how often you agreed. With one rater, it says so and counts
+   nothing.
 
 The worked example's recorded run, with eight real LLM test runs, is
 `examples/recorded/personal-suites/`: load its `bundle.json` to see the mode
@@ -1186,6 +1195,12 @@ judgments and the human tests. The skills never do them for you. They never
 open the held-out prompts before your group says its changes are final.
 They never write your report, reflection, contribution or objection.
 
+In both projects the report is the main thing marked. The packet is its
+evidence: the tests, cases and results for Personal I; the prompts, runs,
+judgments and analysis for Shared I. Write each section of the report from
+the packet and point to the files it rests on. `/packet` says which
+sections point to nothing.
+
 ## Commands
 
     python3 run_ab.py setup FOLDER [--from URL] [--commit SHA]
@@ -1379,7 +1394,7 @@ asked; that a global `AGENTS.md`, a personal skill, an MCP tool or an MCP
 call stops the run; that runners are not mixed; and the import inlining,
 the trace names and the check before each run on their own.
 
-## Limits in 0.2.3
+## Limits in 0.2.4
 
 - The runner runs Claude Code or Codex. A Codex run reads the assistant
   through a generated `AGENTS.md` (see "With Codex"), so its results are not

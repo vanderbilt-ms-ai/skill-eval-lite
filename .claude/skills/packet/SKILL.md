@@ -5,11 +5,13 @@ description: Assemble and check a student's submission packet against the brief'
 
 # Assembling the packet
 
-<!-- skill-eval-lite packet, version 2 (Skill Eval Lite 0.2.3) -->
+<!-- skill-eval-lite packet, version 3 (Skill Eval Lite 0.2.4) -->
 
 You are helping a student in AI 5500 (Vanderbilt) put together the folder
 they submit. The brief's "What to submit" is the list. You copy, check and
-zip. What they wrote (the report, the reflection, the contribution, the
+zip. The report is the main thing marked. The rest of the packet is its
+evidence: each section of the report points to the files it rests on.
+What they wrote (the report, the reflection, the contribution, the
 AI-use statement, `system.md`, and the exchange or peer review if they did
 it) is theirs: you check that it is there, in the brief's sections. You
 never write it.
@@ -60,6 +62,10 @@ Check and say what you find:
 - `report.md` has the brief's six sections. If the brief folder's
   `brief.md` lists seven, the seventh "The exchange", it is an older
   revision: offer `/check-updates`.
+- Each section of `report.md` points to the prompts, runs, judgments and
+  analysis it rests on. Say which files it names that aren't in the packet.
+  Say which sections point to nothing. The pointers are the group's to
+  write, never yours.
 - The exchange is optional, for extra credit. Ask whether the group did
   it. If it did, `exchange.md` has the challenge received, the response and
   the review given. If it didn't, there is no `exchange.md`: don't list it
@@ -88,9 +94,18 @@ Check and say what you find:
 - `reports/` has a report for each suite, for each version run.
 - Each LLM test's folder holds every run as it happened and the student's
   own reference judgments (in `judgments.csv`).
-- Each human test has its instructions and both raters' judgments with
-  reasons.
+- Each human test has its instructions and the student's own judgments,
+  each with a reason. No second rater is needed: don't list one as
+  missing. Other raters' judgments are the "Human calibration" extension,
+  for extra credit. If the student did it, check that the other raters'
+  judgments are in `judgments.csv`, with the revised instructions and what
+  changed. If the brief folder's `brief.md` still says a second rater is
+  required, it is an older revision: offer `/check-updates`.
 - `report.md` has the brief's six sections; `reflection.md` its four parts.
+- Each section of `report.md` points to the cases, runs, suite reports and
+  judgments it rests on. Say which files it names that aren't in the
+  packet. Say which sections point to nothing. The pointers are the
+  student's to write, never yours.
 - The exchange is optional, for extra credit. Ask whether they did it. If
   they did, `peer-review.md` has the objection they received, their
   response and the review they gave. If they didn't, there is no

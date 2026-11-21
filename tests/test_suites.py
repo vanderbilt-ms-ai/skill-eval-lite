@@ -187,6 +187,24 @@ class Suite(unittest.TestCase):
         self.assertIn("| reference | reference | pass | pass | 4 (SL), 4 (TW) |", rep)
         self.assertIn("- dana-brief-2, sound-process: split", rep)
 
+    def test_one_rater_is_enough(self):
+        """0.2.4: Personal I needs no second rater. With one rater the report says
+        so and counts no agreement between raters; with none, no ratings yet."""
+        suite = next(s for s in R.Suites(self.out / "suites.yaml").suites if s["id"] == "graph-briefs")
+        v = {t["id"]: t["version"] for t in suite["tests"]}
+        rows = [r for r in self.rows() if r["item"] in {c["id"] for c in suite["cases"]}]
+        rep = R.suite_report(suite, rows, "now")
+        self.assertIn("- sound-process: no ratings yet.", rep)
+        rows.append({"item": "reference", "config": "", "object": "process", "check": "sound-process", "route": "human",
+                     "judge": "SL", "version": v["sound-process"], "result": "4", "reason": "test", "shown_left": "",
+                     "when": "2030-01-01T00:00:00Z"})
+        rep = R.suite_report(suite, rows, "now")
+        self.assertIn("- sound-process: one rater, SL. Another rater is optional: with two or more, "
+                      "their agreement shows here.", rep)
+        self.assertNotIn("needs two", rep)
+        self.assertNotIn("gave the same answer", rep)
+        self.assertIn("| reference | reference | pass | pass | 4 (SL) |", rep)
+
     def test_program_that_prints_nonsense(self):
         copy = self.root / "nonsense"
         shutil.copytree(self.out, copy)

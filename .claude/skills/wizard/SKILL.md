@@ -5,7 +5,7 @@ description: Open Skill Eval Lite's wizard (wizard.html) in the student's web br
 
 # Using the wizard with the student
 
-<!-- skill-eval-lite wizard, version 1 (Skill Eval Lite 0.2.0) -->
+<!-- skill-eval-lite wizard, version 2 (Skill Eval Lite 0.2.4) -->
 
 The wizard, `wizard.html` in this folder, is one page that opens in a web
 browser and makes no model calls. Freezing, judging and rating happen
@@ -112,12 +112,15 @@ them to export `judgments.csv` from step 4 first and bring it back.
    *Pass*, *Unknown* or *Fail* for each case, with a reason. They decide
    first, before the LLM tests have run (`/run-suites` keeps that order);
    the LLM test's answers appear once they have judged every case.
-3. Step 3, the human tests: pick a human test and rate each case. The cases
-   come shuffled, the control cases mixed in. Their second rater does the
-   same in their own browser and sends their `judgments.csv`.
-4. Step 4, the report: *Import a classmate’s judgments.csv* for the second
-   rater's file, then *Export judgments.csv* and each *Export
-   <suite>-<version>.md*.
+3. Step 3, the human tests: pick a human test and rate each case, with a
+   reason. The cases come shuffled, the control cases mixed in, so the
+   student judges blind. No second rater is needed. Another rater is
+   optional (the brief's "Human calibration" extension, for extra credit):
+   if the student has one, they do the same in their own browser and send
+   their `judgments.csv`.
+4. Step 4, the report: *Import another rater’s judgments.csv* for each
+   other rater's file, if there is one, then *Export judgments.csv* and each
+   *Export <suite>-<version>.md*.
 
 Bring them back. The reports go into the packet's `reports/`. The exported
 `judgments.csv` is added to the packet's, never put over it: the runner may

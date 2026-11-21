@@ -3,9 +3,72 @@ https://github.com/vanderbilt-ms-ai/skill-eval-lite. Version 0.1.0 was
 released on 27 October 2026, versions 0.1.1, 0.1.2 and 0.1.3 on
 3 November 2026, version 0.1.4 on 4 November 2026, version 0.2.0 on
 7 November 2026, version 0.2.1 on 9 November 2026, version 0.2.2 on
-10 November 2026 and version 0.2.3 on 13 November 2026. Each release is one
+10 November 2026, version 0.2.3 on 13 November 2026 and version 0.2.4 on
+21 November 2026. Each release is one
 commit on the public `main`, made from the course's private development
-history and tagged (`v0.1.0` to `v0.2.3`).
+history and tagged (`v0.1.0` to `v0.2.4`).
+
+## 0.2.4, 21 November 2026
+
+Five skills, the wizard and the suite report changed, to match the briefs'
+latest revisions. Personal I needs no second rater now. Until this
+version, the brief asked you to have one classmate judge your human tests
+on their own and to report how often you agreed. Now you make your own
+judgments on each human test, with a reason for each, blind: the wizard
+shuffles the cases with the control cases mixed in, so nothing says which
+is which. The control cases are what check a human test. The reference
+should pass, each planted fault should fail and each harmless variation
+should get the same result as its original. Section 5 of your report,
+"Your own judgment", draws on your own references and on how your own
+judgments did on the control cases. Write your rating instructions so that
+someone else could follow them without asking you, as before.
+
+A second rater is optional, for extra credit. Judgments from one or more
+other people (a classmate, a colleague) on a human test are the brief's
+"Human calibration" extension: 10% of the project's grade. Each of them
+rates the cases on their own, in their own browser, from the bundle your
+last run wrote. Import each one's `judgments.csv` in the wizard's report
+step. Then report how often you agreed, revise the instructions where you
+disagreed and show what changed. `/run-suites` takes you through it. If a
+classmate has already rated your cases, keep their judgments: they are a
+start on the extension.
+
+In both projects, the report is the main thing marked. The packet is its
+evidence: the tests, cases and results (Personal I), or the prompts, runs,
+judgments and analysis (Shared I). Write each section of your report from
+your packet and point to the files it rests on (for Personal I, the cases,
+runs, suite reports and judgments). The rubric's weights are unchanged.
+`/packet` now says which sections of your report point to nothing.
+
+Personal I's 24 November checkpoint now reads: "Your own judgments on each
+human test, made blind with the control cases mixed in; each LLM test
+compared with your own reference; for each test, whether it moved when it
+should and stayed still when it should." The exchange is still optional,
+as in 0.2.3. Everything you have made carries over. To update, in Claude,
+in this folder, type `/check-updates`: it brings in this version and your
+brief folders' newest revisions.
+
+### What changed
+
+| # | Before | In 0.2.4 |
+| --- | --- | --- |
+| 1 | `personal-i` listed a second rater's ratings as part of the human tests and said the brief still asked for one | `personal-i` (version 3): the student's own ratings, each with a reason, made blind; the 24 November checkpoint as it now reads; a second rater is the optional "Human calibration" extension; the report's fifth section draws on the student's own references and the control cases. It offers `/check-updates` if the brief folder still asks for a second rater. The report is the main thing marked: the student writes each section from the packet and points to the cases, runs, suite reports and judgments it rests on |
+| 2 | `run-suites` began the human tests with "the second rater" and checked for both raters' ratings before it finished | `run-suites` (version 3): the student's own ratings first; another rater only if the student chooses the extension, with the same bundle and import as before; a human test's row in the controls table read as how the student's own judgments did |
+| 3 | `wizard` said the second rater does the same in their own browser | `wizard` (version 2): another rater is optional; *Import another rater’s judgments.csv* only if there is one |
+| 4 | `packet` checked each human test for both raters' judgments | `packet` (version 3): checks the student's own judgments with reasons and never lists a second rater as missing; other raters' judgments only if the student did the extension. In both projects it says the report is the main thing marked, with the packet as its evidence. It lists the files a section of the report names that aren't in the packet. It lists the sections that point to nothing |
+| 5 | The wizard asked you to have a classmate rate the same cases and to send them your `judgments.csv` | The wizard says another rater is optional. Its button is *Import another rater’s judgments.csv*. Step 3 says to look in step 4 at how each test did on the control cases |
+| 6 | A suite report with one rater on a human test said "1 rater so far; agreement needs two." | It says "one rater, SL. Another rater is optional: with two or more, their agreement shows here." With none, "no ratings yet." `run_ab.py suite` and the wizard write the same line |
+| 7 | `status` ended Personal I's steps with "Then ask a classmate to rate the same cases." | It ends with "Then read how each test did on the control cases." |
+| 8 | The README's Personal I steps asked for a classmate as second rater | They say a second rater is optional and how to bring one in. The README also says that in both projects the report is the main thing marked, with the packet as its evidence |
+| 9 | `shared-i` said the group writes the report in the brief's six sections | `shared-i` (version 4): the group's report is the main thing marked. The group writes each section from the packet and points to the prompts, runs, judgments and analysis it rests on |
+
+### What was verified for 0.2.4
+
+- `python3 -m unittest`: the whole suite, headless Chrome included, with a
+  new test that one rater is enough (`tests/test_suites.py`) and the
+  wizard's exported reports matching `run_ab.py`'s line for line.
+- `node dev/diagrams.mjs --check`: the two pictures of the human tests and
+  the report step, redrawn from the wizard.
 
 ## 0.2.3, 13 November 2026
 
