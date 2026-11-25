@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="skill-eval-lite-version" content="0.2.4">
+<meta name="skill-eval-lite-version" content="0.2.5">
 <title>Skill Eval Lite</title>
 <!--
   Skill Eval Lite: the wizard. Five steps from an experiment file to results:
@@ -1855,7 +1855,7 @@ const PATHS = {
       see: 'Two answers side by side, under *Held out: the confirmation*.', ifnot: 'No held-out set in step 4? The bundle has no held-out runs yet: load the one Claude made in the step before.',
       pic: () => WZ(4, { kind: 'judge' }) },
     { where: 'web', title: 'Read the confirmation.', click: 'In step 5, read *Held out: the confirmation*, under the main result. Then export `judgments.csv` and `results.json` again.',
-      body: 'It gives the held-out share with its interval, beside the development result for the same comparison. With two prompts the interval is wide: say what it supports.',
+      body: 'It gives the held-out share with its interval, beside the development result for the same comparison (or says the development prompts compared a different pair). Two prompts can’t say much: say what the result supports.',
       see: '“Held out: the confirmation”, with its share and its interval.', ifnot: 'It says the confirmation needs round A run on them too? Ask Claude to run round A on the held-out prompts.',
       pic: () => WZ(5, { kind: 'click', panel: 'Held out: the confirmation', items: ['Judged blind, on the held-out prompts', 'Beside the development result'], buttons: [{ label: 'Export judgments.csv', primary: true }, { label: 'Export results.json' }] }) },
   ] },
@@ -4908,14 +4908,23 @@ function heldSentences(hr) {
   out.push(s.ci.lo > 0.5 ? 'The whole interval is above 50%.' : s.ci.hi < 0.5 ? 'The whole interval is below 50%.'
     : 'The interval includes 50%: on the held-out prompts alone, you can’t tell the two rounds apart.');
   const d = hr.dev && hr.dev.people;
-  if (d) {
-    const what = hr.dev.c.baseline === c.baseline ? 'the same comparison' : 'round ' + c.new + ' against round ' + hr.dev.c.baseline;
+  if (d && hr.dev.c.baseline === c.baseline) {
     const sideOf = x => x > 0.5 ? 1 : x < 0.5 ? -1 : 0, a = sideOf(d.est), b = sideOf(s.est);
-    out.push('On the development prompts, ' + what + ' gave ' + pct(d.est) + ' (' + pct(d.ci.lo) + ' to ' + pct(d.ci.hi) + ').');
+    out.push('On the development prompts, the same comparison gave ' + pct(d.est) + ' (' + pct(d.ci.lo) + ' to ' + pct(d.ci.hi) + ').');
     out.push((a === 0 || b === 0 ? 'One of the two estimates is at 50%.' : a === b ? 'The held-out estimate is on the same side of 50%.' : 'The held-out estimate is on the other side of 50%.')
       + ' The two intervals ' + (d.ci.lo <= s.ci.hi && s.ci.lo <= d.ci.hi ? 'overlap.' : 'don’t overlap.'));
+  } else if (d) {
+    // 0.2.5: the development result here compares the new round with another
+    // round, so it can't be set beside this one as if it were the same test.
+    out.push('On the development prompts, round ' + c.new + ' was judged against round ' + hr.dev.c.baseline + ', not round ' + c.baseline + ': '
+      + pct(d.est) + ' (' + pct(d.ci.lo) + ' to ' + pct(d.ci.hi) + '). That is a different comparison, so this result neither confirms nor contradicts it. '
+      + 'It shows how round ' + c.new + ' compares with round ' + c.baseline + ' on prompts nobody tuned for.');
   }
-  out.push('With ' + n + (n === 1 ? ' prompt' : ' prompts') + ' the interval is wide. Please say what the held-out result supports and what more prompts would settle.');
+  // 0.2.5: an interval with no width means the prompts agreed, not certainty.
+  out.push(s.ci.lo === s.ci.hi
+    ? (n === 1 ? 'With one prompt' : 'Every held-out prompt gave the same result, so') + ' resampling can’t vary the result and the interval has no width. That shows '
+      + (n === 1 ? 'one prompt’s result' : 'these ' + n + ' prompts agreed') + ', not that the result is certain. Please say what the held-out result supports and what more prompts would settle.'
+    : 'The interval comes from ' + (n === 1 ? 'one prompt' : n + ' prompts') + ' only. Please say what the held-out result supports and what more prompts would settle.');
   return out;
 }
 const heldReading = hr => heldSentences(hr).join(' ');

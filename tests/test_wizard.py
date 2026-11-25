@@ -385,6 +385,28 @@ class HeldOutJourney(unittest.TestCase):
         self.assertTrue(b.js("__click('Freeze this demonstration')"))
         b.until("document.querySelector('main').innerText.includes('The record')")
 
+    def test_reading_names_the_comparison(self):
+        """0.2.5: a development result for another pair of rounds is named as a
+        different comparison, not set beside the held-out result as if it were
+        the same test; an interval with no width is read as the prompts
+        agreeing, not as certainty."""
+        b = self.b
+        hr = {"c": {"baseline": "A", "new": "E"},
+              "people": {"prompts": 2, "n": 12, "est": 1, "ci": {"lo": 1, "hi": 1}},
+              "dev": {"c": {"baseline": "B", "new": "E"}, "people": {"est": 0.625, "ci": {"lo": 0.42, "hi": 0.83}}}}
+        text = b.js(f"heldSentences({json.dumps(hr)}).join(' ')")
+        self.assertIn("round E was judged against round B, not round A", text)
+        self.assertIn("neither confirms nor contradicts it", text)
+        self.assertNotIn("same side of 50%", text)
+        self.assertIn("the interval has no width", text)
+        self.assertNotIn("the interval is wide", text)
+        hr["dev"]["c"]["baseline"] = "A"
+        hr["people"]["ci"] = {"lo": 0.6, "hi": 1}
+        text = b.js(f"heldSentences({json.dumps(hr)}).join(' ')")
+        self.assertIn("the same comparison gave 63%", text)
+        self.assertIn("The held-out estimate is on the same side of 50%.", text)
+        self.assertIn("The interval comes from 2 prompts only.", text)
+
     def test_sealed_before_the_runs(self):
         b = self.b
         self.load(self.sealed)

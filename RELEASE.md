@@ -3,10 +3,35 @@ https://github.com/vanderbilt-ms-ai/skill-eval-lite. Version 0.1.0 was
 released on 27 October 2026, versions 0.1.1, 0.1.2 and 0.1.3 on
 3 November 2026, version 0.1.4 on 4 November 2026, version 0.2.0 on
 7 November 2026, version 0.2.1 on 9 November 2026, version 0.2.2 on
-10 November 2026, version 0.2.3 on 13 November 2026 and version 0.2.4 on
-21 November 2026. Each release is one
+10 November 2026, version 0.2.3 on 13 November 2026, version 0.2.4 on
+21 November 2026 and version 0.2.5 on 25 November 2026. Each release is one
 commit on the public `main`, made from the course's private development
-history and tagged (`v0.1.0` to `v0.2.4`).
+history and tagged (`v0.1.0` to `v0.2.5`).
+
+## 0.2.5, 25 November 2026
+
+The wizard's reading of the held-out confirmation changed, in step 5 under
+*Held out: the confirmation*. Nothing else changed: your experiments, runs,
+judgments and results stay as they are.
+
+The confirmation compares round A with your final version on the held-out
+prompts. Until this version, the wizard set it beside your last development
+comparison and said whether the two were on the same side of 50%, even when
+that comparison was a different pair. For example, if your final version E
+was compared with B on the development prompts, the wizard set "E against A"
+beside "E against B" as if one confirmed the other. Now, when the pairs
+differ, it says so: the held-out result neither confirms nor contradicts the
+development one, and it shows how your final version compares with A on
+prompts nobody tuned for. Please name both comparisons in your report.
+
+The wizard also said "the interval is wide" whatever the interval was. When
+every held-out prompt gives the same result (all of the judgments for the
+same side, say), resampling can't vary it and the interval has no width:
+100% to 100%. That shows the prompts agreed, not that the result is certain.
+The wizard now says so. Otherwise it says the interval comes from your
+held-out prompts only.
+
+The read-results skill reads the confirmation the same way.
 
 ## 0.2.4, 21 November 2026
 

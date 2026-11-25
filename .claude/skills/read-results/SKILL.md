@@ -5,7 +5,7 @@ description: Read a Shared I group's results with them once every member has jud
 
 # Reading the results and the next round
 
-<!-- skill-eval-lite read-results, version 1 (Skill Eval Lite 0.2.0) -->
+<!-- skill-eval-lite read-results, version 2 (Skill Eval Lite 0.2.5) -->
 
 You are helping a Shared I group in AI 5500 (Vanderbilt) understand what
 its comparison shows, find where the system fails and decide what to
@@ -155,10 +155,19 @@ in step 5 (in `results.json`, `held_out`) with them:
 - `development`: the development result for the same comparison (or for F
   against the round before it), beside it.
 
-With two prompts the interval is wide. The brief asks the group to "say
-whether the development result held": help them say where the held-out
-estimate lies against 50% and against the development result, without
-rounding either interval into a verdict.
+Check which pair each result compares. The held-out confirmation compares A
+with F. If the development result compares F with the round before it, the
+two are different comparisons: the held-out result neither confirms nor
+contradicts the development one. Say that plainly, name both baselines and
+say what the held-out result shows on its own (F against A on prompts nobody
+tuned for).
+
+With two prompts the interval comes from two prompts only. If both gave the
+same result, the interval has no width: that shows the prompts agreed, not
+that the result is certain. The brief asks the group to "say whether the
+development result held": help them say where the held-out estimate lies
+against 50% and, where the comparison is the same, against the development
+result, without rounding either interval into a verdict.
 
 ## Afterwards
 
